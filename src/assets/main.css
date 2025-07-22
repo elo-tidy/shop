@@ -87,16 +87,16 @@
   --popover-foreground: oklch(0.9845 0.0013 106.42);
   --primary: oklch(0.8601 0.173 91.84);
   --primary-foreground: oklch(0.2854 0.0638 53.82);
-  --secondary: oklch(0.2685 0.0063 34.3);
+  --secondary: oklch(0.2 0 0);
   --secondary-foreground: oklch(0.9845 0.0013 106.42);
-  --muted: oklch(0.2685 0.0063 34.3);
+  --muted: oklch(0.2 0 0);
   --muted-foreground: oklch(0.7159 0.009 56.26);
-  --accent: oklch(0.2685 0.0063 34.3);
+  --accent: oklch(0.2 0 0);
   --accent-foreground: oklch(0.9845 0.0013 106.42);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.8601 0.173 91.84 / 20%);
-  --input: oklch(0.2685 0.0063 34.3);
+  --input: oklch(0.2 0 0);
   --ring: oklch(0.8601 0.173 91.84);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -120,6 +120,75 @@
     @apply border-primary/20;
   }
   body {
-    padding: 2rem 0;
+    > .container {
+      padding: 2rem 0 0 0;
+    }
+  }
+
+  *::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: red;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: yellow;
+    border-radius: 0.5rem;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+  }
+  /**************/
+  /*** Layout ***/
+  /**************/
+  /* Base */
+  #app {
+    height: calc(100dvh - 3rem);
+    overflow: hidden;
+  }
+  main {
+    height: 100%;
+    padding: 2rem;
+    overflow: auto;
+    background-color: var(--secondary);
+    width: 100%;
+  }
+  [data-slot='sidebar-wrapper'] {
+    height: 100%;
+    min-height: inherit !important;
+  }
+
+  /* Header */
+  #skip-links {
+    list-style: none;
+    a {
+      white-space: nowrap;
+      top: 0;
+      position: fixed;
+      left: 0;
+      opacity: 0;
+    }
+    a:focus {
+      opacity: 1;
+      background-color: white;
+      padding: 0.5em;
+      border: 1px solid black;
+    }
+  }
+
+  /* Footer */
+  footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding-left: calc(var(--sidebar-width) + 1rem);
+    padding-right: 1rem;
+    height: 3rem;
+    align-content: center;
   }
 }

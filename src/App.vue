@@ -1,78 +1,46 @@
 <script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import AppSidebar from './components/AppSidebar.vue'
+import AppSidebar from './components/Layout/AppSidebar.vue'
+import Breadcrumbs from './components/Layout/Breadcrumbs.vue'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { useRoute } from 'vue-router'
+import { useTitleStore } from '@/stores/titlesStore'
+import router from '@/router'
+
+const route = useRoute()
+
+const titleStore = useTitleStore()
+
+watch(
+  () => router.currentRoute.value,
+  () => {
+    if (!titleStore.customTitle) {
+      document.title = `Fictive Shop - ${titleStore.title}`
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => titleStore.title,
+  (newTitle) => {
+    document.title = `Fictive Shop - ${newTitle}`
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <SidebarProvider>
     <AppSidebar />
-    <main>
+    <main role="main">
+      <Breadcrumbs />
+      <h1 class="mb-10 text-[30px]">{{ titleStore.title }}</h1>
       <RouterView />
     </main>
+    <footer role="contentinfo" class="border-t text-right">
+      <p>© 2025 Fictive Shop</p>
+    </footer>
   </SidebarProvider>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
