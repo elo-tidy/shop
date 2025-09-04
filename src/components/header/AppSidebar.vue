@@ -1,6 +1,5 @@
 <script setup lang="ts">
-// import SearchForm from '@/components/SearchForm.vue'
-// import VersionSwitcher from '@/components/VersionSwitcher.vue'
+import { ref, watch, onMounted } from 'vue'
 
 import {
   Sidebar,
@@ -15,20 +14,8 @@ import {
   type SidebarProps,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 
-const route = useRoute()
 const backToTop = ref()
-
-watch(
-  () => route.path,
-  () => {
-    backToTop.value.focus()
-  },
-)
-
-// const props = defineProps<SidebarProps>()
 </script>
 
 <template>
@@ -57,7 +44,10 @@ watch(
       <SidebarContent class="px-6">
         <nav role="navigation">
           <ul>
-            <li><RouterLink to="/">Catalogue produits</RouterLink></li>
+            <li>
+              <RouterLink :to="{ name: 'catalogue' }">Catalogue produits</RouterLink>
+            </li>
+
             <li><RouterLink to="/about">About</RouterLink></li>
           </ul>
         </nav>

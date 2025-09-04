@@ -1,4 +1,4 @@
-import type { ProductApi } from '@/types/product'
+import type { ProductApi } from '@/types/Product'
 
 export class Product {
   id: number

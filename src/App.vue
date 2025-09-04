@@ -1,34 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import AppSidebar from './components/Layout/AppSidebar.vue'
-import Breadcrumbs from './components/Layout/Breadcrumbs.vue'
+import AppSidebar from '@/components/header/AppSidebar.vue'
+import Breadcrumbs from '@/components/header/Breadcrumbs.vue'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { useRoute } from 'vue-router'
-import { useTitleStore } from '@/stores/titlesStore'
-import router from '@/router'
+import { useTitleStore } from '@/store/TitlesStore'
 
 const route = useRoute()
 
 const titleStore = useTitleStore()
-
-watch(
-  () => router.currentRoute.value,
-  () => {
-    if (!titleStore.customTitle) {
-      document.title = `Fictive Shop - ${titleStore.title}`
-    }
-  },
-  { immediate: true },
-)
-
-watch(
-  () => titleStore.title,
-  (newTitle) => {
-    document.title = `Fictive Shop - ${newTitle}`
-  },
-  { immediate: true },
-)
 </script>
 
 <template>

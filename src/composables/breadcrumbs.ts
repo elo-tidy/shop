@@ -1,8 +1,7 @@
-// composables/useBreadcrumbs.ts
-import { computed } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useProductStore } from '@/stores/productStore'
-import { watchEffect, ref } from 'vue'
+import { useProductStore } from '@/store/ProductStore'
+import { Category } from '@/models/Category'
 
 export function useBreadcrumbs() {
   const router = useRouter()
@@ -12,13 +11,11 @@ export function useBreadcrumbs() {
   const breadcrumbs = ref<{ name: string; path: string }[]>([])
 
   watchEffect(async () => {
-    let matched = route.matched.filter((routeItem) => routeItem.meta?.breadcrumb)
+    let matched = route.matched.filter((r) => r.meta?.breadcrumb)
 
-    const findCatalogueRoute = () =>
-      router.getRoutes().find((routeItem) => routeItem.meta?.breadcrumb === 'Produits')
-
-    if (route.name === 'product') {
-      const catalogueRoute = findCatalogueRoute()
+    // Inject catalogue page if not matched
+    if (route.name === 'product' || route.name === 'categorie') {
+      const catalogueRoute = router.getRoutes().find((r) => r.meta?.breadcrumb === 'Produits')
 
       if (catalogueRoute) {
         matched = [catalogueRoute, ...matched]
@@ -29,18 +26,40 @@ export function useBreadcrumbs() {
       matched.map(async (routeItem, index) => {
         const isLast = index === matched.length - 1
 
-        if (isLast && 'id' in route.params) {
+        // Cas : Fiche produit
+        if (isLast && route.name === 'product' && 'id' in route.params) {
           const id = route.params.id as string
           let product = productStore.getProductById(id)
 
           if (!product) {
-            await productStore.fetchProducts()
+            productStore.loadProducts()
             product = productStore.getProductById(id)
           }
 
           return {
             name: product?.title ?? 'Produit inconnu',
             path: route.fullPath,
+          }
+        }
+
+        if (isLast && route.name === 'categorie' && 'slug' in route.params) {
+          const slug = route.params.slug as string
+
+          try {
+            const response = await fetch('https://fakestoreapi.com/products/categories')
+            const data: string[] = await response.json()
+            const categories = data.map((item) => new Category(item))
+            const found = categories.find((c) => c.slug === slug)
+
+            return {
+              name: found?.name ?? 'Catégorie inconnue',
+              path: route.fullPath,
+            }
+          } catch (err) {
+            return {
+              name: 'Catégorie inconnue',
+              path: route.fullPath,
+            }
           }
         }
 
