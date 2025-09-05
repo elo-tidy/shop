@@ -6,16 +6,15 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/catalogue',
+      path: '/',
       name: 'catalogue',
       component: ProductList,
-      meta: { title: 'Catalogue', breadcrumb: 'Produits' },
+      meta: { title: 'Catalogue', breadcrumb: 'Catalogue' },
     },
     {
-      path: '/catalogue/product/:id',
+      path: '/product/:id',
       name: 'product',
       component: Product,
-      props: true,
       meta: { title: 'Fiche produit', breadcrumb: 'Détail' },
     },
     {
@@ -30,15 +29,6 @@ const router = createRouter({
     //   component: CategoryList,
     //   meta: { title: 'Page catégorie', breadcrumb: 'Catégorie' },
     // },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('@/views/AboutView.vue'),
-      meta: { title: 'Page About', breadcrumb: 'About' },
-    },
   ],
 })
 

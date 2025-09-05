@@ -6,10 +6,6 @@ import ProductCard from './ProductItem.vue'
 const productStore = useProductStore()
 const nbProduct = computed(() => productStore.filteredProducts.length)
 const wording = computed(() => (nbProduct.value === 1 ? 'Produit' : 'Produits'))
-
-onMounted(() => {
-  productStore.loadProducts()
-})
 </script>
 
 <template>

@@ -5,18 +5,22 @@ import { fetchAllProducts } from '../services/ShopService'
 
 export const useProductStore = defineStore('product', {
   state: () => ({
-    products: [] as Product[],
+    products: [] as ProductApi[],
     isLoading: false,
     error: null as string | null,
     currentCategory: null as string | null,
   }),
   actions: {
     async loadProducts() {
+      if (this.products.length > 0) {
+        return
+      }
       this.isLoading = true
       this.error = null
       try {
         const data: ProductApi[] = await fetchAllProducts()
-        this.products = data.map((item) => new Product(item))
+        // this.products = data.map((item) => new Product(item))
+        this.products = data
       } catch (error: any) {
         console.error('Erreur lors du fetch des produits', error)
         this.error = error.message || 'Erreur inconnue'
