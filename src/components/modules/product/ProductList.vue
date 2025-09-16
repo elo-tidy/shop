@@ -9,14 +9,14 @@ const wording = computed(() => (nbProduct.value === 1 ? 'Produit' : 'Produits'))
 </script>
 
 <template>
-  <p class="mb-4" aria-atomic="true">
-    <span aria-live="polite">{{ nbProduct }}</span> {{ wording }}
-    <span class="sr-only" v-if="productStore.currentCategory !== ''"
+  <p class="mb-4" aria-atomic="true" aria-live="polite">
+    {{ nbProduct }} {{ wording }}
+    <span class="sr-only" v-if="productStore.currentCategory !== null"
       >dans la catégorie {{ productStore.currentCategory }}</span
     >
   </p>
   <div v-if="productStore.isLoading">Chargement des produits...</div>
   <div class="grid grid-cols-3 gap-6" v-else>
-    <ProductCard v-for="product in productStore.filteredProducts" :product />
+    <ProductCard v-for="product in productStore.filteredProducts" :product :key="product.id" />
   </div>
 </template>

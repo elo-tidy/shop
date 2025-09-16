@@ -28,7 +28,7 @@ export const useProductStore = defineStore('product', {
         this.isLoading = false
       }
     },
-    updateCurrentCategory(category: string) {
+    updateCurrentCategory(category: string | null) {
       this.currentCategory = category
     },
   },

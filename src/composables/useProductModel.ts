@@ -3,12 +3,12 @@ import { Product as ProductModel } from '@/models/Product'
 import type { ProductApi } from '@/types/Product'
 
 export function useProductModel(rawProductData: ProductApi) {
-  const product = reactive(new ProductModel(rawProductData))
+  const product = computed(() => new ProductModel(rawProductData))
 
-  const formattedPrice = computed(() => product.formattedPrice)
-  const shortTitle = computed(() => product.shortTitle)
-  const shortDesc = computed(() => product.shortDesc)
-  const imageAlt = computed(() => product.imageAlt)
+  const formattedPrice = computed(() => product.value.formattedPrice)
+  const shortTitle = computed(() => product.value.shortTitle)
+  const shortDesc = computed(() => product.value.shortDesc)
+  const imageAlt = computed(() => product.value.imageAlt)
 
   return {
     product,

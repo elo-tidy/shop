@@ -15,7 +15,7 @@ export function useBreadcrumbs() {
 
     // Inject catalogue page if not matched
     if (route.name === 'product' || route.name === 'categorie') {
-      const catalogueRoute = router.getRoutes().find((r) => r.meta?.breadcrumb === 'Produits')
+      const catalogueRoute = router.getRoutes().find((r) => r.meta?.breadcrumb === 'Catalogue')
 
       if (catalogueRoute) {
         matched = [catalogueRoute, ...matched]

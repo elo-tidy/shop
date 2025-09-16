@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-
+import CartButton from '../modules/cart/CartButton.vue'
 import {
   Sidebar,
   SidebarContent,
@@ -38,17 +38,16 @@ const backToTop = ref()
           width="125"
           height="125"
         />
-
-        <div class="wrapper"></div>
       </SidebarHeader>
       <SidebarContent class="px-6">
         <nav role="navigation">
           <ul>
             <li>
+              <CartButton />
+            </li>
+            <li>
               <RouterLink :to="{ name: 'catalogue' }">Catalogue produits</RouterLink>
             </li>
-
-            <li><RouterLink to="/about">About</RouterLink></li>
           </ul>
         </nav>
       </SidebarContent>

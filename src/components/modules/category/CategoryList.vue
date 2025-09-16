@@ -16,7 +16,7 @@ const filterByCategory = (categorieName: string) => {
 }
 
 const displayAllProduct = (categorieName: string) => {
-  storeProducts.updateCurrentCategory('')
+  storeProducts.updateCurrentCategory(null)
   activeCategory.value = null
 }
 
