@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import router from '@/router'
 
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 
 import type { ProductApi } from '@/types/Product'
 import type { CartType } from '@/types/Cart'
-import type { Session } from '@supabase/supabase-js'
 
 import { useCartStore } from '@/store/CartStore'
 import { useCartModel } from '@/composables/useCartModel'
@@ -13,6 +14,7 @@ import { useSupabaseSession } from '@/composables/useSupabaseSession'
 
 const cartStore = useCartStore()
 const { session } = useSupabaseSession()
+const route = useRoute()
 
 const props = defineProps<{
   cart: CartType
@@ -32,7 +34,7 @@ const cta = computed(() => {
   if (session.value?.user.aud === 'authenticated') {
     return {
       wording: 'Finaliser ma commande',
-      link: { name: 'order' },
+      link: { name: 'order', query: { step: '1' } },
     }
   } else {
     return {
@@ -59,7 +61,7 @@ const cta = computed(() => {
         {{ dataCart?.orderPrice }} €
       </p>
 
-      <p v-if="layout !== 'check'">
+      <p v-if="layout !== 'check' && route.name !== 'order'">
         <RouterLink :to="cta.link" id="order" class="btn">{{ cta.wording }} </RouterLink>
       </p>
     </div>

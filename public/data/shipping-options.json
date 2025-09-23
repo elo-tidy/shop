@@ -1,0 +1,34 @@
+[
+  {
+    "id": "colissimo_standard",
+    "label": "Colissimo Standard",
+    "carrier": "La Poste",
+    "price": 5.9,
+    "estimate": "2 à 3 jours ouvrés",
+    "description": "Livraison à domicile sans signature. Suivi inclus."
+  },
+  {
+    "id": "chronopost_express",
+    "label": "Chronopost Express",
+    "carrier": "Chronopost",
+    "price": 12.9,
+    "estimate": "24h (jour ouvré)",
+    "description": "Livraison express à domicile avec signature. Suivi en temps réel."
+  },
+  {
+    "id": "mondialrelay_pointrelais",
+    "label": "Mondial Relay - Point Relais",
+    "carrier": "Mondial Relay",
+    "price": 3.9,
+    "estimate": "3 à 5 jours",
+    "description": "Retrait dans le point relais de votre choix."
+  },
+  {
+    "id": "retrait_magasin",
+    "label": "Retrait en magasin",
+    "carrier": "Boutique",
+    "price": 0.0,
+    "estimate": "Sous 2 heures",
+    "description": "Disponible dans la boutique de votre choix. Sur présentation d'une pièce d'identité."
+  }
+]
