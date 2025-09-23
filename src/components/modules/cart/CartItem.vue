@@ -1,24 +1,67 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { Button } from '@/components/ui/button'
-import { useCartStore } from '@/store/CartStore'
+import { computed, ref } from 'vue'
+
 import ProductItem from '@/components/modules/product/ProductItem.vue'
+
+import type { ProductApi } from '@/types/Product'
+import type { CartType } from '@/types/Cart'
+import type { Session } from '@supabase/supabase-js'
+
+import { useCartStore } from '@/store/CartStore'
+import { useCartModel } from '@/composables/useCartModel'
+import { useSupabaseSession } from '@/composables/useSupabaseSession'
+
 const cartStore = useCartStore()
-const wordingNbItem = computed(() => (cartStore.getCartTotaLItems === 1 ? 'article' : 'articles'))
+const { session } = useSupabaseSession()
+
+const props = defineProps<{
+  cart: CartType
+  layout?: 'check'
+}>()
+
+const dataCart = computed(() => {
+  return props.cart ? useCartModel(props.cart) : null
+})
+
+const layout = computed(() => (props.layout ? props.layout : 'cart'))
+
+const product_list = computed<ProductApi[]>(() =>
+  props.cart?.products ? props.cart?.products : cartStore.cart.products,
+)
+const cta = computed(() => {
+  if (session.value?.user.aud === 'authenticated') {
+    return {
+      wording: 'Finaliser ma commande',
+      link: { name: 'order' },
+    }
+  } else {
+    return {
+      wording: 'Valider mon panier',
+      link: { name: 'auth', query: { history: 'order' } },
+    }
+  }
+})
 </script>
+
 <template>
-  <div v-if="cartStore.cart.products.length" class="shoping-cart">
+  <div v-if="product_list.length" class="shoping-cart">
     <ul class="grid border bg-background">
-      <li class="not-first:border-t p-5" v-for="item in cartStore.cart.products" :key="item.id">
-        <productItem :product="item" layout="cart" />
+      <li class="not-first:border-t p-5" v-for="item in product_list" :key="item.id">
+        <productItem :product="item" :layout="layout" />
       </li>
     </ul>
     <div class="text-right">
       <p class="total">
-        <span>Sous-total ({{ cartStore.getCartTotaLItems }} {{ wordingNbItem }}) :</span>
-        {{ cartStore.getCartTotalPrice }} €
+        <span
+          >Sous-total ({{ dataCart?.totalNumberOfItem }} {{ dataCart?.wordingTotalNumberOfItem }})
+          :</span
+        >
+        {{ dataCart?.orderPrice }} €
       </p>
-      <Button id="order" type="button" class="text-right">Passer commande</Button>
+
+      <p v-if="layout !== 'check'">
+        <RouterLink :to="cta.link" id="order" class="btn">{{ cta.wording }} </RouterLink>
+      </p>
     </div>
   </div>
   <div v-else class="empty-cart">

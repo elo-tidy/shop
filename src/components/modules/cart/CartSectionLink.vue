@@ -1,10 +1,11 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/store/CartStore'
-import { computed } from 'vue'
+import { useCartModel } from '@/composables/useCartModel'
+
 const cartStore = useCartStore()
-const totalItems = computed(() => cartStore.getCartTotaLItems)
-const totalItemsText = computed(() => (totalItems.value > 1 ? 'articles' : 'article'))
+const { totalNumberOfItem, wordingTotalNumberOfItem } = useCartModel(cartStore.cart)
 </script>
 <template>
   <RouterLink
@@ -15,6 +16,8 @@ const totalItemsText = computed(() => (totalItems.value > 1 ? 'articles' : 'arti
   >
     <span class="sr-only">Voir </span>
     Mon Panier
-    <Badge as="span" class="p-0" v-if="totalItems">({{ totalItems }} {{ totalItemsText }})</Badge>
+    <Badge as="span" class="p-0" v-if="totalNumberOfItem"
+      >({{ totalNumberOfItem }} {{ wordingTotalNumberOfItem }})</Badge
+    >
   </RouterLink>
 </template>

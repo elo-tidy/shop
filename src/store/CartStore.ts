@@ -5,8 +5,12 @@ import type { Product } from '@/models/Product'
 import type { ProductApi } from '@/types/Product'
 
 export const useCartStore = defineStore('cart', {
-  state: () => ({
-    cart: new Cart(),
+  state: (): { cart: Cart } => ({
+    cart: new Cart({
+      cart_id: null,
+      status: null,
+      products: [],
+    }),
   }),
   persist: true,
   actions: {
@@ -19,17 +23,16 @@ export const useCartStore = defineStore('cart', {
     updateItemQuantity(productId: number, addOrRemove: string) {
       this.cart.updateItemQuantity(productId, addOrRemove)
     },
+    clearCartStore() {
+      this.cart.deleteItemsFromCart()
+    },
   },
   getters: {
     getCartTotaLItems: (state) => {
-      return state.cart.products?.reduce((totalItems, product) => {
-        return totalItems + product.quantity
-      }, 0)
+      return state.cart.totalNumberOfItem
     },
     getCartTotalPrice: (state) => {
-      return state.cart.products?.reduce((totalPrice, product) => {
-        return Math.round((totalPrice + product.quantity * product.price) * 100) / 100
-      }, 0)
+      return state.cart.totalPrice
     },
   },
 })

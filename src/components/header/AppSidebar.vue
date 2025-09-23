@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import CartButton from '../modules/cart/CartButton.vue'
+import CartButton from '@/components/modules/cart/CartSectionLink.vue'
+import userInfo from '@/components/modules/user/UserDisplay.vue'
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +15,8 @@ import {
   type SidebarProps,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { useSupabaseSession } from '@/composables/useSupabaseSession'
+const { session } = useSupabaseSession()
 
 const backToTop = ref()
 </script>
@@ -42,6 +45,9 @@ const backToTop = ref()
       <SidebarContent class="px-6">
         <nav role="navigation">
           <ul>
+            <li v-if="session">
+              <userInfo />
+            </li>
             <li>
               <CartButton />
             </li>

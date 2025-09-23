@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
 import ProductItem from '@/components/modules/product/ProductItem.vue'
+
 import { useProductStore } from '@/store/ProductStore'
-import type { Product } from '@/models/Product'
+import type { ProductApi } from '@/types/Product'
 
 const route = useRoute()
 const router = useRouter()
 const store = useProductStore()
 
-const product = ref<Product | null>(null)
+const product = ref<ProductApi | null>(null)
 
 onMounted(async () => {
   const id = route.params.id?.toString()

@@ -9,6 +9,7 @@ export function useProductModel(rawProductData: ProductApi) {
   const shortTitle = computed(() => product.value.shortTitle)
   const shortDesc = computed(() => product.value.shortDesc)
   const imageAlt = computed(() => product.value.imageAlt)
+  const quantity = computed(() => product.value.quantity)
 
   return {
     product,
@@ -16,5 +17,6 @@ export function useProductModel(rawProductData: ProductApi) {
     shortTitle,
     shortDesc,
     imageAlt,
+    quantity,
   }
 }

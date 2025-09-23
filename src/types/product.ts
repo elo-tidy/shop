@@ -5,4 +5,5 @@ export interface ProductApi {
   description: string
   image: string
   category: string
+  quantity?: number
 }

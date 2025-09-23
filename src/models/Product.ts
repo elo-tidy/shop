@@ -7,6 +7,7 @@ export class Product {
   description: string
   image: string
   category: string
+  quantity?: number
 
   constructor(data: ProductApi) {
     this.id = data.id ?? 0
@@ -15,6 +16,7 @@ export class Product {
     this.description = data.description ?? ''
     this.image = data.image ?? ''
     this.category = data.category ?? ''
+    this.quantity = data.quantity ?? 0
   }
 
   get formattedPrice(): string {
@@ -31,5 +33,9 @@ export class Product {
 
   get imageAlt(): string {
     return `Image du produit : ${this.title}`
+  }
+
+  get itemQuantity(): number {
+    return this.quantity ?? 0
   }
 }

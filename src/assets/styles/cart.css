@@ -34,5 +34,6 @@
   }
   #order {
     margin-top: calc(var(--spacing) * 11);
+    display: inline-block;
   }
 }

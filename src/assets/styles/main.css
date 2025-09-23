@@ -89,7 +89,7 @@
   --primary-foreground: oklch(0.2854 0.0638 53.82);
   --secondary: oklch(0.2 0 0);
   --secondary-foreground: oklch(0.9845 0.0013 106.42);
-  --muted: oklch(0.2 0 0);
+  --muted: oklch(0.8601 0.173 91.84 / 10%);
   --muted-foreground: oklch(0.7159 0.009 56.26);
   --accent: oklch(0.2 0 0);
   --accent-foreground: oklch(0.9845 0.0013 106.42);
@@ -124,8 +124,23 @@
       padding: 2rem 0 0 0;
     }
   }
-  button {
+  button,
+  [type='submit'] {
     cursor: pointer;
+  }
+  [type='submit'],
+  .btn {
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    padding-block: calc(var(--spacing) * 2);
+    padding-inline: calc(var(--spacing) * 4);
+    font-weight: var(--font-weight-medium);
+  }
+
+  form legend {
+    margin-block: calc(var(--spacing) * 5);
   }
 
   *::-webkit-scrollbar {
@@ -163,6 +178,26 @@
   [data-slot='sidebar-wrapper'] {
     height: 100%;
     min-height: inherit !important;
+  }
+
+  .loader {
+    width: 50px;
+    --b: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    padding: 1px;
+    background: conic-gradient(#0000 10%, var(--color-primary)) content-box;
+    -webkit-mask:
+      repeating-conic-gradient(#0000 0deg, #000 1deg 20deg, #0000 21deg 36deg),
+      radial-gradient(farthest-side, #0000 calc(100% - var(--b) - 1px), #000 calc(100% - var(--b)));
+    -webkit-mask-composite: destination-in;
+    mask-composite: intersect;
+    animation: l4 1s infinite steps(10);
+  }
+  @keyframes l4 {
+    to {
+      transform: rotate(1turn);
+    }
   }
 
   /* Header */
