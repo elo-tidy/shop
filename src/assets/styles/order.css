@@ -1,31 +1,37 @@
 #order-shipping-mode {
-  li {
+  h3[data-state='active'] button {
+    border-width: 1px;
+    border-style: dashed;
+    border-color: var(--color-primary);
+    color: var(--color-foreground);
+  }
+  [data-slot='tabs-content'] li {
     position: relative;
     span {
-      display: block;
       font-size: 12px;
     }
-    .label {
-      text-align: center;
-    }
-    .price {
-      color: var(--color-primary);
-      text-align: center;
-    }
-    .desc {
-      margin-top: calc(var(--spacing) * 5);
-      text-wrap: balance;
-    }
     button {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: relative;
+      &:is(:hover, :focus),
       &.selected {
+        background-color: transparent;
         border-color: var(--color-primary);
-        background-color: var(--color-input);
+      }
+      &:is(:hover, :focus)&::before,
+      &.selected::before {
+        border-color: var(--color-primary);
+        background-color: var(--color-primary);
+      }
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        transform: translateY(-50%);
       }
     }
   }

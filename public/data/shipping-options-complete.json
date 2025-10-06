@@ -27,6 +27,20 @@
           "estimated_delivery_time": "3-5 jours ouvrés"
         }
       ]
+    },
+    {
+      "id": "pickup_point",
+      "name": "Livraison en point relais",
+      "description": "Retirez votre colis dans un point relais proche de chez vous.",
+      "transporters": [
+        {
+          "id": "mondial_relay",
+          "name": "Mondial Relay",
+          "price": 5.5,
+          "currency": "€",
+          "estimated_delivery_time": "3-5 jours ouvrés"
+        }
+      ]
     }
   ]
 }

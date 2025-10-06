@@ -1,0 +1,1820 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2025-09-30T10:34:45Z",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6850577, 48.1377542]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1766615, 49.1249035]
+      },
+      "properties": {
+        "brand": "Vinted Go",
+        "opening_hours": "24/7",
+        "operator": "Vinted"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2717423, 48.9014355]
+      },
+      "properties": {
+        "brand": "Auchan",
+        "opening_hours": "Mo-Sa 10:00-21:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3415523, 48.8480626]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "Mo-Sa 08:00-22:30",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.2584588, 43.5282766]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.1067763, 44.1099624]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "Mo-Sa 07:00-12:00,15:30-19:00; Su 07:00-12:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1833081, 48.6595445]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5394761, 47.2074854]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5594889, 47.2182013]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "06:00-24:00",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.3458708, 43.5827406]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.4184898, 43.5567906]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "InPost"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.4619856, 43.5190096]
+      },
+      "properties": {
+        "brand": "InPost",
+        "opening_hours": "24/7",
+        "operator": "InPost"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.3619538, 43.4199511]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "InPost"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0992126, 48.9975001]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1774494, 49.1095483]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "Mo-Su 05:30-23:59",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.1183589, 43.5868617]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1685356, 48.6672968]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6774557, 48.1033907]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.7066952, 48.1003275]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8477712, 45.7495507]
+      },
+      "properties": {
+        "brand": "Casino",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.3701235, 43.6558045]
+      },
+      "properties": {
+        "brand": "Speed Queen",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "operator": "Speed Queen"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2376792, 46.1996239]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.1546183, 50.6407868]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "Mo,We,Fr 07:30-13:00,15:00-18:30; Tu 07:00-13:00,15:00-18:30; Th 07:30-13:00; Sa 08:30-13:00,15:00-18:00; PH off; 2021 Dec 31 07:30-13:00,15:00-17:00; 2021 Dec 27 off",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.6189961, 44.7977677]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.094542, 49.1166142]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Fr 08:30-20:30; Sa 08:30-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1828003, 48.6477942]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "Thiriet"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.489, 43.6091692]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2355036, 48.7078985]
+      },
+      "properties": {
+        "brand": "Pickup La Poste",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2355345, 48.7078668]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5430401, 47.2171649]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1771309, 44.0700821]
+      },
+      "properties": {
+        "brand": "Intermarché",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.0454869, 47.3426087]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1610463, 48.6851081]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:00-21:00, Su 08:30-13:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.0383941, 49.2568216]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3753749, 48.8251816]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "Mo-Su 06:00-22:00",
+        "operator": "Colissimo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5327664, 47.2417727]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8667007, 45.7712725]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.828674, 45.7797361]
+      },
+      "properties": {
+        "brand": "Casino",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.811043, 48.3754432]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5688285, 48.6285117]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5690413, 48.6280412]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.7113148, 45.1885774]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 09:00-20:00; Su 09:00-13:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.22211, 44.0880647]
+      },
+      "properties": {
+        "brand": "Amazon",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.4778443, 43.5466846]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "Mo-Sa 08:00-20:00;Su 09:00-12:45",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.5847953, 47.4490563]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2667397, 46.1982992]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:00-20:00; Su 08:00-13:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2413725, 46.1936609]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.1977797, 48.677731]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.889705, 47.925248]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5507996, 47.2241769]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Fr 09:00-20:15; Sa 09:00-20:00; Su 09:30-12:30",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5512127, 47.2107411]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:30-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.554283, 47.2302377]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6183891, 47.2111867]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6062235, 47.2146117]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6037947, 47.2205446]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Su 07:00-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5427476, 47.2267707]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:30-20:00; Su 09:00-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5721232, 47.1940432]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5449122, 47.2022187]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 09:00-13:30,15:30-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5547988, 47.2479413]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5358284, 47.2055452]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:00-22:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5904266, 47.2620994]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5453467, 47.1616255]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 09:00-21:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.8998797, 47.9098472]
+      },
+      "properties": {
+        "brand": "Decathlon",
+        "opening_hours": "24/7",
+        "operator": "Decathlon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5774966, 44.3618128]
+      },
+      "properties": {
+        "brand": "Spar",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1958715, 48.6952682]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:30-20:30; Su 09:00-13:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.1819525, 49.2114827]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1978995, 49.1010751]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2902974, 48.9317868]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.142892, 43.6784602]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon Locker"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.9796508, 43.6506689]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon Locker"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.1279665, 43.6760499]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon Locker"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.0113793, 47.3326875]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.699972, 46.8440387]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.9068422, 47.9265234]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8447606, 45.7977162]
+      },
+      "properties": {
+        "brand": "Pickup Station",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2576335, 48.9897481]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-4.4892628, 48.4128304]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.9407916, 43.6422919]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon Locker"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2578408, 48.7263376]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.811245, 48.3753792]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "Pickup"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.8219806, 46.463647]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.8951175, 43.9061987]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1804831, 49.0998898]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4582425, 48.8963808]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Su 05:00-23:59",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3902838, 48.9768552]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4792047, 48.8944186]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "Mo-Su 08:00-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3228144, 49.0450331]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon Locker - boylan"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4900214, 49.1387593]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3708096, 48.9631491]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5251848, 49.0989219]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.7957763, 45.7743331]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4252148, 48.9308307]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3621574, 48.9179941]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5671158, 48.9447095]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.6030741, 48.9532956]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2612697, 48.9080462]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Sa 08:00-21:00; Su 09:00-20:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5121006, 48.9630179]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.2231773, 50.5663972]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2641914, 48.9701373]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4560493, 49.1780012]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.462449, 49.1899798]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.593288, 49.2107581]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0997294, 49.4233151]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0883766, 49.4264636]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.8871073, 49.2312171]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3374657, 48.9756721]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.9292346, 46.1845014]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2574278, 48.9467802]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5586471, 44.2944996]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.6527337, 44.8924613]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.667427, 44.8921622]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.1985941, 48.8717698]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.2840147, 48.9304423]
+      },
+      "properties": {
+        "brand": "Colissimo",
+        "opening_hours": "Mo-Su 05:00-01:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.6000441, 47.2066315]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "Mo-Sa 08:30-20:00",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.8758786, 42.6693214]
+      },
+      "properties": {
+        "brand": "Leroy Merlin",
+        "opening_hours": "Mo-Sa 08:00-20:00; Su 09:00-18:00",
+        "operator": "Leroy Merlin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5596543, 47.1776406]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "Mondial Relais"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.0580648, 44.0565423]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.0536865, 44.0548715]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "Mondiale Relais"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.7062582, 48.6042897]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.7062797, 48.6043118]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5369929, 47.2052091]
+      },
+      "properties": {
+        "brand": "chronopost;colissimo",
+        "opening_hours": "24/7",
+        "operator": "La Poste"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5370466, 47.2051945]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "InPost"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.1699233, 49.3541418]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.4565677, 43.5694694]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5308144, 47.2239564]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "Mo-Sa 08:30-20:30",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.5524671, 46.6682267]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.2993473, 49.1891156]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.4993621, 48.2239338]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8390915, 45.8724772]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8495787, 43.8877424]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.7861499, 43.9223686]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Su 05:00-23:59",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [0.7382607, 45.8818035]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.1985682, 48.8717768]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3284923, 48.786147]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.572154, 48.1096895]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.6682235, 48.4305032]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.3505728, 48.0830067]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.8933043, 48.3776561]
+      },
+      "properties": {
+        "brand": "Amazon",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.8571676, 47.5636474]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.191346, 48.577019]
+      },
+      "properties": {
+        "brand": "Amazon Hub Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.6904478, 45.1235984]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "Mo 14:00-18:00; Tu-Fr 08:00-12:00,14:00-18:00; Sa 09:00-12:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.7435132, 45.163003]
+      },
+      "properties": {
+        "brand": null,
+        "opening_hours": "24/7",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.3334945, 43.9849619]
+      },
+      "properties": {
+        "brand": "Decathlon",
+        "opening_hours": "24/7",
+        "operator": "Decathlon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.5298824, 47.2085749]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "Mo-Su 07:00-20:00",
+        "operator": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.48235, 46.3357568]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "24/7",
+        "operator": "Mondial Relay"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3219709, 49.0659984]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.0855274, 45.9219704]
+      },
+      "properties": {
+        "brand": "Leroy-Merlin",
+        "opening_hours": "24/7",
+        "operator": "Leroy-Merlin"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.8672545, 45.738565]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3378409, 49.0326273]
+      },
+      "properties": {
+        "brand": "Amazon Locker",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.1942294, 48.9134779]
+      },
+      "properties": {
+        "brand": "Amazon Hub",
+        "opening_hours": "24/7",
+        "operator": "Amazon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [6.2534067, 46.1960257]
+      },
+      "properties": {
+        "brand": "Mondial Relay",
+        "opening_hours": "Mo-Su 09:00-20:00",
+        "operator": null
+      }
+    }
+  ]
+}

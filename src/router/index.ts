@@ -4,7 +4,6 @@ import Product from '@/views/ProductView.vue'
 import Cart from '@/views/CartView.vue'
 import Auth from '@/views/AuthView.vue'
 import Checkout from '@/views/CheckoutView.vue'
-import Order from '@/views/OrderView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,12 +36,6 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: Checkout,
-      meta: { title: 'Vérification du panier', breadcrumb: 'Vérification du panier' },
-    },
-    {
-      path: '/order',
-      name: 'order',
-      component: Order,
       meta: { title: 'Passation de commande', breadcrumb: 'Commande en cours' },
     },
 

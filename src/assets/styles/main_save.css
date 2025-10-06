@@ -40,24 +40,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-  @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--reka-accordion-content-height);
-    }
-  }
-  @keyframes accordion-up {
-    from {
-      height: var(--reka-accordion-content-height);
-    }
-    to {
-      height: 0;
-    }
-  }
 }
 
 :root {
@@ -225,17 +207,6 @@
     mask-composite: intersect;
     animation: l4 1s infinite steps(10);
   }
-  .isLoading::before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    background-color: rgba(var(--color-background), 0.2);
-    @apply bg-background/80;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-  }
   @keyframes l4 {
     to {
       transform: rotate(1turn);
@@ -281,14 +252,5 @@
     padding-right: 1rem;
     height: 3rem;
     align-content: center;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

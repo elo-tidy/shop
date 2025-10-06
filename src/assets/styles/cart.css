@@ -20,7 +20,7 @@
 }
 .shoping-cart {
   .total {
-    padding-inline: calc(var(--spacing) * 11);
+    padding-inline: calc(var(--spacing) * 6);
     padding-block: calc(var(--spacing) * 3);
     background-color: var(--color-background);
     border-width: 1px;
@@ -28,8 +28,5 @@
     border-style: var(--tw-border-style);
     border-top: 0;
     font-weight: bold;
-    span {
-      padding-right: calc(var(--spacing) * 11);
-    }
   }
 }

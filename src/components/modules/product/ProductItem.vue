@@ -38,7 +38,7 @@ const {
 const hn = layout.value === 'detail' ? 1 : undefined
 
 const productTitleWrapper = computed(() => {
-  return layout.value !== 'detail' ? RouterLink : 'span'
+  return layout.value !== 'detail' && layout.value !== 'check' ? RouterLink : 'span'
 })
 const productTitleWrapperProps = computed(() => {
   return productTitleWrapper.value !== 'span' ? { to: `/product/${modelProduct.value.id}` } : null
@@ -68,8 +68,11 @@ const productFooter = computed(() => {
 })
 </script>
 <template>
-  <Card v-if="product" :class="['py-0 relative card', layout]">
-    <CardHeader class="px-6">
+  <Card
+    v-if="product"
+    :class="['py-0 relative card', layout, layout === 'check' ? 'gap-0' : 'gap-2']"
+  >
+    <CardHeader class="card-header">
       <ProductTitle :hn="hn">
         <component :is="productTitleWrapper" v-bind="productTitleWrapperProps">
           {{ productContent.productTitle }}

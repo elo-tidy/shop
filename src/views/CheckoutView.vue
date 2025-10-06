@@ -1,50 +1,78 @@
-<script setup>
-import { watch, ref } from 'vue'
+<script lang="ts" setup>
+// Ui
+import { Button } from '@/components/ui/button'
+import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'
+import Step from '@/components/modules/checkout/CheckoutStep.vue'
+import CheckoutSummary from '@/components/modules/checkout/CheckoutSummary.vue'
 
-import CartItem from '@/components/modules/cart/CartItem.vue'
-import { toast } from 'vue-sonner'
+// Stores
+import { useCartStore } from '@/store/CartStore'
+import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
-import { inserCartService, getLastCartDetail } from '@/services/SupabaseServices'
-import { useCartStore } from '@/store/CartStore.ts'
-import { useSupabaseSession } from '@/composables/useSupabaseSession'
+// Utilities
 import { useCartModel } from '@/composables/useCartModel'
 
+// Data : Store
 const cartStore = useCartStore()
-const cartDetail = cartStore.cart
-const { session } = useSupabaseSession()
-const order = ref(null)
+const { cart: productInCart } = useCartModel(cartStore.cart)
+const stepStore = usecheckoutStepper()
+const steps = stepStore.steps
 
-watch(
-  () => session.value?.user?.id,
-  async (userId) => {
-    if (userId && cartDetail.products.length) {
-      try {
-        //Insert into BDD
-        await inserCartService(userId, { products: cartDetail.products })
-        // Empty store
-        await cartStore.clearCartStore()
-        // Display order
-        const latestOrder = await getLastCartDetail(userId)
-        order.value = latestOrder
-      } catch (error) {
-        toast(error.message)
-      }
-    }
-  },
-  { immediate: true },
-)
+// Navigate within validated steps
+const GoToStep = (stepNumber: number) => {
+  stepStore.changeStep(stepNumber)
+}
+const nextStep = (stepNumber: number) => {
+  stepStore.incrementStep(stepNumber)
+}
+const prevtStep = () => {
+  stepStore.decrementStep()
+}
 </script>
-
 <template>
-  <h1 class="mb-10 text-[30px]">Vérification de mon panier</h1>
+  <div class="grid gap-10 grid-cols-2">
+    <div>
+      <div class="grid">
+        <h1 class="mt-10 mb-5 text-[30px]">Commande</h1>
+        <Stepper :productInCart :GoToStep="GoToStep" />
+      </div>
 
-  <template v-if="order">
-    <CartItem :cart="order" layout="check" />
-  </template>
-  <template v-else>
-    <div class="loader-wrapper grid auto-cols-max grid-flow-col gap-4 iplace-items-center">
-      <div class="loader"></div>
-      <p>Données en cours de chargement</p>
-    </div></template
-  >
+      <template v-for="stepDetail in steps">
+        <Step
+          v-if="stepStore.step === stepDetail.step"
+          :title="stepDetail.description"
+          :step="stepDetail.step"
+        >
+          <template #default="{ content }">
+            <component :is="content" />
+          </template>
+        </Step>
+      </template>
+
+      <div
+        :class="['grid grid-flow-col', stepStore.step != 0 ? 'justify-between ' : 'justify-end']"
+        v-if="productInCart.products.length"
+      >
+        <Button
+          v-if="stepStore.step > 0 && stepStore.step < steps.length"
+          type="button"
+          class="btn"
+          @click="prevtStep()"
+          >Revenir à l'étape précédente</Button
+        >
+        <Button
+          v-if="stepStore.step < steps.length - 1"
+          type="button"
+          class="btn"
+          @click="nextStep(stepStore.step)"
+          :disabled="!stepStore.carrier && stepStore.step === 1"
+          >Passer à l'étape suivante</Button
+        >
+        <!-- :disabled="!selectedCarrier && stepStore.step === 2" -->
+      </div>
+    </div>
+    <div>
+      <CheckoutSummary :GoToStep="GoToStep" />
+    </div>
+  </div>
 </template>
