@@ -7,15 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-.DS_Store
+# Node modules
+client/node_modules/
+server/node_modules/
+
+# Environnement
+client/*.local
+client/.env
+server/*.local
+server/.env
+
+# Dossiers de build
+client/dist/
+server/dist/
 dist
 dist-ssr
 coverage
-*.local
-
-/cypress/videos/
-/cypress/screenshots/
 
 # Editor directories and files
 .vscode/*
@@ -26,5 +33,8 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-
 *.tsbuildinfo
+
+# MacOS
+.DS_Store
+
