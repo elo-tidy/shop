@@ -26,9 +26,6 @@ importers:
       '@vee-validate/zod':
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.22(typescript@5.8.3))(zod@4.1.11)
-      '@vue-stripe/vue-stripe':
-        specifier: ^4.5.0
-        version: 4.5.0
       '@vueuse/core':
         specifier: ^13.9.0
         version: 13.9.0(vue@3.5.22(typescript@5.8.3))
@@ -1301,9 +1298,6 @@ packages:
   '@speed-highlight/core@1.2.7':
     resolution: {integrity: sha512-0dxmVj4gxg3Jg879kvFS/msl4s9F3T9UXC1InxgOf7t5NvcPD97u/WTA5vL/IxWHMn7qSxBozqrnnE2wvl1m8g==}
 
-  '@stripe/stripe-js@1.54.2':
-    resolution: {integrity: sha512-R1PwtDvUfs99cAjfuQ/WpwJ3c92+DAMy9xGApjqlWQMj0FKQabUAys2swfTRNzuYAYJh7NqK2dzcYVNkKLEKUg==}
-
   '@stripe/stripe-js@5.10.0':
     resolution: {integrity: sha512-PTigkxMdMUP6B5ISS7jMqJAKhgrhZwjprDqR1eATtFfh0OpKVNp110xiH+goeVdrJ29/4LeZJR4FaHHWstsu0A==}
     engines: {node: '>=12.16'}
@@ -1603,9 +1597,6 @@ packages:
     peerDependenciesMeta:
       vue:
         optional: true
-
-  '@vue-stripe/vue-stripe@4.5.0':
-    resolution: {integrity: sha512-BU449XT5zegjNQirl+SSztbzGIvPjhxlHv8ybomSZcI1jB6qEpLgpk2eHMFDKnOGZZRhqtg4C5FiErwSJ/yuRw==}
 
   '@vue/babel-helper-vue-transform-on@1.5.0':
     resolution: {integrity: sha512-0dAYkerNhhHutHZ34JtTl2czVQHUNWv6xEbkdF5W+Yrv5pCWsqjeORdOgbtW2I9gWlt+wBmVn+ttqN9ZxR5tzA==}
@@ -4710,9 +4701,6 @@ packages:
   vue-bundle-renderer@2.2.0:
     resolution: {integrity: sha512-sz/0WEdYH1KfaOm0XaBmRZOWgYTEvUDt6yPYaUzl4E52qzgWLlknaPPTTZmp6benaPTlQAI/hN1x3tAzZygycg==}
 
-  vue-coerce-props@1.0.0:
-    resolution: {integrity: sha512-4fdRMXO6FHzmE7H4soAph6QmPg3sL/RiGdd+axuxuU07f02LNMns0jMM88fmt1bvSbN+2Wyd8raho6p6nXUzag==}
-
   vue-demi@0.14.10:
     resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
     engines: {node: '>=12'}
@@ -6120,8 +6108,6 @@ snapshots:
   '@speed-highlight/core@1.2.7':
     optional: true
 
-  '@stripe/stripe-js@1.54.2': {}
-
   '@stripe/stripe-js@5.10.0': {}
 
   '@stripe/stripe-js@8.0.0': {}
@@ -6474,11 +6460,6 @@ snapshots:
     optionalDependencies:
       vue: 3.5.22(typescript@5.8.3)
     optional: true
-
-  '@vue-stripe/vue-stripe@4.5.0':
-    dependencies:
-      '@stripe/stripe-js': 1.54.2
-      vue-coerce-props: 1.0.0
 
   '@vue/babel-helper-vue-transform-on@1.5.0': {}
 
@@ -10056,8 +10037,6 @@ snapshots:
     dependencies:
       ufo: 1.6.1
     optional: true
-
-  vue-coerce-props@1.0.0: {}
 
   vue-demi@0.14.10(vue@3.5.22(typescript@5.8.3)):
     dependencies:
