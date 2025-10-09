@@ -34,18 +34,30 @@ const getStepState = (index: number): 'completed' | 'active' | 'inactive' => {
   if (index === 0 || steps[index - 1]?.stepValidated) return 'active'
   return 'inactive'
 }
-const isStepClickable = (stepItem: stepType, index: number) => {
+const isStepClickable = (stepItem: stepType, index: number): boolean => {
   const currentStep = stepStore.step
+  const lastStepIndex = steps.length - 1
+  const lastStep = steps[lastStepIndex]
+  const isLastStepValidatedAndActive = currentStep === lastStep.step && lastStep.stepValidated
+
+  // 🔒 Si la dernière étape est atteinte ET validée => aucune étape ne doit être cliquable
+  if (isLastStepValidatedAndActive) {
+    return false
+  }
+
+  const previousStepValidated = index > 0 && steps[index - 1].stepValidated
+  const currentStepNotValidated = !stepItem.stepValidated && !steps[index].stepValidated
+  const isLastStep = index === lastStepIndex
+
+  if (isLastStep && stepItem.step === currentStep && stepItem.stepValidated) return false
+
   if (stepItem.stepValidated) return true
   if (stepItem.step === currentStep) return true
-  if (
-    !stepItem.stepValidated &&
-    index > 0 &&
-    !steps[index].stepValidated &&
-    steps[index - 1].stepValidated
-  ) {
+
+  if (previousStepValidated && currentStepNotValidated) {
     return true
   }
+
   return false
 }
 </script>
@@ -66,6 +78,8 @@ const isStepClickable = (stepItem: stepType, index: number) => {
       :disabled="!isStepClickable(stepItem, index)"
       :aria-current="stepStore.step === stepItem.step ? 'step' : undefined"
       :aria-label="`Étape ${stepItem.step + 1} sur ${steps.length} : ${stepItem.description}`"
+      :data-index="index"
+      :data-store="stepStore.steps.length - 1"
     >
       <StepperSeparator
         v-if="stepItem.step !== steps[steps.length - 1].step"

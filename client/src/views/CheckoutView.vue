@@ -54,14 +54,14 @@ const prevtStep = () => {
         v-if="productInCart.products.length"
       >
         <Button
-          v-if="stepStore.step > 0 && stepStore.step < steps.length"
+          v-if="stepStore.step > 0 && stepStore.step < steps.length - 2"
           type="button"
           class="btn"
           @click="prevtStep()"
           >Revenir à l'étape précédente</Button
         >
         <Button
-          v-if="stepStore.step < steps.length - 1"
+          v-if="stepStore.step < steps.length - 2"
           type="button"
           class="btn"
           @click="nextStep(stepStore.step)"
