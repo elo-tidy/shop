@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import CartButton from '@/components/modules/cart/CartSectionLink.vue'
-import userInfo from '@/components/modules/user/UserDisplay.vue'
+import { ref } from 'vue'
+// Ui
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +14,13 @@ import {
   type SidebarProps,
   SidebarRail,
 } from '@/components/ui/sidebar'
+// Components
+import CartButton from '@/components/modules/cart/CartSectionLink.vue'
+import userInfo from '@/components/modules/user/UserDisplay.vue'
+// Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
-const { session } = useSupabaseSession()
 
+const { session } = useSupabaseSession()
 const backToTop = ref()
 </script>
 
@@ -29,29 +32,27 @@ const backToTop = ref()
         <a href="#main">Passer au contenu principal</a>
       </li>
     </ul>
-    <!-- <Sidebar v-bind="props"> -->
     <Sidebar>
       <SidebarHeader class="px-6">
-        <!-- <VersionSwitcher :versions="data.versions" :default-version="data.versions[0]" /> -->
         <!-- <SearchForm /> -->
         <img
-          alt="Logo boutique"
+          alt="Logo boutique fictive"
           class="logo"
           src="@/assets/img/logo.svg"
           width="125"
           height="125"
         />
       </SidebarHeader>
-      <SidebarContent class="px-6">
+      <SidebarContent class="px-6 pt-1">
         <nav role="navigation">
-          <ul>
+          <ul class="grid gap-y-2">
             <li v-if="session">
               <userInfo />
             </li>
             <li>
               <CartButton />
             </li>
-            <li>
+            <li class="mt-5 pt-2 border-t-1">
               <RouterLink :to="{ name: 'catalogue' }">Catalogue produits</RouterLink>
             </li>
           </ul>

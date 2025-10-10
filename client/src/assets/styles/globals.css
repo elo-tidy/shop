@@ -1,0 +1,108 @@
+/************************************/
+/************* browser **************/
+/************************************/
+*::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+*::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+*::-webkit-scrollbar-thumb {
+  @apply bg-primary;
+  border-radius: 0.5rem;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+/************************************/
+/*************** cta ****************/
+/************************************/
+
+/*** Default ***/
+
+/* Cursor */
+button:not(:disabled),
+[type='submit']:not(:disabled),
+[role='button']:not(:disabled) {
+  @apply cursor-pointer;
+}
+
+/* Disabled */
+.btn:disabled,
+[type='submit']:disabled,
+[type='button']:disabled {
+  background-color: var(--border) !important;
+  @apply text-background;
+}
+
+/* default */
+[type='submit'],
+.btn {
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+  @apply text-sm py-2 px-4 font-medium inline-block;
+}
+
+[type='submit']:not(:disabled),
+.btn:not(:disabled) {
+  background-color: var(--primary) !important;
+  @apply text-primary-foreground mt-6;
+}
+
+/*** Sidebar ***/
+.btn-sidebar {
+  padding-left: 2.6rem;
+  padding-block: 0.5rem;
+  @apply block;
+  &.btn-cart {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Huge Icons by Hugeicons - undefined --%3E%3Cg fill='none' stroke='%23facc15' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' color='%23888888'%3E%3Cpath d='m3.062 15.193l.365-2.071c.432-2.448.647-3.672 1.502-4.397S7.012 8 9.467 8h5.066c2.455 0 3.683 0 4.538.725s1.07 1.949 1.502 4.397l.365 2.071c.598 3.388.896 5.082-.023 6.195c-.92 1.112-2.62 1.112-6.017 1.112H9.102c-3.398 0-5.097 0-6.017-1.113s-.62-2.806-.023-6.194M7.5 8l.168-2.014a4.347 4.347 0 0 1 8.664 0L16.5 8'/%3E%3Cpath d='M15 11c-.13 1.413-1.434 2.5-3 2.5S9.13 12.413 9 11'/%3E%3C/g%3E%3C/svg%3E")
+      no-repeat 0.5rem center / auto 1.5rem;
+  }
+  &.btn-profile {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Huge Icons by Hugeicons - undefined --%3E%3Cg fill='none' stroke='%23facc15' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'%3E%3Cpath d='M15 8A5 5 0 1 0 5 8a5 5 0 0 0 10 0'/%3E%3Cpath d='M3 20a7 7 0 0 1 12-4.899M13 18.5s1.348.507 2 2.5c0 0 3.177-5 6-6'/%3E%3C/g%3E%3C/svg%3E")
+      no-repeat 0.5rem center / auto 1.5rem;
+  }
+  &:is(:hover, :focus) {
+    @apply border-primary;
+  }
+}
+
+/************************************/
+/************** forms ***************/
+/************************************/
+
+form legend {
+  @apply my-5;
+}
+
+/************************************/
+/************* loaders **************/
+/************************************/
+
+.loader {
+  @apply aspect-square;
+  width: 50px;
+  --b: 8px;
+  border-radius: 50%;
+  background: conic-gradient(#0000 10%, var(--color-primary)) content-box;
+  -webkit-mask:
+    repeating-conic-gradient(#0000 0deg, #000 1deg 20deg, #0000 21deg 36deg),
+    radial-gradient(farthest-side, #0000 calc(100% - var(--b) - 1px), #000 calc(100% - var(--b)));
+  -webkit-mask-composite: destination-in;
+  mask-composite: intersect;
+  animation: l4 1s infinite steps(10);
+}
+.isLoading::before {
+  content: '';
+  z-index: 1;
+  @apply w-full h-full absolute top-0 left-0 bg-background/80;
+}
+@keyframes l4 {
+  to {
+    transform: rotate(1turn);
+  }
+}

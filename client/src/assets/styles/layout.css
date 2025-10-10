@@ -1,0 +1,47 @@
+/************************************/
+/********** core structure **********/
+/************************************/
+* {
+  @apply border-dashed border-primary/20;
+  transition: var(--transition);
+}
+#app {
+  height: calc(100dvh - 3rem);
+  @apply overflow-hidden;
+}
+main {
+  @apply h-full p-10 overflow-auto bg-secondary w-full;
+}
+[data-slot='sidebar-wrapper'] {
+  @apply h-full;
+  min-height: inherit !important;
+}
+
+/************************************/
+/************** Header **************/
+/************************************/
+
+#skip-links {
+  @apply list-none;
+  a {
+    @apply whitespace-nowrap top-0 fixed left-0 opacity-0;
+  }
+  a:focus {
+    @apply opacity-100 bg-white border-1 border-solid border-black p-1;
+  }
+}
+
+[data-sonner-toast] *:not(button) {
+  @apply w-full;
+}
+
+/************************************/
+/************** Footer **************/
+/************************************/
+
+footer {
+  @apply fixed w-full bottom-0 left-0 content-center;
+  padding-left: calc(var(--sidebar-width) + 1rem);
+  padding-right: 1rem;
+  height: 3rem;
+}
