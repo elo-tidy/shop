@@ -36,7 +36,7 @@ button:not(:disabled),
 .btn:disabled,
 [type='submit']:disabled,
 [type='button']:disabled {
-  background-color: var(--border) !important;
+  /* background-color: var(--border) !important; */
   @apply text-background;
 }
 
@@ -44,13 +44,13 @@ button:not(:disabled),
 [type='submit'],
 .btn {
   line-height: var(--tw-leading, var(--text-sm--line-height));
-  @apply text-sm py-2 px-4 font-medium inline-block;
+  @apply text-sm py-2 px-4 font-medium inline-block mt-6;
 }
 
 [type='submit']:not(:disabled),
 .btn:not(:disabled) {
   background-color: var(--primary) !important;
-  @apply text-primary-foreground mt-6;
+  @apply text-primary-foreground;
 }
 
 /*** Sidebar ***/
