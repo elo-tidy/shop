@@ -1,32 +1,47 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+// Types
+import type { ShippingMode, Transporter, DeliveryMode } from '@/types/ShippingMode'
 // Ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 // Components
-import CheckoutPickupMap from './CheckoutPickupMap.vue'
+// import CheckoutPickupMap from './CheckoutPickupMap.vue'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
-// Composables
-import { useLivraisonDetails } from '@/composables/useLivraisonDetails'
+// Services
+import { fetchShippingOptions } from '@/services/ShippingOptions'
+// Utils
+import { numberWithTwoDecimals } from '@/utils/maths'
 
 // Data
 const stepStore = usecheckoutStepper()
-const { shippingOptions } = useLivraisonDetails()
-const currentCarrier = computed(() => stepStore.carrier)
-const selectThisCarrier = (carrierID: string) => {
-  stepStore.setTransporter(carrierID)
-}
-const priceWith2Decimals = (transporterPrice: number): string => {
-  const price = transporterPrice || 0
-  return price.toFixed(2)
+const shippingOptions = ref<ShippingMode | null>(null)
+const activeTab = ref<string>('home_delivery')
+
+// Transporter details
+const currentCarrier = computed(() => stepStore.getLivraisonDetails?.transporter.id)
+const selectThisCarrier = (
+  transporter: Transporter,
+  deliveryMode: string,
+  deliveryModeId: string,
+): void => {
+  stepStore.setLivraisonDetails({
+    transporter,
+    deliveryMode,
+    deliveryModeId,
+  })
 }
 
+// Map
 const mapComponentIsLoaded = ref(false)
-const activeTab = ref<string>('home_delivery')
-function updateMapVisible(newState: boolean) {
+function updateMapVisible(newState: boolean): void {
   mapComponentIsLoaded.value = newState
 }
+
+onMounted(async () => {
+  shippingOptions.value = await fetchShippingOptions()
+})
 </script>
 <template>
   <Tabs
@@ -56,35 +71,32 @@ function updateMapVisible(newState: boolean) {
     >
       <p>{{ shippingOption.description }}</p>
       <ul class="mt-4 grid gap-2">
-        <li v-for="transporters in shippingOption?.transporters">
+        <li v-for="transporter in shippingOption?.transporters">
           <Button
             type="button"
             :class="[
               'flex flex-col w-full h-auto bg-background border text-foreground gap-0 items-start pl-15',
-              currentCarrier === transporters.id ? 'selected' : null,
+              currentCarrier === transporter.id ? 'selected' : null,
             ]"
-            @click="selectThisCarrier(transporters.id)"
+            @click="selectThisCarrier(transporter, shippingOption.name, shippingOption.id)"
           >
             <span class="flex justify-between w-full">
-              <span class="label">{{ transporters.name }}</span>
+              <span class="label">{{ transporter.name }}</span>
               <span class="price"
-                >{{ priceWith2Decimals(transporters.price) }} {{ transporters.currency }}</span
+                >{{ numberWithTwoDecimals(transporter.price) }} {{ transporter.currency }}</span
               >
             </span>
-            <span class="desc"> Livraison en {{ transporters.estimated_delivery_time }} </span>
+            <span class="desc"> Livraison en {{ transporter.estimated_delivery_time }} </span>
           </Button>
         </li>
       </ul>
-      <template v-if="shippingOption.id === 'pickup_point'">
+      <!--<template v-if="shippingOption.id === 'pickup_point'">
         <div v-show="mapComponentIsLoaded">
           <keep-alive>
             <CheckoutPickupMap :mapComponentIsLoaded @isMapVisible="updateMapVisible" :activeTab />
           </keep-alive>
         </div>
-      </template>
+      </template>-->
     </TabsContent>
   </Tabs>
 </template>
-<style lang="css">
-@import '@/assets/styles/order.css';
-</style>

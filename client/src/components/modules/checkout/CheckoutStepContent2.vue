@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref } from 'vue'
-import { loadStripe } from '@stripe/stripe-js'
-import { StripeElements, StripeElement } from 'vue-stripe-js'
+import { useRoute } from 'vue-router'
+// UI
 import Button from '@/components/ui/button/Button.vue'
+// Stores
 import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
-import { useRoute } from 'vue-router'
-
+// Stripes
+import { loadStripe } from '@stripe/stripe-js'
+import { StripeElements, StripeElement } from 'vue-stripe-js'
 import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
+// Service
+import { fetchPaymentIntents, getConfirmedPayment } from '@/services/StripeServices'
+// Utils
+import { priceFromEurosToCents } from '@/utils/maths'
 
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 const stripeOptions = ref({
@@ -44,8 +50,8 @@ const paymentElementOptions = ref<StripePaymentElementOptions>({
     },
   },
 })
-const stripeLoaded = ref(false)
-const clientSecret = ref('')
+const stripeLoaded = ref<boolean>(false)
+const clientSecretRef = ref<string | null>('')
 
 // Define component refs
 const elementsComponent = ref()
@@ -57,8 +63,9 @@ const currentDeliveryPrice: number = stepStore.getLivraisonDetails?.transporter.
 const cartStore = useCartStore()
 const currentTotalPrice: number = cartStore.getCartTotalPrice
 const convertPriceInCents = (itemPrice: number, deliveryPrice: number): number => {
-  return Math.round((itemPrice + deliveryPrice) * 100)
+  return priceFromEurosToCents(itemPrice + deliveryPrice)
 }
+const amount: number = convertPriceInCents(currentDeliveryPrice, currentTotalPrice)
 
 onBeforeMount(() => {
   loadStripe(stripeKey)
@@ -66,27 +73,9 @@ onBeforeMount(() => {
       stripeLoaded.value = true
       // Good place to call your backend to create PaymentIntent
       // Skipping to the point when you got clientSecret
-      const res = await fetch('/api/payment_intents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: convertPriceInCents(currentDeliveryPrice, currentTotalPrice),
-          items: cartStore.cart.products,
-          currency: 'eur',
-          payment_method_types: ['card'],
-        }),
-      })
-      const data = await res.json()
 
-      if (data.clientSecret) {
-        clientSecret.value = data.clientSecret
-      } else {
-        console.error('Erreur : aucun clientSecret reçu depuis le serveur.')
-      }
-
-      clientSecret.value = data.clientSecret
+      const { clientSecret } = await fetchPaymentIntents(amount, cartStore.cart.products)
+      clientSecretRef.value = clientSecret
     })
     .catch((error) => {
       console.error('Erreur lors du chargement de Stripe :', error)
@@ -107,25 +96,16 @@ async function handleSubmit() {
   }
 
   if (stripeInstance) {
-    const { error } = await stripeInstance.confirmPayment({
+    const returned_url = 'http://localhost:5173/checkout'
+    const { error } = await getConfirmedPayment(
+      stripeInstance,
       elements,
-      clientSecret: clientSecret.value,
-      confirmParams: {
-        return_url: 'http://localhost:5173/checkout',
-        payment_method_data: {
-          billing_details: {
-            address: {
-              country: 'FR',
-            },
-          },
-        },
-      },
-    })
+      clientSecretRef.value,
+      returned_url,
+    )
 
     if (error) {
-      // This point is only reached if there's an immediate error when
-      // confirming the payment. Show the error to your customer (for example, payment details incomplete)
-      console.log(error)
+      console.error('Stripe error:', error.message)
     } else {
       // Your customer is redirected to your `return_url`. For some payment
       // methods like iDEAL, your customer is redirected to an intermediate
@@ -144,7 +124,7 @@ onMounted(() => {
 </script>
 <template>
   <StripeElements
-    v-if="stripeLoaded && clientSecret != null && elementsOptions"
+    v-if="stripeLoaded && clientSecretRef"
     :stripe-key="stripeKey"
     :instance-options="stripeOptions"
     :elements-options="elementsOptions"

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'
 import Step from '@/components/modules/checkout/CheckoutStep.vue'
 import CheckoutSummary from '@/components/modules/checkout/CheckoutSummary.vue'
+// Types
+import type { stepType } from '@/types/Stepper'
 
 // Stores
 import { useCartStore } from '@/store/CartStore'
@@ -16,21 +18,21 @@ import { useCartModel } from '@/composables/useCartModel'
 const cartStore = useCartStore()
 const { cart: productInCart } = useCartModel(cartStore.cart)
 const stepStore = usecheckoutStepper()
-const steps = stepStore.steps
+const steps: stepType[] = stepStore.steps
 
 // Navigate within validated steps
-const GoToStep = (stepNumber: number) => {
+const GoToStep = (stepNumber: number): void => {
   stepStore.changeStep(stepNumber)
 }
-const nextStep = (stepNumber: number) => {
+const nextStep = (stepNumber: number): void => {
   stepStore.incrementStep(stepNumber)
 }
-const prevtStep = () => {
+const prevtStep = (): void => {
   stepStore.decrementStep()
 }
 </script>
 <template>
-  <div class="grid gap-10 grid-cols-2">
+  <div id="checkout" class="grid gap-10 grid-cols-2">
     <div>
       <div class="grid">
         <h1 class="mt-10 mb-5 text-[30px]">Commande</h1>
@@ -65,7 +67,7 @@ const prevtStep = () => {
           type="button"
           class="btn"
           @click="nextStep(stepStore.step)"
-          :disabled="!stepStore.carrier && stepStore.step === 1"
+          :disabled="!stepStore.livraisonDetails?.transporter.id && stepStore.step === 1"
           >Passer à l'étape suivante</Button
         >
         <!-- :disabled="!selectedCarrier && stepStore.step === 2" -->
@@ -76,3 +78,6 @@ const prevtStep = () => {
     </div>
   </div>
 </template>
+<style lang="css">
+@import '@/assets/styles/checkout.css';
+</style>

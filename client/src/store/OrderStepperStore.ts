@@ -9,8 +9,6 @@ export const usecheckoutStepper = defineStore(
   () => {
     // state
     const step = ref(0)
-    const higherStepValidated = ref(0)
-    const carrier = ref('')
     const livraisonDetails = ref<{
       transporter: Transporter
       deliveryMode: string
@@ -43,57 +41,53 @@ export const usecheckoutStepper = defineStore(
         id: 'confirmation',
         step: 3,
         title: 'Étape 4',
-        description: 'Confirmation',
+        description: 'Paiement confirmé',
         stepValidated: false,
       },
     ])
 
     // Getters
     const getSteps = computed(() => steps.value)
-    const getStepsNumber = computed(() => steps.value.length)
     const getLivraisonDetails = computed(() => livraisonDetails.value)
 
     // Actions
-    function validStep(stepNumber: number) {
+    function validStep(stepNumber: number): void {
       steps.value[stepNumber].stepValidated = true
     }
 
-    function changeStep(stepNumber: number) {
+    function changeStep(stepNumber: number): void {
       step.value = stepNumber
     }
 
-    function incrementStep(stepNumber: number) {
+    function incrementStep(stepNumber: number): void {
       validStep(stepNumber)
       step.value++
     }
 
-    function decrementStep() {
+    function decrementStep(): void {
       step.value--
     }
 
-    function setTransporter(carrierName: string) {
-      carrier.value = carrierName
-    }
-
-    function setLivraisonDetails(payload: typeof livraisonDetails.value) {
+    function setLivraisonDetails(payload: {
+      transporter: Transporter
+      deliveryMode: string
+      deliveryModeId: string
+    }) {
       livraisonDetails.value = payload
     }
 
     return {
       step,
-      higherStepValidated,
-      carrier,
       steps,
+      livraisonDetails,
 
       getSteps,
-      getStepsNumber,
       getLivraisonDetails,
 
       validStep,
       changeStep,
       incrementStep,
       decrementStep,
-      setTransporter,
       setLivraisonDetails,
     }
   },
