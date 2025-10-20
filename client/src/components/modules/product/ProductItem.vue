@@ -35,7 +35,8 @@ const {
   quantity,
 } = useProductModel(props.product)
 
-const hn = layout.value === 'detail' ? 1 : undefined
+const hn: 1 | 4 | undefined =
+  layout.value === 'detail' ? 1 : layout.value === 'check' ? 4 : undefined
 
 const productTitleWrapper = computed(() => {
   return layout.value !== 'detail' && layout.value !== 'check' ? RouterLink : 'span'

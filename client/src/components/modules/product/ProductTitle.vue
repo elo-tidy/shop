@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 
 const props = defineProps<{
-  hn?: 1
+  hn?: 1 | 4
 }>()
 
 const hn = props.hn ?? 2

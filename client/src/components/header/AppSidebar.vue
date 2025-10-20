@@ -21,13 +21,11 @@ import userInfo from '@/components/modules/user/UserDisplay.vue'
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
 
 const { session } = useSupabaseSession()
-const backToTop = ref()
 </script>
 
 <template>
   <header role="banner">
-    <span ref="backToTop" tabindex="-1" />
-    <ul id="skip-links" class="z-11 bg-foreground text-background">
+    <ul id="skip-links" class="z-11 bg-foreground text-background relative">
       <li>
         <a href="#main">Passer au contenu principal</a>
       </li>

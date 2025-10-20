@@ -9,7 +9,9 @@ import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
 import { useCartModel } from '@/composables/useCartModel'
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
-import { useLivraisonDetails } from '@/composables/useLivraisonDetails'
+import { useLivraisonDetails } from '@/composables/useLivraisonDetails_del'
+// utils
+import { formatPriceWithTwoDecimals, numberWithTwoDecimals } from '@/utils/maths'
 // Stores
 import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
@@ -40,11 +42,12 @@ const displayProductOnly = computed(() => {
 const total = computed(() => {
   const orderPrice = dataCart.value?.orderPrice?.value ?? 0
   const shippingPrice = Number(stepStore.getLivraisonDetails?.transporter.price ?? 0)
-  return orderPrice + shippingPrice
+  const price = orderPrice + shippingPrice
+  return formatPriceWithTwoDecimals(price)
 })
 const shippingPrice = computed(() => {
   const price = stepStore.getLivraisonDetails?.transporter.price ?? 0
-  return price.toFixed(2)
+  return numberWithTwoDecimals(price)
 })
 // Cta
 const cta = computed(() => {
@@ -70,7 +73,11 @@ const cta = computed(() => {
       </li>
     </ul>
     <div v-if="!displayProductOnly" class="text-right">
-      <p class="total grid grid-cols-[1fr_80px] place-items-end auto-cols-auto">
+      <p
+        class="total grid grid-cols-[1fr_80px] place-items-end auto-cols-auto"
+        aria-atomic="true"
+        aria-live="polite"
+      >
         <span
           >Sous-total ({{ dataCart?.totalNumberOfItem }} {{ dataCart?.wordingTotalNumberOfItem }})
           :</span
@@ -78,11 +85,20 @@ const cta = computed(() => {
         <span class="text-right tabular-nums font-mono">{{ dataCart?.orderPrice }} €</span>
       </p>
       <template v-if="stepStore && layout === 'check'">
-        <p class="total grid grid-cols-[1fr_80px] place-items-end">
+        <p
+          class="total grid grid-cols-[1fr_80px] place-items-end"
+          aria-atomic="true"
+          aria-live="polite"
+        >
           <span>Frais de livraison :</span>
           <span class="text-right tabular-nums font-mono">{{ shippingPrice }} €</span>
         </p>
-        <p v-if="total" class="total text-primary grid grid-cols-[1fr_80px] place-items-end">
+        <p
+          v-if="total"
+          class="total text-primary grid grid-cols-[1fr_80px] place-items-end"
+          aria-atomic="true"
+          aria-live="polite"
+        >
           <span>Total :</span>
           <span class="text-right tabular-nums font-mono">{{ total }} €</span>
         </p>
