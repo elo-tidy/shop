@@ -1,39 +1,30 @@
-# shop
+# Boutique en ligne fictive
+Projet de boutique en ligne fictive en cours de développement
 
-This template should help get you started developing with Vue 3 in Vite.
+## Fonctionnalités
 
-## Recommended IDE Setup
+- Gestion d'un catalogue produits via fakestore api
+- Gestion d'un panier
+- Authentification de l'utilisateur
+- Implémentation d'une solution de paiement
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Stack
 
-## Type Support for `.vue` Imports in TS
+- Vue 3 (Composition API)
+- Typescript
+- Pinia
+- Shadcn-vue
+- Tailwind 4
+- CSS
+- Supabase
+- Stripe
+- Express
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Lancer le projet localement
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+```bash
+git clone git@github.com:elo-tidy/shop.git
+cd shop
+pnpm install
+pnpm run dev
 ```
