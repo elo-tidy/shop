@@ -1,31 +1,31 @@
 <script setup>
 import { onMounted, ref, toRefs, computed, watch } from 'vue'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import router from '@/router'
+import { useRoute } from 'vue-router'
+// Ui
+import { Field, FieldGroup, FieldLabel, FieldSet, FieldLegend } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
+// Services
 import { getUserProfile, updateProfileService, signOutService } from '@/services/SupabaseServices'
-import router from '@/router'
-import { useRoute } from 'vue-router'
+// Stores
 import { useCartStore } from '@/store/CartStore'
+
+// Refs
+const loading = ref(true)
+const username = ref('')
+
+// Props
+const props = defineProps(['session'])
+
+// Data
 const route = useRoute()
 const history = route.query.history
 
-const props = defineProps(['session'])
-const { session } = toRefs(props)
 const cartDetail = useCartStore().cart
-
-const loading = ref(true)
-const username = ref('')
+const { session } = toRefs(props)
 const email = computed(() => session.value.user.email)
 
 watch(
@@ -42,10 +42,10 @@ watch(
   { immediate: true, once: true },
 )
 
+// User
 onMounted(async () => {
   getProfile()
 })
-
 async function getProfile() {
   try {
     loading.value = true
@@ -60,7 +60,6 @@ async function getProfile() {
     loading.value = false
   }
 }
-
 async function updateProfile() {
   try {
     loading.value = true
@@ -73,7 +72,6 @@ async function updateProfile() {
     loading.value = false
   }
 }
-
 async function signOut() {
   try {
     loading.value = true
@@ -94,35 +92,27 @@ async function signOut() {
     <Button class="button block" @click="signOut" :disabled="loading">Se déconnecter</Button>
   </div>
   <Card class="px-6 max-w-xl">
-    <Form @submit="updateProfile">
-      <fieldset>
-        <legend>Modifier mes informations de profil</legend>
-        <!-- <FormField :name="email"> -->
-
-        <FormField name="username">
-          <FormItem class="grid w-full gap-4 mb-4">
-            <FormLabel>Nom d'utilisateur</FormLabel>
-            <FormControl>
-              <Input id="username" class="inputField" type="text" v-model="username" />
-            </FormControl>
-          </FormItem>
-        </FormField>
-        <FormField name="email">
-          <FormItem class="grid w-full gap-4 mb-4">
-            <FormLabel>Adresse mail</FormLabel>
-            <FormControl>
-              <Input id="email" class="inputField" type="email" disabled v-model="email" />
-            </FormControl>
-          </FormItem>
-        </FormField>
-        <FormItem class="grid w-full gap-4 mb-4 justify-end">
-          <input
-            type="submit"
-            class="button primary block"
-            :value="loading ? 'En cours de mise à jour ...' : 'Mettre à jour mon profil'"
-            :disabled="loading"
-          />
-        </FormItem>
-      </fieldset> </Form
+    <form @submit.prevent="updateProfile">
+      <FieldSet>
+        <FieldLegend variant="label">Modifier mes informations de profil</FieldLegend>
+        <FieldGroup>
+          <Field>
+            <FieldLabel for="username">Nom d'utilisateur</FieldLabel>
+            <Input id="username" class="inputField" type="text" v-model="username" />
+          </Field>
+          <Field>
+            <FieldLabel for="email">Adresse mail</FieldLabel>
+            <Input id="email" class="inputField" type="email" disabled v-model="email" />
+          </Field>
+          <Field class="grid w-full gap-4 mb-4 justify-end">
+            <input
+              type="submit"
+              class="button primary block"
+              :value="loading ? 'En cours de mise à jour ...' : 'Mettre à jour mon profil'"
+              :disabled="loading"
+            />
+          </Field>
+        </FieldGroup>
+      </FieldSet></form
   ></Card>
 </template>
