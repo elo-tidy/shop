@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import CheckoutStepContent0 from '@/components/modules/checkout/CheckoutStepContent0.vue'
 import CheckoutStepContent1 from '@/components/modules/checkout/CheckoutStepContent1.vue'
 import CheckoutStepContent2 from '@/components/modules/checkout/CheckoutStepContent2.vue'
+import CheckoutStepContent3 from '@/components/modules/checkout/CheckoutStepContent3.vue'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
@@ -29,6 +30,7 @@ const content: Record<number, Component> = {
   0: CheckoutStepContent0,
   1: CheckoutStepContent1,
   2: CheckoutStepContent2,
+  3: CheckoutStepContent3,
 }
 const currentContent = computed(() => content[stepStore.step])
 </script>
