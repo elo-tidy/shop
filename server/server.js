@@ -18,11 +18,26 @@ app.post("/api/payment_intents", async (req, res) => {
 			currency: currency,
 			payment_method_types: ["card"],
 		});
-		res.send({clientSecret: paymentIntent.client_secret});
+		res.json({clientSecret: paymentIntent.client_secret});
 	} catch (error) {
 		console.error("Erreur Stripe :", error);
 		res.status(500).json({
 			error: "Échec de la création du PaymentIntent",
+		});
+	}
+});
+
+app.get("/api/payment_intents/:id", async (req, res) => {
+	const paymentIntentId = req.params.id;
+	try {
+		const paymentIntent = await stripe.paymentIntents.retrieve(
+			paymentIntentId
+		);
+		res.json(paymentIntent);
+	} catch (error) {
+		console.error("Erreur Stripe :", error);
+		res.status(500).json({
+			error: "Échec de la récupération du PaymentIntent",
 		});
 	}
 });

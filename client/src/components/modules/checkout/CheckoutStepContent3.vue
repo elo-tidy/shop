@@ -25,24 +25,25 @@ const paymentMethod = () => {
 }
 
 onMounted(async () => {
-  loadStripe(stripeKey).then(async () => {
-    if (!payment_intent) {
-      console.error('payment_intent non défini !')
-      loading.value = false
-      return
-    }
+  // loadStripe(stripeKey).then(async () => {
+  if (!payment_intent) {
+    console.error('payment_intent non défini !')
+    loading.value = false
+    return
+  }
 
-    try {
-      const res = await fetchPaymentDetails(payment_intent)
-      payment.value = res
-      formattedDate.value = new Date(res.created * 1000).toLocaleString('fr-FR')
-    } catch (err) {
-      console.error('Erreur lors de la récupération du PaymentIntent :', err)
-      error.value = true
-    } finally {
-      loading.value = false
-    }
-  })
+  try {
+    const res = await fetchPaymentDetails(payment_intent)
+    payment.value = res
+    formattedDate.value = new Date(res.created * 1000).toLocaleString('fr-FR')
+    localStorage.removeItem('order_id')
+  } catch (err) {
+    console.error('Erreur lors de la récupération du PaymentIntent :', err)
+    error.value = true
+  } finally {
+    loading.value = false
+  }
+  // })
 })
 </script>
 

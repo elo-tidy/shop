@@ -2,6 +2,11 @@
 // Types
 import type { Component } from 'vue'
 import type { stepType } from '@/types/Stepper'
+interface SummaryContent {
+  title: string
+  component: Component
+  cta: string
+}
 // Components
 import checkoutSummaryContent from '@/components/modules/checkout/checkoutSummaryContent.vue'
 import CheckoutSummaryContent0 from '@/components/modules/checkout/CheckoutSummaryContent0.vue'
@@ -15,11 +20,6 @@ const props = defineProps<{
 }>()
 
 // Content data
-interface SummaryContent {
-  title: string
-  component: Component
-  cta: string
-}
 const contents: Record<number, SummaryContent> = {
   0: {
     title: 'Mon panier',
@@ -29,7 +29,7 @@ const contents: Record<number, SummaryContent> = {
   1: { title: 'Livraison', cta: 'la livraison', component: CheckoutSummaryContent1 },
 }
 const stepStore = usecheckoutStepper()
-const isStepVisible = (i: number, steps: stepType[]) => {
+const isStepVisible = (i: number, steps: stepType[]): boolean => {
   if (Number(i) === 0) return true
   // if (Number(i) === 1 && steps[Number(i) - 1]?.stepValidated === true) return true
   if (steps[Number(i)].stepValidated === true) return true

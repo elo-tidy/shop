@@ -2,15 +2,15 @@
 import { computed } from 'vue'
 // Types
 import type { Component } from 'vue'
-// Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
-
-// Props
 interface SummaryContent {
   title: string
   component: Component
   cta: string
 }
+// Stores
+import { usecheckoutStepper } from '@/store/OrderStepperStore'
+
+// Props
 const props = defineProps<{
   GoToStep?: (stepNumber: number) => void
   data: SummaryContent
@@ -23,7 +23,7 @@ const currentContent = computed(() => props.data.component)
 
 // Delivery estimated date
 const stepStore = usecheckoutStepper()
-const estimatedDelivery = () => {
+const estimatedDelivery = (): string => {
   const options: Intl.DateTimeFormatOptions = {
     weekday: 'long',
     year: 'numeric',
@@ -31,18 +31,20 @@ const estimatedDelivery = () => {
     day: 'numeric',
   }
   // Current date
-  const today = new Date(Date.now())
+  const today: Date = new Date(Date.now())
 
   // Number of days to be delivered
   const processing: number = 2
   const deliveryDaysInfo: string | undefined =
     stepStore.getLivraisonDetails?.transporter.estimated_delivery_time
-  const extractDeliveryDays = deliveryDaysInfo?.match(/\d+/g)?.map((n) => parseInt(n, 10)) || []
-  const deliveryMaxDays = extractDeliveryDays.length > 0 ? Math.max(...extractDeliveryDays) : null
+  const extractDeliveryDays: number[] =
+    deliveryDaysInfo?.match(/\d+/g)?.map((n) => parseInt(n, 10)) || []
+  const deliveryMaxDays: number | null =
+    extractDeliveryDays.length > 0 ? Math.max(...extractDeliveryDays) : null
   const deliveryDay: number = deliveryMaxDays! + processing
 
-  const newDate = new Date(today)
-  let daysAdded = 0
+  const newDate: Date = new Date(today)
+  let daysAdded: number = 0
   while (daysAdded < deliveryDay) {
     newDate.setDate(newDate.getDate() + 1)
     const dayOfWeek = newDate.getDay()
@@ -52,6 +54,9 @@ const estimatedDelivery = () => {
   }
   return ' estimée le : ' + newDate.toLocaleDateString()
 }
+const isEditable = computed((): boolean => {
+  return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
+})
 </script>
 
 <template>
@@ -62,7 +67,7 @@ const estimatedDelivery = () => {
       {{ title }}
       {{ id === 1 ? estimatedDelivery() : null }}
     </h3>
-    <div v-if="id !== 1">
+    <div v-if="id !== 1 && isEditable">
       <p>
         <RouterLink to="/cart" class="text-primary text-[14px]"
           >Modifier<span class="sr-only"> {{ data.cta }}</span></RouterLink

@@ -67,19 +67,16 @@ const convertPriceInCents = (itemPrice: number, deliveryPrice: number): number =
 }
 const amount: number = convertPriceInCents(currentDeliveryPrice, currentTotalPrice)
 
-onBeforeMount(() => {
-  loadStripe(stripeKey)
-    .then(async () => {
-      stripeLoaded.value = true
-      // Good place to call your backend to create PaymentIntent
-      // Skipping to the point when you got clientSecret
+onBeforeMount(async () => {
+  try {
+    await loadStripe(stripeKey)
+    stripeLoaded.value = true
 
-      const { clientSecret } = await fetchPaymentIntents(amount, cartStore.cart.products)
-      clientSecretRef.value = clientSecret
-    })
-    .catch((error) => {
-      console.error('Erreur lors du chargement de Stripe :', error)
-    })
+    const { clientSecret } = await fetchPaymentIntents(amount, cartStore.cart.products)
+    clientSecretRef.value = clientSecret
+  } catch (error) {
+    console.error('Erreur lors du chargement de Stripe ou de la création du PaymentIntent :', error)
+  }
 })
 
 async function handleSubmit() {

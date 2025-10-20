@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 // Ui
 import { Button } from '@/components/ui/button'
 // Stores
@@ -8,6 +9,9 @@ const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 const stepStore = usecheckoutStepper()
+const isEditable = computed(() => {
+  return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
+})
 </script>
 <template>
   <div class="grid grid-cols-2 gap-2">
@@ -27,6 +31,7 @@ const stepStore = usecheckoutStepper()
       </address>
 
       <Button
+        v-if="isEditable"
         type="button"
         variant="link"
         class="text-primary underline p-0 text-[14px] mt-2"
@@ -45,6 +50,7 @@ const stepStore = usecheckoutStepper()
       </address>
 
       <Button
+        v-if="isEditable"
         type="button"
         variant="link"
         class="text-primary underline p-0 text-[14px] mt-2"
@@ -66,6 +72,7 @@ const stepStore = usecheckoutStepper()
       </div>
 
       <Button
+        v-if="isEditable"
         type="button"
         variant="link"
         class="text-primary underline p-0 text-[14px] mt-2"
