@@ -1,6 +1,7 @@
 import { supabase } from '@/utils/supabase'
 import type { CartType, InsertCartProduct } from '@/types/Cart'
-import { Category } from '@/models/Category'
+import type { Database, Tables } from '@/types/supabase'
+// import type { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
 export async function sendMagicLink(email: string): Promise<void> {
   const { error } = await supabase.auth.signInWithOtp({ email })
@@ -22,10 +23,10 @@ export async function getUserProfile(userId: string) {
 }
 
 export async function updateProfileService(userId: string, userName: string): Promise<void> {
-  const updates = {
+  const updates: Tables<'profiles'> = {
     id: userId,
     username: userName,
-    updated_at: new Date(),
+    updated_at: new Date().toString(),
   }
   const { error } = await supabase.from('profiles').upsert(updates)
   if (error) throw error
@@ -38,12 +39,7 @@ export async function signOutService(): Promise<void> {
 
 export async function inserCartService(userId: string, product_list: CartType) {
   // Check if user exist
-  const { data: user, error: userError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', userId)
-    .single()
-
+  const { data: user, error: userError } = await getUserProfile(userId)
   if (userError || !user) {
     throw new Error('Utilisateur non trouvé')
   }
@@ -70,7 +66,6 @@ export async function inserCartService(userId: string, product_list: CartType) {
     category: product.category,
     quantity: product.quantity!,
   }))
-
   const { error } = await supabase.from('cart_products').insert(cart_products)
   if (error) throw error
 }
