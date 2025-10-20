@@ -34,7 +34,12 @@ export const useCartStore = defineStore(
 
     // Getters
     const getCartTotalItems = computed(() => cart.value.totalNumberOfItem)
-    const getCartTotalPrice = computed(() => cart.value.totalPrice)
+    const getCartTotalPrice = computed(() =>
+      Number((Math.floor(cart.value.totalPrice * 100) / 100).toFixed(2)),
+    )
+    const getCartTotalPriceInCents = computed(() =>
+      Number(Math.floor(cart.value.totalPrice * 100).toFixed(2)),
+    )
 
     return {
       cart,
@@ -44,6 +49,7 @@ export const useCartStore = defineStore(
       clearCartStore,
       getCartTotalItems,
       getCartTotalPrice,
+      getCartTotalPriceInCents,
     }
   },
   {
