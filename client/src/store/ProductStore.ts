@@ -13,7 +13,7 @@ export const useProductStore = defineStore(
     const error = ref<string | null>(null)
     const currentCategory = ref<string | null>(null)
 
-    // 🔸 Actions
+    // Actions
     async function loadProducts() {
       if (products.value.length > 0) return
 
@@ -23,7 +23,6 @@ export const useProductStore = defineStore(
       try {
         const data = await fetchAllProducts()
         products.value = data
-        // Si tu veux instancier via `new Product(data)` :
         // products.value = data.map((item) => new Product(item))
       } catch (err: any) {
         console.error('Erreur lors du fetch des produits', err)
