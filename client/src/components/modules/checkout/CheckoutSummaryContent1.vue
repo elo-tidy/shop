@@ -2,46 +2,35 @@
 import { computed } from 'vue'
 // Ui
 import { Button } from '@/components/ui/button'
+// Composables
+import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+
 // Props
 const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
+
+/**
+ * Data : step edition -
+ */
+
+// Step edition
 const stepStore = usecheckoutStepper()
 const isEditable = computed(() => {
   return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
 })
+
+// Delivery date
+const { deliveryDetails } = useOrderProcess()
 </script>
 <template>
   <div class="grid grid-cols-2 gap-2">
-    <div
-      v-if="stepStore.getLivraisonDetails?.deliveryModeId === 'pickup_point'"
-      class="flex flex-col justify-between h-full items-start"
-    >
-      <p>
-        <strong>{{ stepStore.getLivraisonDetails?.deliveryMode }}</strong
-        >:
+    <div class="flex flex-col justify-between h-full items-start">
+      <p class="mb-2">
+        <strong>{{ deliveryDetails?.deliveryMode }}</strong> :
       </p>
-      <address>
-        Studio <br />
-        Rue du <br />
-        point relai<br />
-        Pays
-      </address>
-
-      <Button
-        v-if="isEditable"
-        type="button"
-        variant="link"
-        class="text-primary underline p-0 text-[14px] mt-2"
-        @click="props.GoToStep(0)"
-        >Modifier <span class="sr-only">adresse de livraison</span></Button
-      >
-    </div>
-
-    <div v-else class="flex flex-col justify-between h-full items-start">
-      <p class="mb-2"><strong>Livraison à domicile</strong> :</p>
       <address>
         Studio <br />
         Rue Saint-Honoré <br />
@@ -62,13 +51,12 @@ const isEditable = computed(() => {
     <div class="flex flex-col justify-between h-full items-start">
       <div>
         <p class="mb-2"><strong>Transporteur :</strong></p>
-        <p>{{ stepStore.getLivraisonDetails?.transporter.name }}</p>
+        <p>{{ deliveryDetails?.transporter.name }}</p>
         <p>
           Frais :
-          {{ stepStore.getLivraisonDetails?.transporter.price }}
-          {{ stepStore.getLivraisonDetails?.transporter.currency }}
+          {{ deliveryDetails?.transporter.price }} €
         </p>
-        <p>Livraison en {{ stepStore.getLivraisonDetails?.transporter.estimated_delivery_time }}</p>
+        <p>Livraison en {{ deliveryDetails?.transporter.estimated_delivery_time }}</p>
       </div>
 
       <Button

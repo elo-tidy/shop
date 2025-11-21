@@ -1,7 +1,6 @@
 <script setup>
-import { onMounted, ref, toRefs, computed, watch } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import router from '@/router'
-import { useRoute } from 'vue-router'
 // Ui
 import { Field, FieldGroup, FieldLabel, FieldSet, FieldLegend } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -9,42 +8,25 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
 // Services
-import { getUserProfile, updateProfileService, signOutService } from '@/services/SupabaseServices'
-// Stores
-import { useCartStore } from '@/store/CartStore'
+import {
+  getUserProfile,
+  updateProfileService,
+  signOutService,
+} from '../../../../../shared/services/SupabaseServices'
+// Composables
+import { useSupabaseSession } from '@/composables/useSupabaseSession'
 
 // Refs
 const loading = ref(true)
 const username = ref('')
 
-// Props
-const props = defineProps(['session'])
-
 // Data
-const route = useRoute()
-const history = route.query.history
-
-const cartDetail = useCartStore().cart
-const { session } = toRefs(props)
+const { session } = useSupabaseSession()
 const email = computed(() => session.value.user.email)
-
-watch(
-  () => session.value,
-  async (currentSession) => {
-    if (history === 'order' && currentSession?.user?.id && cartDetail.products.length) {
-      try {
-        router.push('/cart')
-      } catch (error) {
-        toast(error.message || 'Erreur lors de la création du panier')
-      }
-    }
-  },
-  { immediate: true, once: true },
-)
 
 // User
 onMounted(async () => {
-  getProfile()
+  await getProfile()
 })
 async function getProfile() {
   try {

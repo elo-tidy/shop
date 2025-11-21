@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { toast } from 'vue-sonner'
 // Services
-import { sendMagicLink } from '@/services/SupabaseServices'
+import { sendMagicLink } from '../../../../../shared/services/SupabaseServices'
 
 const loading = ref(false)
 const email = ref('')

@@ -58,32 +58,22 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          status: number
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          status: number
           updated_at?: string | null
           user_id?: string
         }
         Update: {
           created_at?: string
           id?: string
-          status?: number
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "carts_status_fkey"
-            columns: ["status"]
-            isOneToOne: false
-            referencedRelation: "cart_status"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "carts_user_id_fkey"
             columns: ["user_id"]
@@ -162,10 +152,14 @@ export type Database = {
         Row: {
           cart_id: string
           created_at: string
-          delivery_status: number
+          delivery_carrier: string
+          delivery_date: string
+          delivery_price: number
+          delivery_status: number | null
           id: string
-          payment_method: string
+          payment_method: string | null
           payment_status: number
+          products_price: number | null
           total_price: number
           updated_at: string | null
           user_id: string
@@ -173,10 +167,14 @@ export type Database = {
         Insert: {
           cart_id?: string
           created_at?: string
-          delivery_status: number
+          delivery_carrier: string
+          delivery_date: string
+          delivery_price: number
+          delivery_status?: number | null
           id?: string
-          payment_method: string
+          payment_method?: string | null
           payment_status: number
+          products_price?: number | null
           total_price: number
           updated_at?: string | null
           user_id?: string
@@ -184,10 +182,14 @@ export type Database = {
         Update: {
           cart_id?: string
           created_at?: string
-          delivery_status?: number
+          delivery_carrier?: string
+          delivery_date?: string
+          delivery_price?: number
+          delivery_status?: number | null
           id?: string
-          payment_method?: string
+          payment_method?: string | null
           payment_status?: number
+          products_price?: number | null
           total_price?: number
           updated_at?: string | null
           user_id?: string
@@ -217,7 +219,7 @@ export type Database = {
           {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

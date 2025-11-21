@@ -2,11 +2,9 @@
 // Types
 import type { CartType } from '@/types/Cart'
 import type { stepType } from '@/types/Stepper'
-
 // Ui
 import { Stepper, StepperItem, StepperSeparator, StepperTrigger } from '@/components/ui/stepper'
 import { Button } from '@/components/ui/button'
-
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
@@ -16,7 +14,11 @@ const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 
-// Step store data
+/**
+ * Data : step store -
+ */
+
+// Steps details
 const stepStore = usecheckoutStepper()
 const steps = stepStore.steps
 
@@ -58,10 +60,10 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
     class="flex w-full items-start gap-2 -order-1 mb-10"
     v-if="productInCart.products.length"
     :defaultValue="stepStore.step"
-    :totalSteps="stepStore.getStepsNumber"
     :linear="false"
     aria-label="Étapes de la commande"
   >
+    <!-- :totalSteps="stepStore.getStepsNumber" -->
     <StepperItem
       v-for="(stepItem, index) in steps"
       :key="stepItem.step"

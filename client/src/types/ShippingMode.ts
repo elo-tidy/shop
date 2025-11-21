@@ -16,3 +16,12 @@ export interface DeliveryMode {
 export interface ShippingMode {
   delivery_modes: DeliveryMode[]
 }
+
+export interface DeliveryDetailsWrapper extends ShippingMode {
+  transporter: Transporter
+}
+export interface DeliveryDetails {
+  transporter: Transporter
+  deliveryMode: string // nom du mode choisi
+  deliveryModeId: string // id du mode choisi
+}

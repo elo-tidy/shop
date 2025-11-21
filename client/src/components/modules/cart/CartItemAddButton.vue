@@ -1,29 +1,36 @@
 <script lang="ts" setup>
 import { defineComponent, h, markRaw } from 'vue'
-import { toast } from 'vue-sonner'
-
+// Types
+import type { ProductApi } from '@/types/Product'
+// Ui
 import { Button } from '@/components/ui/button'
 import { CardFooter } from '@/components/ui/card'
-
-import type { ProductApi } from '@/types/Product'
-
+import { toast } from 'vue-sonner'
+// Composables
+import { useCartDetails } from '@/composables/useCartDetails'
+// Stores
 import { useCartStore } from '@/store/CartStore'
-import { useCartModel } from '@/composables/useCartModel'
 
-const cartStore = useCartStore()
-const { wordingTotalNumberOfItem } = useCartModel(cartStore.cart)
-
+// Props
 const props = defineProps<{
   product: ProductApi
   layout?: 'detail' | 'cart' | 'check'
 }>()
 
+/**
+ * Data : add to cart - notification when adding item -
+ */
+
+const { wordingTotalNumberOfItem } = useCartDetails()
+const cartStore = useCartStore()
+
 // Add product to cart
 const addThisProductToCart = (product: ProductApi, quantity: number) => {
   cartStore.addToCart(product, quantity)
-  cartStore.getCartTotaLItems
+  cartStore.getCartTotalItems
   toast(markRaw(customToast))
 }
+
 // Notify user that item has been added to cart
 const customToast = defineComponent({
   setup() {
@@ -32,7 +39,7 @@ const customToast = defineComponent({
         h('p', 'Le produit a été ajouté au panier.'),
         h(
           'p',
-          `Vous avez ${cartStore.getCartTotaLItems} ${wordingTotalNumberOfItem.value} dans votre panier.`,
+          `Vous avez ${cartStore.getCartTotalItems} ${wordingTotalNumberOfItem.value} dans votre panier.`,
         ),
         h('div', {
           innerHTML:

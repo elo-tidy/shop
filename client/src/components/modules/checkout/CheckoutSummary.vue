@@ -19,7 +19,13 @@ const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 
-// Content data
+/**
+ * Data : stepstore - component content -
+ */
+
+const stepStore = usecheckoutStepper()
+
+// Content
 const contents: Record<number, SummaryContent> = {
   0: {
     title: 'Mon panier',
@@ -28,10 +34,10 @@ const contents: Record<number, SummaryContent> = {
   },
   1: { title: 'Livraison', cta: 'la livraison', component: CheckoutSummaryContent1 },
 }
-const stepStore = usecheckoutStepper()
+
+// Step visibility
 const isStepVisible = (i: number, steps: stepType[]): boolean => {
   if (Number(i) === 0) return true
-  // if (Number(i) === 1 && steps[Number(i) - 1]?.stepValidated === true) return true
   if (steps[Number(i)].stepValidated === true) return true
   return false
 }

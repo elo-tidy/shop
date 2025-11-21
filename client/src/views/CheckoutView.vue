@@ -1,26 +1,23 @@
 <script lang="ts" setup>
+// Types
+import type { stepType } from '@/types/Stepper'
 // Ui
 import { Button } from '@/components/ui/button'
 import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'
 import Step from '@/components/modules/checkout/CheckoutStep.vue'
 import CheckoutSummary from '@/components/modules/checkout/CheckoutSummary.vue'
-// Types
-import type { stepType } from '@/types/Stepper'
-
+// Composables
+import { useCartDetails } from '@/composables/useCartDetails'
 // Stores
-import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
-// Utilities
-import { useCartModel } from '@/composables/useCartModel'
-
-// Data : Store
-const cartStore = useCartStore()
-const { cart: productInCart } = useCartModel(cartStore.cart)
+/**
+ * Data : Step navigation
+ */
+const { cartData: productInCart } = useCartDetails()
 const stepStore = usecheckoutStepper()
 const steps: stepType[] = stepStore.steps
 
-// Navigate within validated steps
 const GoToStep = (stepNumber: number): void => {
   stepStore.changeStep(stepNumber)
 }
@@ -32,7 +29,7 @@ const prevtStep = (): void => {
 }
 </script>
 <template>
-  <div id="checkout" class="grid gap-10 grid-cols-2">
+  <div id="checkout" class="grid gap-10 grid-cols-2" v-if="productInCart">
     <div>
       <div class="grid">
         <h1 class="mt-10 mb-5 text-[30px]">Commande</h1>
@@ -70,7 +67,6 @@ const prevtStep = (): void => {
           :disabled="!stepStore.livraisonDetails?.transporter.id && stepStore.step === 1"
           >Passer à l'étape suivante</Button
         >
-        <!-- :disabled="!selectedCarrier && stepStore.step === 2" -->
       </div>
     </div>
     <div>

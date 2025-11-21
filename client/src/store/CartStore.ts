@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { Cart } from '@/models/Cart'
+import { usecheckoutStepper } from './OrderStepperStore'
 import type { ProductApi } from '@/types/Product'
+import {
+  formatPriceWithTwoDecimals,
+  priceFromEurosToCents,
+  numberWithTwoDecimals,
+} from '@/utils/maths'
 
 export const useCartStore = defineStore(
   'cart',
@@ -10,7 +16,7 @@ export const useCartStore = defineStore(
     const cart = ref<Cart>(
       new Cart({
         cart_id: null,
-        status: null,
+        // status: null,
         products: [],
       }),
     )
@@ -34,12 +40,22 @@ export const useCartStore = defineStore(
 
     // Getters
     const getCartTotalItems = computed(() => cart.value.totalNumberOfItem)
-    const getCartTotalPrice = computed(() =>
-      Number((Math.floor(cart.value.totalPrice * 100) / 100).toFixed(2)),
-    )
-    const getCartTotalPriceInCents = computed(() =>
-      Number(Math.floor(cart.value.totalPrice * 100).toFixed(2)),
-    )
+    const getCartTotalPrice = computed(() => {
+      return formatPriceWithTwoDecimals(cart.value.totalPrice)
+    })
+    const getCartTotalPriceInCents = computed(() => priceFromEurosToCents(cart.value.totalPrice))
+
+    const getShippingPrice = computed((): string => {
+      const stepStore = usecheckoutStepper()
+      const price = stepStore.getLivraisonDetails?.transporter.price ?? 0
+      return numberWithTwoDecimals(price)
+    })
+    const getOrderPrice = computed(() => {
+      const cartPrice = Number(getCartTotalPrice.value)
+      const shipping = Number(getShippingPrice.value)
+      const price = cartPrice + shipping
+      return formatPriceWithTwoDecimals(price)
+    })
 
     return {
       cart,
@@ -50,6 +66,8 @@ export const useCartStore = defineStore(
       getCartTotalItems,
       getCartTotalPrice,
       getCartTotalPriceInCents,
+      getShippingPrice,
+      getOrderPrice,
     }
   },
   {

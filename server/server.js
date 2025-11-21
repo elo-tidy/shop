@@ -34,6 +34,19 @@ app.get("/api/payment_intents/:id", async (req, res) => {
 			paymentIntentId
 		);
 		res.json(paymentIntent);
+		console.log(paymentIntent);
+		// if (payment.value.status === "succeeded") {
+		// 	try {
+		// 		await inserOrderService(cartDetail);
+		// 		useCartStore().clearCartStore();
+		// 	} catch (error) {
+		// 		const message =
+		// 			error instanceof Error
+		// 				? error.message
+		// 				: "Erreur inattendue";
+		// 		toast(message);
+		// 	}
+		// }
 	} catch (error) {
 		console.error("Erreur Stripe :", error);
 		res.status(500).json({

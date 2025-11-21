@@ -8,6 +8,6 @@ const { session } = useSupabaseSession()
 </script>
 
 <template>
-  <Account v-if="session" :session="session" />
+  <Account v-if="session" />
   <Auth v-else />
 </template>

@@ -18,20 +18,26 @@ const props = defineProps<{
   title: string
 }>()
 
-// Step data
+/**
+ * Data : step components init
+ */
+
+// Step init
 const stepStore = usecheckoutStepper()
 const stepProp = computed(() => ({
   title: props.title,
   contentId: props.step,
 }))
 
-// Content data
+// Components
 const content: Record<number, Component> = {
   0: CheckoutStepContent0,
   1: CheckoutStepContent1,
   2: CheckoutStepContent2,
   3: CheckoutStepContent3,
 }
+
+// Current step content
 const currentContent = computed(() => content[stepStore.step])
 </script>
 

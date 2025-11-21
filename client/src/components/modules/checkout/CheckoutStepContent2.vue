@@ -1,20 +1,103 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+// Type
+import type { CartType } from '@/types/Cart'
+import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
 // UI
 import Button from '@/components/ui/button/Button.vue'
+import { toast } from 'vue-sonner'
+// Composables
+import { useOrderProcess } from '@/composables/useOrderProcess'
+// Utils
+import { priceFromEurosToCents } from '@/utils/maths'
+// Service
+import {
+  fetchPaymentIntents,
+  getConfirmedPayment,
+} from '../../../../../shared/services/StripeServices'
 // Stores
-import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 // Stripes
 import { loadStripe } from '@stripe/stripe-js'
 import { StripeElements, StripeElement } from 'vue-stripe-js'
-import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
-// Service
-import { fetchPaymentIntents, getConfirmedPayment } from '@/services/StripeServices'
-// Utils
-import { priceFromEurosToCents } from '@/utils/maths'
 
+/**
+ * Data : orderProcess - cart
+ */
+
+// Insert order process
+const { insertOrder, effectiveOrder } = useOrderProcess()
+
+// Cart
+// const cartDetail: CartType = { products: effectiveOrder.value.carts[0].carts_products }
+const currentTotalPrice = effectiveOrder.value.total_price
+const amount = priceFromEurosToCents(currentTotalPrice)
+
+// Pay button clic
+async function handleSubmit() {
+  if (!effectiveOrder.value || !effectiveOrder.value.carts) {
+    console.error('Aucune commande disponible pour créer le panier.')
+    toast('Le panier n’est pas encore chargé. Merci de réessayer.')
+    return
+  }
+
+  // Map cart before inserting in bdd
+  const cartDetail: CartType = {
+    products: effectiveOrder.value.carts[0].carts_products.map((p) => ({
+      id: p.product_id,
+      title: p.title,
+      price: p.price,
+      description: p.description ?? '',
+      image: p.image,
+      category: p.category,
+      quantity: p.quantity,
+    })),
+  }
+  // Insert order in bdd, stop stripe if not
+  const orderIsInserted = await insertOrder(cartDetail)
+  if (!orderIsInserted) {
+    console.error("La commande n'a pas été insérée, paiement stoppé.")
+    toast(
+      'Une erreur est survenue lors de l’enregistrement de votre commande. Votre paiement n’a pas été effectué. Merci de réessayer ou de nous contacter',
+    )
+    return
+  }
+
+  // Confirm the PaymentIntent using the details collected by the Payment Element
+  const stripeInstance = elementsComponent.value?.instance
+  const elements = elementsComponent.value?.elements
+
+  if (!stripeInstance || !elements) return
+
+  // Front Stripe form error
+  const { error: submitError } = await elements.submit()
+  if (submitError) {
+    console.error('Erreur lors de la soumission des éléments Stripe:', submitError)
+    return
+  }
+
+  // Stripe payment success
+  if (stripeInstance) {
+    const returned_url = 'http://localhost:5173/checkout'
+    const { error } = await getConfirmedPayment(
+      stripeInstance,
+      elements,
+      clientSecretRef.value,
+      returned_url,
+    )
+
+    if (error) {
+      console.error('Stripe error:', error.message)
+    } else {
+      // Your customer is redirected to your `return_url`. For some payment
+      // methods like iDEAL, your customer is redirected to an intermediate
+      // site first to authorize the payment, then redirected to the `return_url`.
+    }
+  }
+}
+
+// Stripe
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 const stripeOptions = ref({
   // https://stripe.com/docs/js/initializing#init_stripe_js-options
@@ -24,7 +107,7 @@ const elementsOptions = ref<StripeElementsOptionsMode>({
 
   mode: 'payment',
   payment_method_types: ['card'],
-  amount: 1099,
+  amount: amount,
   currency: 'eur',
   appearance: {
     theme: 'night',
@@ -57,62 +140,42 @@ const clientSecretRef = ref<string | null>('')
 const elementsComponent = ref()
 const paymentComponent = ref()
 
-// Total price in cents
-const stepStore = usecheckoutStepper()
-const currentDeliveryPrice: number = stepStore.getLivraisonDetails?.transporter.price ?? 0
-const cartStore = useCartStore()
-const currentTotalPrice: number = cartStore.getCartTotalPrice
-const convertPriceInCents = (itemPrice: number, deliveryPrice: number): number => {
-  return priceFromEurosToCents(itemPrice + deliveryPrice)
-}
-const amount: number = convertPriceInCents(currentDeliveryPrice, currentTotalPrice)
-
 onBeforeMount(async () => {
   try {
+    // Return Stripe clientSecret to load Stripe form
     await loadStripe(stripeKey)
     stripeLoaded.value = true
 
-    const { clientSecret } = await fetchPaymentIntents(amount, cartStore.cart.products)
+    if (!effectiveOrder.value || !effectiveOrder.value.carts) {
+      console.error('Aucune commande disponible pour créer le panier.')
+      toast('Le panier n’est pas encore chargé. Merci de réessayer.')
+      return
+    }
+
+    // map cart before inserting in bdd
+    const cartDetail: CartType = {
+      products: effectiveOrder.value.carts[0].carts_products.map((p) => ({
+        id: p.product_id,
+        title: p.title,
+        price: p.price,
+        description: p.description ?? '',
+        image: p.image,
+        category: p.category,
+        quantity: p.quantity,
+      })),
+    }
+
+    const { clientSecret } = await fetchPaymentIntents(amount, cartDetail.products)
     clientSecretRef.value = clientSecret
   } catch (error) {
     console.error('Erreur lors du chargement de Stripe ou de la création du PaymentIntent :', error)
   }
 })
 
-async function handleSubmit() {
-  // Confirm the PaymentIntent using the details collected by the Payment Element
-  const stripeInstance = elementsComponent.value?.instance
-  const elements = elementsComponent.value?.elements
-
-  if (!stripeInstance || !elements) return
-
-  const { error: submitError } = await elements.submit()
-  if (submitError) {
-    console.error('Erreur lors de la soumission des éléments Stripe:', submitError)
-    return
-  }
-
-  if (stripeInstance) {
-    const returned_url = 'http://localhost:5173/checkout'
-    const { error } = await getConfirmedPayment(
-      stripeInstance,
-      elements,
-      clientSecretRef.value,
-      returned_url,
-    )
-
-    if (error) {
-      console.error('Stripe error:', error.message)
-    } else {
-      // Your customer is redirected to your `return_url`. For some payment
-      // methods like iDEAL, your customer is redirected to an intermediate
-      // site first to authorize the payment, then redirected to the `return_url`.
-    }
-  }
-}
-
+const stepStore = usecheckoutStepper()
 onMounted(() => {
   const route = useRoute()
+  // Valid current step - got to next step
   if (route.query.redirect_status === 'succeeded') {
     stepStore.incrementStep(2)
     stepStore.validStep(3)

@@ -2,18 +2,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { stepType } from '@/types/Stepper'
-import type { Transporter } from '@/types/ShippingMode'
+import type { Transporter, DeliveryDetailsWrapper, DeliveryDetails } from '@/types/ShippingMode'
 
 export const usecheckoutStepper = defineStore(
   'checkoutStepper',
   () => {
     // state
     const step = ref(0)
-    const livraisonDetails = ref<{
-      transporter: Transporter
-      deliveryMode: string
-      deliveryModeId: string
-    } | null>(null)
+    const livraisonDetails = ref<DeliveryDetails | null>(null)
 
     const steps = ref<stepType[]>([
       {
@@ -68,12 +64,14 @@ export const usecheckoutStepper = defineStore(
       step.value--
     }
 
-    function setLivraisonDetails(payload: {
-      transporter: Transporter
-      deliveryMode: string
-      deliveryModeId: string
-    }) {
+    function setLivraisonDetails(payload: DeliveryDetails) {
       livraisonDetails.value = payload
+    }
+
+    function resetStepper(): void {
+      step.value = 0
+      livraisonDetails.value = null
+      steps.value.forEach((step) => (step.stepValidated = false))
     }
 
     return {
@@ -89,6 +87,7 @@ export const usecheckoutStepper = defineStore(
       incrementStep,
       decrementStep,
       setLivraisonDetails,
+      resetStepper,
     }
   },
   {

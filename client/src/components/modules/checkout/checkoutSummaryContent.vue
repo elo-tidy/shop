@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 // Types
 import type { Component } from 'vue'
 interface SummaryContent {
@@ -7,6 +7,8 @@ interface SummaryContent {
   component: Component
   cta: string
 }
+// Composables
+import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
@@ -17,43 +19,20 @@ const props = defineProps<{
   index: number
 }>()
 
+/**
+ * Data : props - estimated delivery date - step edition
+ */
+
+// Props
 const title = computed(() => props.data.title)
 const id = computed(() => props.index)
 const currentContent = computed(() => props.data.component)
 
 // Delivery estimated date
+const { deliveryDate } = useOrderProcess()
+
+// Enable step edition if order is not completed
 const stepStore = usecheckoutStepper()
-const estimatedDelivery = (): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }
-  // Current date
-  const today: Date = new Date(Date.now())
-
-  // Number of days to be delivered
-  const processing: number = 2
-  const deliveryDaysInfo: string | undefined =
-    stepStore.getLivraisonDetails?.transporter.estimated_delivery_time
-  const extractDeliveryDays: number[] =
-    deliveryDaysInfo?.match(/\d+/g)?.map((n) => parseInt(n, 10)) || []
-  const deliveryMaxDays: number | null =
-    extractDeliveryDays.length > 0 ? Math.max(...extractDeliveryDays) : null
-  const deliveryDay: number = deliveryMaxDays! + processing
-
-  const newDate: Date = new Date(today)
-  let daysAdded: number = 0
-  while (daysAdded < deliveryDay) {
-    newDate.setDate(newDate.getDate() + 1)
-    const dayOfWeek = newDate.getDay()
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      daysAdded++
-    }
-  }
-  return ' estimée le : ' + newDate.toLocaleDateString()
-}
 const isEditable = computed((): boolean => {
   return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
 })
@@ -65,7 +44,7 @@ const isEditable = computed((): boolean => {
   >
     <h3 class="text-[18px]">
       {{ title }}
-      {{ id === 1 ? estimatedDelivery() : null }}
+      {{ id === 1 ? ' estimée le : ' + deliveryDate : null }}
     </h3>
     <div v-if="id !== 1 && isEditable">
       <p>

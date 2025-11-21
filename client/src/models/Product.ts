@@ -1,22 +1,39 @@
 import type { ProductApi } from '@/types/Product'
 
 export class Product {
-  id: number
-  title: string
-  price: number
-  description: string
-  image: string
-  category: string
-  quantity?: number
+  private data: ProductApi
 
   constructor(data: ProductApi) {
-    this.id = data.id ?? 0
-    this.title = data.title ?? ''
-    this.price = data.price ?? 0
-    this.description = data.description ?? ''
-    this.image = data.image ?? ''
-    this.category = data.category ?? ''
-    this.quantity = data.quantity ?? 0
+    // on conserve la référence réactive directement
+    this.data = data
+  }
+
+  get id(): number {
+    return this.data.id ?? 0
+  }
+
+  get title(): string {
+    return this.data.title ?? ''
+  }
+
+  get price(): number {
+    return this.data.price ?? 0
+  }
+
+  get description(): string {
+    return this.data.description ?? ''
+  }
+
+  get image(): string {
+    return this.data.image ?? ''
+  }
+
+  get category(): string {
+    return this.data.category ?? ''
+  }
+
+  get quantity(): number {
+    return this.data.quantity ?? 0
   }
 
   get formattedPrice(): string {
@@ -36,6 +53,6 @@ export class Product {
   }
 
   get itemQuantity(): number {
-    return this.quantity ?? 0
+    return this.quantity
   }
 }

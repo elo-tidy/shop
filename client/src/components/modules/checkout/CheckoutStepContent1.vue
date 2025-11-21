@@ -7,30 +7,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 // Components
 // import CheckoutPickupMap from './CheckoutPickupMap.vue'
-// Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
-// Services
-import { fetchShippingOptions } from '@/services/ShippingOptions'
+// Composables
+import { useOrderProcess } from '@/composables/useOrderProcess'
 // Utils
 import { numberWithTwoDecimals } from '@/utils/maths'
+// Services
+import { fetchShippingOptions } from '@/services/ShippingOptions'
+// Stores
+import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
-// Data
-const stepStore = usecheckoutStepper()
+/**
+ * Data : Ref -
+ */
+
+// Ref
 const shippingOptions = ref<ShippingMode | null>(null)
 const activeTab = ref<string>('home_delivery')
 
 // Transporter details
+const { deliveryDetails } = useOrderProcess()
+const stepStore = usecheckoutStepper()
 const currentCarrier = computed(() => stepStore.getLivraisonDetails?.transporter.id)
 const selectThisCarrier = (
   transporter: Transporter,
   deliveryMode: string,
   deliveryModeId: string,
 ): void => {
-  stepStore.setLivraisonDetails({
+  const payload = {
     transporter,
     deliveryMode,
     deliveryModeId,
-  })
+  }
+  stepStore.setLivraisonDetails(payload)
+  deliveryDetails.value = payload
 }
 
 // Map
@@ -39,6 +48,7 @@ function updateMapVisible(newState: boolean): void {
   mapComponentIsLoaded.value = newState
 }
 
+// Load Transporters'list
 onMounted(async () => {
   shippingOptions.value = await fetchShippingOptions()
 })
