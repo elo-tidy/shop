@@ -1,5 +1,6 @@
 export type PaymentIntentResponse = {
   clientSecret: string
+  paymentIntentId: string
 }
 export type PaymentDetails = {
   id: string
@@ -9,4 +10,5 @@ export type PaymentDetails = {
   created: number
   payment_method_types: string[]
   status: string
+  client_secret: string
 }

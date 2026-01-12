@@ -88,7 +88,7 @@ export type Database = {
           cart_id: string
           category: string
           created_at: string
-          description: string | null
+          description: string
           id: string
           image: string
           price: number
@@ -100,7 +100,7 @@ export type Database = {
           cart_id?: string
           category: string
           created_at?: string
-          description?: string | null
+          description: string
           id?: string
           image: string
           price: number
@@ -112,7 +112,7 @@ export type Database = {
           cart_id?: string
           category?: string
           created_at?: string
-          description?: string | null
+          description?: string
           id?: string
           image?: string
           price?: number
@@ -157,9 +157,10 @@ export type Database = {
           delivery_price: number
           delivery_status: number | null
           id: string
-          payment_method: string | null
+          payment_ID: string | null
+          payment_method: string
           payment_status: number
-          products_price: number | null
+          products_price: number
           total_price: number
           updated_at: string | null
           user_id: string
@@ -172,9 +173,10 @@ export type Database = {
           delivery_price: number
           delivery_status?: number | null
           id?: string
-          payment_method?: string | null
+          payment_ID?: string | null
+          payment_method: string
           payment_status: number
-          products_price?: number | null
+          products_price: number
           total_price: number
           updated_at?: string | null
           user_id?: string
@@ -187,9 +189,10 @@ export type Database = {
           delivery_price?: number
           delivery_status?: number | null
           id?: string
-          payment_method?: string | null
+          payment_ID?: string | null
+          payment_method?: string
           payment_status?: number
-          products_price?: number | null
+          products_price?: number
           total_price?: number
           updated_at?: string | null
           user_id?: string

@@ -1,31 +1,48 @@
 // Types
-import type {ProductApi} from "@/types/Product";
-import type {CartType} from "@/types/Cart";
-import type {Stripe, StripeElements, StripeError} from "@stripe/stripe-js";
-import type {PaymentIntentResponse, PaymentDetails} from "@/types/stripe";
+import type {ProductApi} from "../../client/src/types/Product";
+import type {CartType, Order, Cart} from "../../client/src/types/Cart";
+import type {
+	Stripe,
+	StripeElements,
+	StripeError,
+} from "../../client/node_modules/@stripe/stripe-js";
+import type {
+	PaymentIntentResponse,
+	PaymentDetails,
+} from "../../client/src/types/stripe";
 
 // Return paymentIntents from backend
 export async function fetchPaymentIntents(
 	priceInCents: number,
-	items: CartType["products"]
+	// items: CartType["products"],
+	orderId: Order["id"],
+	userId: CartType["user_id"],
+	cartId: Cart["id"]
+	// orderId: Order["id"]
 ): Promise<PaymentIntentResponse> {
-	const res = await fetch("/api/payment_intents", {
+	const res = await fetch("http://localhost:3000/api/payment_intents", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
 			amount: priceInCents,
-			items: items,
 			currency: "eur",
-			payment_method_types: ["card"],
+			// items: items,
+			metadata: {
+				orderId: orderId,
+				userId: userId,
+				cartId: cartId,
+			},
 		}),
 	});
 	if (!res.ok) {
 		throw new Error("Erreur lors de la création du PaymentIntent");
 	}
-
-	return await res.json();
+	const data = await res.json();
+	console.log("fetchPaymentIntents response:", data);
+	return data;
+	// return await res.json();
 }
 
 // Return confirm payment

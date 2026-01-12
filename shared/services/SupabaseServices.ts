@@ -1,6 +1,6 @@
 // Types
 import type {CartType, InsertCartProduct, Order} from "@/types/Cart";
-import type {Database, Tables} from "@/types/supabase";
+import type {Database, Tables, TablesInsert} from "@/types/supabase";
 // import type { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 // Stores
 import {useCartStore} from "@/store/CartStore";
@@ -59,7 +59,8 @@ export async function signOutService(): Promise<void> {
 
 export async function inserOrderService(
 	product_list: CartType,
-	carrierId: string
+	carrierId: string,
+	paymentIntentId: string
 ) {
 	// Skip if no products to insert
 	if (
@@ -76,7 +77,7 @@ export async function inserOrderService(
 	if (sessionError || !sessionData) {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
-	const userId = sessionData?.session?.user.id;
+	const userId = sessionData?.session?.user.id!;
 
 	// load last order if exists
 	const {data: lastOrder, error: lastOrderError} = await supabase
@@ -93,9 +94,10 @@ export async function inserOrderService(
 			lastOrderError
 		);
 	}
+	console.log(lastOrder);
 
 	// Check if lastOrder already in bdd
-	if (lastOrder && lastOrder.cart_id === product_list.cart_id) {
+	if (lastOrder && lastOrder.cart_id === product_list.id) {
 		console.log("Commande déjà insérée pour ce panier, rien à faire.");
 		return;
 	}
@@ -159,6 +161,7 @@ export async function inserOrderService(
 	const {data: newOrder, error: errorOrder} = await supabase
 		.from("orders")
 		.insert({
+			/*id:"",
 			user_id: userId,
 			cart_id: cartId,
 			total_price: totalPrice,
@@ -167,8 +170,18 @@ export async function inserOrderService(
 			delivery_price: carrierDetails.transporter.price,
 			products_price: productsPrice,
 			payment_status: 1,
+			payment_method: "Carte bancaire",*/
+			cart_id: cartId,
+			delivery_carrier: carrierDetails.transporter.id,
+			delivery_date: isoStringDateOnly,
+			delivery_price: carrierDetails.transporter.price,
 			payment_method: "Carte bancaire",
-		})
+			payment_status: 1,
+			products_price: Number(productsPrice),
+			total_price: Number(totalPrice),
+			user_id: userId,
+			payment_ID: paymentIntentId,
+		} as Database["public"]["Tables"]["orders"]["Insert"])
 		.select("id")
 		.single();
 
@@ -178,11 +191,15 @@ export async function inserOrderService(
 	}
 }
 
-export async function updateOrderService(
-	orderId: Order["id"]
+/*export async function updatePaymentOrderService(
+	orderId: Order["id"],
+	paymentId: Order["payment_ID"]
 ): Promise<boolean> {
+	console.log("orderId", orderId);
+	console.log("paymentId", paymentId);
 	// Get last order
 	const orderData = await getOrderService(orderId);
+	console.log("orderData", orderData);
 	if (!orderData) {
 		return false;
 	}
@@ -190,8 +207,8 @@ export async function updateOrderService(
 	// Update payment status
 	const {data, error} = await supabase
 		.from("orders")
-		.update({payment_status: 2})
-		.eq("id", orderData.id)
+		.update({payment_status: 2, payment_ID: paymentId!})
+		.eq("id", orderData.id!)
 		.select();
 	if (error) {
 		console.error(
@@ -205,7 +222,125 @@ export async function updateOrderService(
 		return false;
 	}
 	return true;
+}*/
+export async function updatePaymentOrderService(
+	orderId: Order["id"],
+	paymentId: Order["payment_ID"]
+): Promise<Order | null> {
+	// retourne la commande mise à jour
+	console.log("orderId", orderId);
+	console.log("paymentId", paymentId);
+
+	const orderData = await getOrderService(orderId);
+	if (!orderData) return null;
+
+	const {data, error} = await supabase
+		.from("orders")
+		.update({payment_status: 2, payment_ID: paymentId!})
+		.eq("id", orderData.id!)
+		.select()
+		.single();
+	if (error) {
+		console.error(
+			"Erreur lors de la mise à jour du statut de paiement :",
+			error
+		);
+		return null;
+	}
+
+	return data as Order;
 }
+
+export async function deleteOrderFromBdd(
+	OrderID: Order["id"]
+): Promise<boolean> {
+	// Récupérer la commande
+	const orderData = await getOrderService(OrderID);
+	if (!orderData || !orderData.id) {
+		console.error("Commande introuvable pour l'ID :", OrderID);
+		return false;
+	}
+
+	console.log("Suppression de la commande ID :", orderData.id);
+	console.log("Suppression cart_id :", orderData.cart_id);
+
+	// Supprimer les produits liés au panier
+	if (orderData.cart_id) {
+		// Log avant suppression
+		const {data: existingProducts} = await supabase
+			.from("carts_products")
+			.select("*")
+			.eq("cart_id", orderData.cart_id);
+
+		console.log(
+			"Produits trouvés avant suppression :",
+			existingProducts?.length
+		);
+
+		// Supprime sans select
+		const {error: errorProducts} = await supabase
+			.from("carts_products")
+			.delete()
+			.eq("cart_id", orderData.cart_id);
+
+		if (errorProducts) {
+			console.error(
+				"Erreur de suppression des produits du panier :",
+				errorProducts
+			);
+			return false;
+		}
+
+		// Vérification après suppression
+		const {data: afterDelete} = await supabase
+			.from("carts_products")
+			.select("*")
+			.eq("cart_id", orderData.cart_id);
+
+		console.log(
+			"Produits restants après suppression :",
+			afterDelete?.length
+		);
+	} else {
+		console.warn("Pas de cart_id associé, aucun produit à supprimer");
+	}
+
+	// Supprimer la commande
+	const {data: deletedOrder, error: errorOrder} = await supabase
+		.from("orders")
+		.delete()
+		.eq("id", orderData.id)
+		.select(); // récupère la commande supprimée
+
+	if (errorOrder) {
+		console.error("Erreur de suppression de la commande :", errorOrder);
+		return false;
+	}
+
+	console.log("Commande supprimée :", deletedOrder);
+
+	return true;
+}
+/*
+export async function updateOrderFromBdd(
+	paymentIntentId: string
+): Promise<boolean> {
+	// Supprimer la commande
+	const {data: deletedOrder, error: errorOrder} = await supabase
+		.from("orders")
+		.update()
+		.eq("payment_ID", paymentIntentId)
+		.select(); // récupère la commande supprimée
+
+	if (errorOrder) {
+		console.error("Erreur de suppression de la commande :", errorOrder);
+		return false;
+	}
+
+	console.log("Commande updated :", deletedOrder);
+
+	return true;
+}*/
 
 export async function getCarrierDetails(carrierId: string) {
 	const carriers = await fetchShippingOptions();
@@ -241,6 +376,7 @@ export async function getOrderService(
 				delivery_date,
 				delivery_price,
 				products_price,
+				payment_ID,
 				carts (
 				id,
 				carts_products (
@@ -269,7 +405,7 @@ export async function getOrderService(
 	if (sessionError || !sessionData) {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
-	const userId = sessionData?.session?.user.id;
+	const userId = sessionData?.session?.user.id!;
 
 	// select order and return order
 	const {data, error} = await supabase
@@ -289,6 +425,7 @@ export async function getOrderService(
 				delivery_date,
 				delivery_price,
 				products_price,
+				payment_ID,
 				carts (
 				id,
 				carts_products (
@@ -306,6 +443,7 @@ export async function getOrderService(
 			`
 		)
 		.eq("user_id", userId)
+		.eq("payment_status", 1)
 		.order("created_at", {ascending: false})
 		.limit(1)
 		.maybeSingle();

@@ -37,13 +37,13 @@ const products = computed<ProductApi[]>(() => {
   if (props.products?.length) return props.products
 
   const carts = effectiveOrder.value?.carts
-  if (!carts || carts.length === 0) return []
+  if (!carts) return []
 
   const firstCart = Array.isArray(carts) ? carts[0] : carts
   if (!firstCart?.carts_products || firstCart.carts_products.length === 0) return []
 
-  return firstCart.carts_products.map((p) => ({
-    id: p.product_id,
+  return firstCart.carts_products.map((p: ProductApi) => ({
+    id: p.id,
     title: p.title,
     price: p.price,
     description: p.description ?? '',

@@ -10,6 +10,7 @@ import { useProductModel } from '@/composables/useProductModel'
 import { useCartDetails } from '@/composables/useCartDetails'
 // Stores
 import { useCartStore } from '@/store/CartStore'
+import { useOrderProcess } from '@/composables/useOrderProcess'
 
 // Props
 const props = defineProps<{
@@ -23,6 +24,7 @@ const props = defineProps<{
 
 const cartStore = useCartStore()
 const { cartData } = useCartDetails()
+const { effectiveOrder, deleteOrder, currentOrder, loadLastOrder, resetOrder } = useOrderProcess()
 
 // Products from bdd first, from store then
 const storeProduct = computed(() => {
@@ -45,13 +47,14 @@ const storeProduct = computed(() => {
 const { product } = useProductModel(storeProduct)
 
 // Delete from cart
-const deleteThisProductfromCart = (productId: number) => {
-  console.log('delete')
+const deleteThisProductfromCart = async (productId: number) => {
+  await resetOrder()
   cartStore.deleteFromCart(productId)
 }
 
 // Update item quantity
-const updateItemQuantity = (productId: number, addOrRemove: string) => {
+const updateItemQuantity = async (productId: number, addOrRemove: string) => {
+  await resetOrder()
   cartStore.updateItemQuantity(productId, addOrRemove)
 }
 </script>

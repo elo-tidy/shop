@@ -1,25 +1,30 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
 import type { CartType, Order, InsertCartProduct, Cart } from '@/types/Cart'
 import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/types/ShippingMode'
 import type { ProductApi } from '@/types/Product'
+import type { Database } from '@/types/supabase'
 // Stores
 import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { usePaymentStore } from '@/store/StripeStore'
 // Services
 import { fetchPaymentDetails, fetchPaymentIntents } from '../../../shared/services/StripeServices'
 import {
   inserOrderService,
-  updateOrderService,
+  updatePaymentOrderService,
   getOrderService,
   getCarrierDetails,
+  deleteOrderFromBdd,
+  getUserProfile,
 } from '../../../shared/services/SupabaseServices'
 // Composable
 import {
   estimatedDelivery,
   convertDateFRtoISO,
 } from '../../../shared/composables/useDeliveryEstimation'
+import type { User } from '@supabase/supabase-js'
 
 const currentOrder = ref<Order | null>(null)
 const lastOrder = ref<Order | null>(null)
@@ -32,6 +37,7 @@ export function useOrderProcess() {
 
   const payment = ref<any>(null)
   const formattedDate = ref('')
+
   // const currentOrder = ref<Order | null>(null)
   // const lastOrder = ref<Order | null>(null)
   // const deliveryDetails = ref<DeliveryDetails | null>(null)
@@ -50,6 +56,13 @@ export function useOrderProcess() {
     // estimatedDelivery(transporterInfo.value?.estimated_delivery_time ?? 0),
     estimatedDelivery(),
   )
+  const userId = ref<Database['public']['Tables']['profiles']['Row']['id'] | undefined>('')
+  async function loadUserId() {
+    const profile = await getUserProfile()
+    userId.value = profile.data.session?.user.id
+    return userId.value
+  }
+  loadUserId()
 
   /** Computed pour gérer l’ordre effectif : BDD si dispo sinon store */
   const effectiveOrder = computed<Order>(() => {
@@ -59,7 +72,7 @@ export function useOrderProcess() {
     // Génère un ordre basé sur le store
     const cart = cartStore.cart
     const delivery = stepStore.livraisonDetails
-    return createOrderFromCart(cart, delivery)
+    return createOrderFromCart(cart, userId.value, delivery)
   })
 
   /** Charge la dernière commande depuis la BDD */
@@ -75,7 +88,7 @@ export function useOrderProcess() {
         return null
       }
 
-      // 📌 Si la BDD renvoie une commande
+      // BDD last order
       lastOrder.value = order
       currentOrder.value = order
 
@@ -101,9 +114,14 @@ export function useOrderProcess() {
   }
 
   //
-  function createOrderFromCart(cart: CartType, delivery?: DeliveryDetails | null): Order {
+
+  function createOrderFromCart(
+    cart: CartType,
+    userId?: Database['public']['Tables']['profiles']['Row']['id'],
+    delivery?: DeliveryDetails | null,
+  ): Order {
     const carts_products = cart.products.map((p) => ({
-      cart_id: String(cart.cart_id ?? 0),
+      cart_id: String(cart.id ?? 0),
       product_id: p.id,
       title: p.title,
       price: p.price,
@@ -117,10 +135,11 @@ export function useOrderProcess() {
       return total + p.price * (p.quantity ?? 1)
     }, 0)
 
+    const { paymentIntentId } = usePaymentStore()
     const order = {
-      id: 0,
-      user_id: 0,
-      cart_id: cart.cart_id ?? 0,
+      id: '0',
+      user_id: userId,
+      cart_id: cart.id ?? '0',
       total_price: productsPrice + (delivery?.transporter?.price ?? 0),
       payment_status: 0,
       payment_method: 'Carte bancaire',
@@ -131,61 +150,22 @@ export function useOrderProcess() {
       delivery_carrier: delivery?.transporter?.name ?? '',
       delivery_date: 'Non encore estimée 2',
       products_price: productsPrice,
-      carts: [
-        {
-          id: cart.cart_id ?? 0,
-          carts_products,
-        },
-      ],
+      payment_ID: paymentIntentId,
+      carts: {
+        id: cart.id ?? '0',
+        carts_products,
+      },
     }
 
     return order
   }
 
-  /** Insère la commande si le paiement a réussi */
-  /*async function insertOrder(payment_intent: string, cartDetail: CartType, forceInsert = false) {
-    loading.value = true
-    error.value = false
-
-    try {
-      const paymentDetails = await fetchPaymentDetails(payment_intent)
-      if (!paymentDetails) throw new Error('Aucun détail de paiement trouvé.')
-
-      payment.value = paymentDetails
-      formattedDate.value = new Date(paymentDetails.created * 1000).toLocaleString('fr-FR')
-
-      if (!deliveryDetails.value) {
-        await loadLastOrder()
-      }
-
-      const carrierId = stepStore.livraisonDetails?.transporter?.id
-      if (!carrierId) {
-        console.warn("Aucun transporteur trouvé, impossible d'insérer la commande.")
-        return
-      }
-
-      if (paymentDetails.status === 'succeeded') {
-        if (forceInsert || !orderAlreadyInserted.value) {
-          await inserOrderService(cartDetail, carrierId)
-          orderAlreadyInserted.value = true
-          cartStore.clearCartStore()
-        }
-        await loadLastOrder()
-      } else {
-        console.warn('Le paiement n’a pas abouti, affichage des données locales.')
-      }
-    } catch (err) {
-      console.error('Erreur dans insertOrder :', err)
-      error.value = true
-    } finally {
-      loading.value = false
-    }
-  }*/
   async function insertOrder(
     // priceInCents: number,
     // items: ProductApi[],
     // payment_intent: string,
     cartDetail: CartType,
+    paymentIntentId: string,
     forceInsert = false,
   ): Promise<boolean> {
     loading.value = true
@@ -203,11 +183,11 @@ export function useOrderProcess() {
       }
 
       const lastOrderFromDb = await getOrderService()
-      const alreadyInserted = !!lastOrderFromDb && lastOrderFromDb.cart_id === cartDetail.cart_id
+      const alreadyInserted = !!lastOrderFromDb && lastOrderFromDb.cart_id === cartDetail.id
 
       if (forceInsert || !alreadyInserted) {
-        await inserOrderService(cartDetail, carrierId)
-        cartStore.clearCartStore()
+        await inserOrderService(cartDetail, carrierId, paymentIntentId)
+        // cartStore.clearCartStore()
       } else {
         console.log('Commande déjà insérée, rien à faire.')
       }
@@ -221,51 +201,13 @@ export function useOrderProcess() {
     } finally {
       loading.value = false
     }
-
-    /*try {
-      // console.log('payment_intent ', payment_intent)
-      // const paymentDetails = await fetchPaymentDetails(payment_intent)
-      if (!paymentDetails) throw new Error('Aucun détail de paiement trouvé.')
-
-      payment.value = paymentDetails
-      formattedDate.value = new Date(paymentDetails.created * 1000).toLocaleString('fr-FR')
-
-      if (!deliveryDetails.value) {
-        await loadLastOrder()
-      }
-
-      const carrierId = stepStore.livraisonDetails?.transporter?.id
-      if (!carrierId) {
-        console.warn("Aucun transporteur trouvé, impossible d'insérer la commande.")
-        return false
-      }
-      if (paymentDetails.status !== 'succeeded') {
-        console.warn('Le paiement n’a pas abouti.')
-        return false
-      }
-
-      const lastOrderFromDb = await getOrderService()
-      const alreadyInserted = !!lastOrderFromDb && lastOrderFromDb.cart_id === cartDetail.cart_id
-
-      if (forceInsert || !alreadyInserted) {
-        await inserOrderService(cartDetail, carrierId)
-        cartStore.clearCartStore()
-      } else {
-        console.log('Commande déjà insérée, rien à faire.')
-      }
-
-      await loadLastOrder()
-      return true
-    } catch (err) {
-      console.error('Erreur dans insertOrder :', err)
-      error.value = true
-      return false
-    } finally {
-      loading.value = false
-    }*/
   }
 
-  async function updateOrder(orderId: Order['id'], payment_intent: string): Promise<boolean> {
+  async function updatePaymentOrder(
+    orderId: Order['id'],
+    payment_intent: string,
+  ): Promise<boolean> {
+    console.log('updatePaymentOrder', orderId)
     loading.value = true
     error.value = false
 
@@ -281,19 +223,73 @@ export function useOrderProcess() {
     formattedDate.value = new Date(paymentDetails.created * 1000).toLocaleString('fr-FR')
 
     try {
-      const isOrderUpdated = await updateOrderService(orderId)
+      const isOrderUpdated = await updatePaymentOrderService(orderId, payment_intent)
+      if (!isOrderUpdated) {
+        error.value = true
+        return false
+      }
+      currentOrder.value = isOrderUpdated
+      return true
+    } catch (err) {
+      console.error('Erreur dans updatePaymentOrder :', err)
+      error.value = true
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Delete Products of order
+  async function deleteOrder(orderId: Order['id']): Promise<boolean> {
+    try {
+      const isOrderDeleted = await deleteOrderFromBdd(orderId)
+
+      if (!isOrderDeleted) {
+        error.value = true
+        return false
+      }
+      // currentOrder.value = isOrderDeleted
+      return true
+    } catch (err) {
+      console.error('Erreur dans la suppression de la commande :', err)
+      error.value = true
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Update order table
+  /*async function updateOrderTable(paymentIntentId: string): Promise<boolean> {
+    try {
+      const isOrderUpdated = await updateOrderFromBdd(paymentIntentId)
+
       if (!isOrderUpdated) {
         error.value = true
         return false
       }
       return true
     } catch (err) {
-      console.error('Erreur dans updateOrder :', err)
+      console.error('Erreur dans la suppression de la commande :', err)
       error.value = true
       return false
     } finally {
       loading.value = false
     }
+  }*/
+
+  async function resetOrder(): Promise<boolean> {
+    const test = await loadLastOrder()
+    console.log('test reset', test)
+
+    if (currentOrder.value?.id && currentOrder.value.id !== '0') {
+      const deleted = await deleteOrder(currentOrder.value.id)
+      if (!deleted) {
+        throw new Error('Erreur lors de la suppression de la commande')
+      }
+      currentOrder.value = await loadLastOrder()
+    }
+    return true
   }
 
   return {
@@ -308,7 +304,10 @@ export function useOrderProcess() {
     loading,
     error,
     insertOrder,
-    updateOrder,
+    updatePaymentOrder,
     loadLastOrder,
+    createOrderFromCart,
+    resetOrder,
+    deleteOrder,
   }
 }

@@ -15,7 +15,7 @@ export const useCartStore = defineStore(
     // State
     const cart = ref<Cart>(
       new Cart({
-        cart_id: null,
+        id: '',
         // status: null,
         products: [],
       }),

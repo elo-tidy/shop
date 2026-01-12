@@ -5,6 +5,8 @@ import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useOrderProcess } from '@/composables/useOrderProcess'
 // Store
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { useCartStore } from '@/store/CartStore'
+import { usePaymentStore } from '@/store/StripeStore'
 
 /**
  * Data : order detail - delivery
@@ -22,7 +24,7 @@ const {
   loading,
   error,
   currentOrder,
-  updateOrder,
+  updatePaymentOrder,
   loadLastOrder,
 } = useOrderProcess()
 
@@ -33,15 +35,21 @@ const shippingDate = computed(() => deliveryDate.value)
 // Update order payment status to paid after payment_intent - load order details
 onMounted(async () => {
   if (payment_intent) {
-    await updateOrder(effectiveOrder.value.id, payment_intent)
+    console.log('effectiveOrder.value.id ', effectiveOrder.value.id)
     await loadLastOrder()
+    await updatePaymentOrder(effectiveOrder.value.id!, payment_intent)
+    // console.log('onMounted', effectiveOrder.value.id)
   }
 })
 
 // Reset StepStore before route leaving - reset local order
 const stepper = usecheckoutStepper()
+const cartStore = useCartStore()
+const paymentStore = usePaymentStore()
 onBeforeRouteLeave(() => {
   if (route.query.redirect_status === 'succeeded') {
+    cartStore.clearCartStore()
+    paymentStore.resetPayment()
     stepper.resetStepper()
     currentOrder.value = null
   }
@@ -64,7 +72,7 @@ onBeforeRouteLeave(() => {
       <p><strong>Date :</strong> {{ formattedDate }}</p>
       <p><strong>Montant :</strong> {{ effectiveOrder?.total_price }} €</p>
       <p><strong>Moyen de paiement :</strong> {{ effectiveOrder?.payment_method }}</p>
-      <p><strong>Paiement n°:</strong> {{ payment?.id }}</p>
+      <p><strong>Paiement n°:</strong> {{ effectiveOrder.payment_ID }}</p>
     </div>
 
     <h3 class="text-[18px] mt-5">Modalités de livraison :</h3>

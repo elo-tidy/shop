@@ -3,12 +3,12 @@ import type { ProductApi } from '@/types/Product'
 
 export class Cart {
   products: CartType['products']
-  cart_id: number | null
+  cart_id: string | null
   // status: string | null
 
   constructor(data: CartType) {
     this.products = data.products
-    this.cart_id = data.cart_id ?? null
+    this.cart_id = data.id ?? null
     // this.status = data.status
   }
 

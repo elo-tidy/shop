@@ -15,30 +15,42 @@ import { numberWithTwoDecimals } from '@/utils/maths'
 import { fetchShippingOptions } from '@/services/ShippingOptions'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { usePaymentStore } from '@/store/StripeStore'
 
 /**
  * Data : Ref -
  */
+
+const { paymentIntentId } = usePaymentStore()
 
 // Ref
 const shippingOptions = ref<ShippingMode | null>(null)
 const activeTab = ref<string>('home_delivery')
 
 // Transporter details
-const { deliveryDetails } = useOrderProcess()
+const { deliveryDetails, deleteOrder, effectiveOrder, loadLastOrder, currentOrder, resetOrder } =
+  useOrderProcess()
 const stepStore = usecheckoutStepper()
 const currentCarrier = computed(() => stepStore.getLivraisonDetails?.transporter.id)
-const selectThisCarrier = (
+const selectThisCarrier = async (
   transporter: Transporter,
   deliveryMode: string,
   deliveryModeId: string,
-): void => {
+): Promise<void> => {
   const payload = {
     transporter,
     deliveryMode,
     deliveryModeId,
   }
+  console.log('effectiveOrder.value.id', effectiveOrder.value.id)
+  // Update orderTable
+  if (paymentIntentId) {
+    await resetOrder()
+    // await updateOrderTable(paymentIntentId)
+  }
+
   stepStore.setLivraisonDetails(payload)
+  console.log(payload)
   deliveryDetails.value = payload
 }
 
