@@ -21,17 +21,7 @@ export async function sendMagicLink(email: string): Promise<void> {
 	}
 }
 
-export async function getUserProfile(/*userId: string*/) {
-	/*const {data, error, status} = await supabase
-		.from("profiles")
-		.select("username")
-		.eq("id", userId)
-		.single();
-
-	if (error && status !== 406) throw error;
-
-	return {data, error, status};*/
-
+export async function getUserProfile() {
 	const {data, error} = await supabase.auth.getSession();
 	if (error || !data) {
 		throw new Error("Utilisateur non connecté ou session invalide");
@@ -43,12 +33,14 @@ export async function updateProfileService(
 	userId: string,
 	userName: string
 ): Promise<void> {
-	const updates: Tables<"profiles"> = {
-		id: userId,
+	const updates: Database["public"]["Tables"]["profiles"]["Update"] = {
 		username: userName,
-		updated_at: new Date().toString(),
+		updated_at: new Date().toISOString(),
 	};
-	const {error} = await supabase.from("profiles").upsert(updates);
+	const {error} = await supabase
+		.from("profiles")
+		.update(updates)
+		.eq("id", userId);
 	if (error) throw error;
 }
 

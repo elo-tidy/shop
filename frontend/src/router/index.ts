@@ -4,6 +4,7 @@ import Product from '@/views/ProductView.vue'
 import Cart from '@/views/CartView.vue'
 import Auth from '@/views/AuthView.vue'
 import Checkout from '@/views/CheckoutView.vue'
+import AdminProducts from '@/views/admin/productView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,12 @@ const router = createRouter({
       name: '404',
       component: Product,
       meta: { title: 'Page introuvable', breadcrumb: 'Page introuvable' },
+    },
+    {
+      path: '/admin/products',
+      name: 'products',
+      component: AdminProducts,
+      meta: { title: 'Gestion des produits', breadcrumb: 'Gestion des produits' },
     },
     // {
     //   path: '/catalogue/categorie/:slug',

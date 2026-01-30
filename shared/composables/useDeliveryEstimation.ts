@@ -1,5 +1,5 @@
 // Stores
-import {usecheckoutStepper} from "../../client/src/store/OrderStepperStore";
+import {usecheckoutStepper} from "../../frontend/src/store/OrderStepperStore";
 
 export function estimatedDelivery(): string {
 	const stepStore = usecheckoutStepper();
