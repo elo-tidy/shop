@@ -1,0 +1,29 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@shop/shared':
+        specifier: file:../../shared
+        version: file:../../shared
+
+packages:
+
+  '@shop/shared@file:../../shared':
+    resolution: {directory: ../../shared, type: directory}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
+snapshots:
+
+  '@shop/shared@file:../../shared':
+    dependencies:
+      zod: 4.3.6
+
+  zod@4.3.6: {}
