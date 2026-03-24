@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineComponent, h, markRaw } from 'vue'
 // Types
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 // Ui
 import { Button } from '@/components/ui/button'
 import { CardFooter } from '@/components/ui/card'
@@ -54,7 +54,7 @@ const customToast = defineComponent({
 })
 </script>
 <template>
-  <CardFooter class="card-footer flex jpx-6 pb-6 justify-end-safe">
+  <CardFooter>
     <Button type="button" @click="addThisProductToCart(product, 1)"
       >Ajouter au panier <span class="sr-only">le produit {{ product.title }}</span></Button
     >

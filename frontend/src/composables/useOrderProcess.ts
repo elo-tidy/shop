@@ -1,10 +1,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { CartType, Order, InsertCartProduct, Cart } from '@/types/Cart'
-import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/types/ShippingMode'
-import type { ProductApi } from '@/types/Product'
-import type { Database } from '@/types/supabase'
+import type { CartType, Order, InsertCartProduct, Cart } from '@/typesold/Cart'
+import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/typesold/ShippingMode'
+import type { ProductApi } from '@/typesold/Product'
+import type { Database } from '@/typesold/supabase'
 // Stores
 import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'

@@ -2,8 +2,8 @@ import { computed, watchEffect, ref } from 'vue'
 import { useCartStore } from '@/store/CartStore'
 import { useOrderProcess } from '@/composables/useOrderProcess'
 import { Cart as CartModel } from '@/models/Cart'
-import type { CartType, Cart, InsertCartProduct } from '@/types/Cart'
-import type { ProductApi } from '@/types/Product'
+import type { CartType, Cart, InsertCartProduct } from '@/typesold/Cart'
+import type { ProductApi } from '@/typesold/Product'
 
 export function useCartDetails() {
   const { effectiveOrder } = useOrderProcess()

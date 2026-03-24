@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // Types
 import type { Component } from 'vue'
-import type { stepType } from '@/types/Stepper'
+import type { stepType } from '@/typesold/Stepper'
 interface SummaryContent {
   title: string
   component: Component

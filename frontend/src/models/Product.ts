@@ -1,4 +1,4 @@
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 
 export class Product {
   private data: ProductApi

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
 // Types
-import type { ShippingMode, Transporter, DeliveryMode } from '@/types/ShippingMode'
+import type { ShippingMode, Transporter, DeliveryMode } from '@/typesold/ShippingMode'
 // Ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'

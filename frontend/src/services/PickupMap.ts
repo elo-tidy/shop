@@ -1,4 +1,4 @@
-import type { FeatureCollection, Pickup } from '@/types/pickup'
+import type { FeatureCollection, Pickup } from '@/typesold/pickup'
 const BASE_URL = '/data/pickup.json'
 
 export async function fetchMarkersData(): Promise<FeatureCollection> {

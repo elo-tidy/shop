@@ -2,9 +2,9 @@
 import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 // Type
-import type { CartType, Order } from '@/types/Cart'
+import type { CartType, Order } from '@/typesold/Cart'
 import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
-import type { DeliveryDetails } from '@/types/ShippingMode'
+import type { DeliveryDetails } from '@/typesold/ShippingMode'
 // UI
 import Button from '@/components/ui/button/Button.vue'
 import { toast } from 'vue-sonner'

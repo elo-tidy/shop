@@ -1,5 +1,5 @@
-import type { CartType } from '@/types/Cart'
-import type { ProductApi } from '@/types/Product'
+import type { CartType } from '@/typesold/Cart'
+import type { ProductApi } from '@/typesold/Product'
 
 export class Cart {
   products: CartType['products']

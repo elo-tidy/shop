@@ -1,8 +1,8 @@
 // src/store/OrderStepperStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { stepType } from '@/types/Stepper'
-import type { Transporter, DeliveryDetailsWrapper, DeliveryDetails } from '@/types/ShippingMode'
+import type { stepType } from '@/typesold/Stepper'
+import type { Transporter, DeliveryDetailsWrapper, DeliveryDetails } from '@/typesold/ShippingMode'
 
 export const usecheckoutStepper = defineStore(
   'checkoutStepper',

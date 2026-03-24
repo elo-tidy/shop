@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import type { Ref } from 'vue'
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 import { Product } from '@/models/Product'
 
 export function useProductModel(storeProductData: Ref<ProductApi | undefined>) {

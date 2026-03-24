@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { Cart } from '@/models/Cart'
 import { usecheckoutStepper } from './OrderStepperStore'
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 import {
   formatPriceWithTwoDecimals,
   priceFromEurosToCents,

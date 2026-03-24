@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 // Components
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
@@ -15,7 +15,7 @@ import { usecheckoutStepper } from '@/store/OrderStepperStore'
 // Props
 const props = defineProps<{
   products?: ProductApi[]
-  layout?: 'cart' | 'check'
+  layout?: 'cart' | 'check' | 'admin'
   productOnly?: true
 }>()
 

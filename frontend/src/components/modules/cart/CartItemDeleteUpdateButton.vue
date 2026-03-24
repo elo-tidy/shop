@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 // Types
-import type { ProductApi } from '@/types/Product'
+import type { ProductApi } from '@/typesold/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

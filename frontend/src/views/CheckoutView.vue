@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // Types
-import type { stepType } from '@/types/Stepper'
+import type { stepType } from '@/typesold/Stepper'
 // Ui
 import { Button } from '@/components/ui/button'
 import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'

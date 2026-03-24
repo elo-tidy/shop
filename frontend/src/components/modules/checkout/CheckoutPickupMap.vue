@@ -7,7 +7,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/
 import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
 // Types
-import type { Pickup } from '@/types/pickup'
+import type { Pickup } from '@/typesold/pickup'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 // Services
