@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 // Ui
 import {
   Sidebar,
@@ -17,10 +17,14 @@ import {
 // Components
 import CartButton from '@/components/modules/cart/CartSectionLink.vue'
 import userInfo from '@/components/modules/user/UserDisplay.vue'
+import dashboard from '@/components/modules/admin/AdminDashboard.vue'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
+import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 
+// Data
 const { session } = useSupabaseSession()
+const { currentSessionIsAdmin } = useIsUserAdmin()
 </script>
 
 <template>
@@ -44,6 +48,9 @@ const { session } = useSupabaseSession()
       <SidebarContent class="px-6 pt-1">
         <nav role="navigation">
           <ul class="grid gap-y-2">
+            <li v-if="currentSessionIsAdmin">
+              <dashboard />
+            </li>
             <li v-if="session">
               <userInfo />
             </li>

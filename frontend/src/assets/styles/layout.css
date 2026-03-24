@@ -3,7 +3,7 @@
 /************************************/
 * {
   @apply border-dashed border-primary/20;
-  transition: var(--transition);
+  /* transition: var(--transition); */
 }
 #app {
   height: calc(100dvh - 3rem);
@@ -32,7 +32,11 @@ main {
 }
 
 [data-sonner-toast] *:not(button) {
-  @apply w-full;
+  /* @apply w-full; */
+}
+
+[data-sonner-toast] [data-close-button] svg {
+  @apply h-full w-full;
 }
 
 /************************************/
