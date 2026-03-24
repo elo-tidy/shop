@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -130,7 +125,7 @@ export type Database = {
           },
         ]
       }
-      categories: {
+      categoriescat: {
         Row: {
           id: number
           title: string | null
@@ -263,57 +258,55 @@ export type Database = {
       }
       products: {
         Row: {
-          category: number
-          description: string
+          archived: boolean
+          category: Database["public"]["Enums"]["categories"]
+          description: string | null
           id: number
           image: string | null
           price: number
           title: string
         }
         Insert: {
-          category: number
-          description: string
+          archived?: boolean
+          category: Database["public"]["Enums"]["categories"]
+          description?: string | null
           id?: number
           image?: string | null
           price: number
           title: string
         }
         Update: {
-          category?: number
-          description?: string
+          archived?: boolean
+          category?: Database["public"]["Enums"]["categories"]
+          description?: string | null
           id?: number
           image?: string | null
           price?: number
           title?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "products_category_fkey"
-            columns: ["category"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
+          created_at: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
-          username: string
+          username: string | null
         }
         Insert: {
+          created_at?: string | null
           id: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
-          username: string
+          username?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
-          username?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -322,9 +315,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_products_categories: {Returns: Json }
     }
     Enums: {
+      categories:
+        | "electronics"
+        | "jewelery"
+        | "mens clothing"
+        | "womens clothing"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -456,7 +454,14 @@ export const Constants = {
   },
   public: {
     Enums: {
+      categories: [
+        "electronics",
+        "jewelery",
+        "mens clothing",
+        "womens clothing",
+      ],
       user_role: ["user", "admin"],
     },
   },
 } as const
+

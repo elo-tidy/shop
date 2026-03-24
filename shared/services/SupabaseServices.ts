@@ -1,6 +1,6 @@
 // Types
-import type {CartType, InsertCartProduct, Order} from "@/types/Cart";
-import type {Database, Tables, TablesInsert} from "@/types/supabase";
+import type {CartType, InsertCartProduct, Order} from "@/typesold/Cart";
+import type {Database, Tables, TablesInsert} from "@/typesold/supabase";
 // import type { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 // Stores
 import {useCartStore} from "@/store/CartStore";
@@ -27,6 +27,23 @@ export async function getUserProfile() {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
 	return {data, error};
+}
+
+export async function isAdmin():Promise<boolean> {
+	const {data: sessionData, error: sessionError} = await getUserProfile();
+	if (sessionError || !sessionData) {
+		throw new Error("Utilisateur non connecté ou session invalide");
+	}
+	const userId = sessionData?.session?.user.id!;
+
+	const {data, error} = await supabase
+		.from("profiles")
+		.select("role")
+		.eq("id", userId)
+		.single()
+	if (error) throw error;
+
+	return data.role === "admin" ? true : false
 }
 
 export async function updateProfileService(

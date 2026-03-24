@@ -8,9 +8,12 @@
     "pnpm": "10.28.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
+    "copy-shared-frontend": "robocopy ..\\shared\\types src\\types /E || exit 0",
+    "copy-shared-supabase": "robocopy ..\\shared\\types ..\\supabase\\functions\\types /E || exit 0",
+    "copy-shared": "pnpm run copy-shared-frontend && pnpm run copy-shared-supabase",
+    "dev": "npm run copy-shared && vite",
+    "build": "npm run copy-shared && run-p type-check \"build-only {@}\" --",
+    "preview": "npm run copy-shared && vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
@@ -39,7 +42,7 @@
     "vue-router": "^4.5.1",
     "vue-sonner": "^2.0.9",
     "vue-stripe-js": "^2.0.2",
-    "zod": "^4.1.11"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
