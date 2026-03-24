@@ -4,11 +4,9 @@ import { RouterView } from 'vue-router'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import 'vue-sonner/style.css'
-import { Button } from './components/ui/button'
 // Components
 import AppSidebar from '@/components/header/AppSidebar.vue'
 import Breadcrumbs from '@/components/header/Breadcrumbs.vue'
-// import type { Button } from './components/ui/button'
 </script>
 
 <template>
@@ -22,5 +20,20 @@ import Breadcrumbs from '@/components/header/Breadcrumbs.vue'
       <p>© 2025 Fictive Shop</p>
     </footer>
   </SidebarProvider>
-  <Toaster :expand="false" :duration="Infinity" closeButton position="top-right"> </Toaster>
+  <Toaster
+    :expand="false"
+    :duration="Infinity"
+    :closeButton="true"
+    position="top-right"
+    :containerAriaLabel="'Espace de notifications'"
+    :closeButtonAriaLabel="'Fermer la fenêtre de notification'"
+    :toastOptions="{
+      unstyled: true,
+      classes: {
+        toast: 'p-4 pr-8 bg-background border text-sm text-white',
+        closeButton: 'absolute top-2 right-2 w-[20px] h-[20px] text-white hover:text-primary',
+      },
+    }"
+  >
+  </Toaster>
 </template>
