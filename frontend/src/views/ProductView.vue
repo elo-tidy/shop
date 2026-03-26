@@ -5,13 +5,13 @@ import { useRoute, useRouter } from 'vue-router'
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 
 import { useProductStore } from '@/store/ProductStore'
-import type { ProductApi } from '@/typesold/Product'
+import type { productCatalog } from '../../../shared/types/Product'
 
 const route = useRoute()
 const router = useRouter()
 const store = useProductStore()
 
-const product = ref<ProductApi | null>(null)
+const product = ref<productCatalog | null>(null)
 
 onMounted(async () => {
   const id = route.params.id?.toString()

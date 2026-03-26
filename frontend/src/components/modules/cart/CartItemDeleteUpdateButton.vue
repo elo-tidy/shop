@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 // Types
-import type { ProductApi } from '@/typesold/Product'
+import type { productCatalog } from '../../../../../shared/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import { useOrderProcess } from '@/composables/useOrderProcess'
 
 // Props
 const props = defineProps<{
-  product: ProductApi
+  product: productCatalog
   layout?: 'detail' | 'cart' | 'check'
 }>()
 
@@ -59,7 +59,7 @@ const updateItemQuantity = async (productId: number, addOrRemove: string) => {
 }
 </script>
 <template>
-  <CardFooter>
+  <CardFooter class="mt-6">
     <div
       class="grid auto-cols-max grid-flow-col group-quantity mr-10"
       role="group"
@@ -80,7 +80,7 @@ const updateItemQuantity = async (productId: number, addOrRemove: string) => {
       <!-- Less quantity or delete if 1 -->
       <Button
         v-if="product?.itemQuantity === 1"
-        class="delete-item remove-quantity"
+        class="delete-item remove-quantity btn-icon"
         type="button"
         title="Supprimer l'article"
         @click="deleteThisProductfromCart(product?.id)"
@@ -90,7 +90,7 @@ const updateItemQuantity = async (productId: number, addOrRemove: string) => {
       </Button>
       <Button
         v-else
-        class="remove-quantity"
+        class="remove-quantity btn-icon"
         type="button"
         title="Diminuer la quantité de 1"
         :aria-controls="`item-quantity-id${product?.id}`"

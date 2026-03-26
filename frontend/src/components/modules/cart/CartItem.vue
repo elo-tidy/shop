@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { ProductApi } from '@/typesold/Product'
+import type { productCatalog } from '@/types/Product'
 // Components
+
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
@@ -13,11 +14,16 @@ import { useOrderProcess } from '@/composables/useOrderProcess'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
 // Props
-const props = defineProps<{
-  products?: ProductApi[]
-  layout?: 'cart' | 'check' | 'admin'
-  productOnly?: true
-}>()
+const props = withDefaults(
+  defineProps<{
+    products?: productCatalog[]
+    layout?: 'cart' | 'check' | 'admin'
+    productOnly?: true
+  }>(),
+  {
+    layout: 'cart',
+  },
+)
 
 /**
  * Data : global - layout - order - cart - wording
@@ -28,12 +34,12 @@ const route = useRoute()
 const stepStore = usecheckoutStepper()
 
 // Layout
-const layout = computed(() => props.layout ?? 'cart')
+// const layout = computed(() => props.layout ?? 'cart')
 const displayProductOnly = computed(() => !!props.productOnly)
 
 // Order
 const { effectiveOrder } = useOrderProcess()
-const products = computed<ProductApi[]>(() => {
+const products = computed<productCatalog[]>(() => {
   if (props.products?.length) return props.products
 
   const carts = effectiveOrder.value?.carts
@@ -42,7 +48,7 @@ const products = computed<ProductApi[]>(() => {
   const firstCart = Array.isArray(carts) ? carts[0] : carts
   if (!firstCart?.carts_products || firstCart.carts_products.length === 0) return []
 
-  return firstCart.carts_products.map((p: ProductApi) => ({
+  return firstCart.carts_products.map((p: productCatalog) => ({
     id: p.id,
     title: p.title,
     price: p.price,
@@ -74,10 +80,12 @@ const cta = computed(() => {
 </script>
 
 <template>
-  <div v-if="products.length" class="shoping-cart">
-    <ul :class="['grid', layout !== 'check' ? 'border bg-background' : 'border-b']">
-      <li class="not-first:border-t p-5" v-for="item in products" :key="item.id">
-        <productItem :product="item" :layout="layout" />
+  <div v-if="products.length" class="shoping-cart max-w-4xl">
+    <!-- <ul :class="['grid', layout !== 'check' ? 'border bg-background' : 'border-b']"> -->
+    <ul class="grid border-t-0 border-b-0 gap-y-2">
+      <!-- <li class="not-first:border-t p-5" v-for="item in products" :key="item.id"> -->
+      <li class="" v-for="item in products" :key="item.id">
+        <productItem :product="item" :layout="props.layout" />
       </li>
     </ul>
 

@@ -296,7 +296,7 @@ const onSubmit = handleSubmit(async (data) => {
     </div>
     <div v-if="dataReq">
       <h2 class="mb-5 text-[23px]">Visuel du produit précédemment {{ labels.previewTitle }} :</h2>
-      <ProductCard :product="dataReq.data[0]" layout="grid" :displayFooter="false" :hn="3" />
+      <ProductCard :product="dataReq.data[0]" display="card" :displayFooter="false" :hn="3" />
     </div>
   </div>
 </template>

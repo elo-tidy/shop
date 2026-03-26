@@ -14,19 +14,21 @@ if (productStore.products.length === 0) {
 // Props
 const props = withDefaults(
   defineProps<{
-    layout?: 'admin' | 'detail'
-    display?: 'grid' | ''
+    layout?: 'admin' | 'detail' | 'liste'
+    display?: 'grid' | 'card'
     hn?: 1 | 2 | 3 | 4
     showItemId?: boolean
   }>(),
   {
-    layout: 'detail',
-    display: '',
+    display: 'grid',
   },
 )
 
 // Class
-const gridClass = props.display === 'grid' ? '' : 'grid-cols-3 gap-6'
+const gridClass = computed(() => (props.display === 'card' ? 'grid-cols-3 gap-6' : 'gap-y-2'))
+const compLayout = computed(() =>
+  props.display === 'grid' || !props.display === null ? 'grid-tpl' : 'card-tpl',
+)
 </script>
 
 <template>
@@ -38,9 +40,11 @@ const gridClass = props.display === 'grid' ? '' : 'grid-cols-3 gap-6'
   </p>
   <div v-if="productStore.isLoading">Chargement des produits...</div>
 
+  <!-- <div v-else :class="['grid', gridClass, layoutClass]"> -->
   <div v-else :class="['grid', gridClass]">
     <ProductCard
       v-for="product in productStore.filteredProducts"
+      :class="compLayout"
       :product
       :key="product.id"
       :layout="props.layout"

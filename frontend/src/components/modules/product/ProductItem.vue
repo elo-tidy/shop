@@ -2,8 +2,7 @@
 import { computed, toRef } from 'vue'
 import { RouterLink } from 'vue-router'
 // Type
-// import type { Product } from '../../../../../shared/types/Product'
-import type { productAdd } from '@/types/Product'
+import type { productCatalog } from '@/types/Product'
 // Ui
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 // Components
@@ -14,15 +13,12 @@ import ProductTitle from '@/components/modules/product/ProductTitle.vue'
 import CartItemFooterAdmin from '@/components/modules/cart/CartItemFooterAdmin.vue'
 // Composables
 import { useProductModel } from '@/composables/useProductModel'
-import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
-
-const { currentSessionIsAdmin } = useIsUserAdmin()
 
 // Props
 const props = withDefaults(
   defineProps<{
-    product: productAdd
-    layout?: 'admin' | 'detail'
+    product: productCatalog
+    layout?: 'admin' | 'detail' | 'liste' | 'cart' | 'check'
     display?: 'grid' | 'card'
     hn?: 1 | 2 | 3 | 4
     cart_id?: string
@@ -35,6 +31,8 @@ const props = withDefaults(
     product_id: 0,
     showItemId: false,
     displayFooter: true,
+    // layout: 'liste',
+    display: 'grid',
   },
 )
 
@@ -42,13 +40,16 @@ const props = withDefaults(
  * Data : layout
  */
 // Class
-const gridClass =
-  props.display === 'grid' ? 'bg-transparent border-0 border-b-1 py-4 gap-0' : 'border'
+const gridClass = props.display !== 'grid' ? '' : ' py-4'
+const compLayout = computed(() =>
+  props.display === 'grid' || props.display === undefined ? 'grid-tpl' : 'card-tpl',
+)
 
 // Layout
-const layout = computed(() => {
-  return props.layout ? props.layout : undefined
-})
+// const layout = computed(() => {
+//   return props.layout ? props.layout : 'detail bg-transparent border-0'
+// })
+
 /*const hn: 1 | 4 | undefined =
   layout.value === 'detail' ? 1 : layout.value === 'admin' ? 4 : undefined*/
 
@@ -56,7 +57,7 @@ const layout = computed(() => {
 const productRef = toRef(props, 'product')
 const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
 const productTitleWrapper = computed(() => {
-  return layout.value !== 'detail' && layout.value !== 'admin' ? RouterLink : 'span'
+  return props.layout !== 'detail' ? RouterLink : 'span'
 })
 const productTitleWrapperProps = computed(() => {
   return productTitleWrapper.value !== 'span' && modelProduct.value
@@ -64,7 +65,7 @@ const productTitleWrapperProps = computed(() => {
     : null
 })
 const productContent = computed(() => {
-  return layout.value === 'detail' && modelProduct.value
+  return props.layout === 'detail' && modelProduct.value
     ? {
         productDescription: modelProduct.value.description,
         productTitle: modelProduct.value.title,
@@ -77,11 +78,11 @@ const productContent = computed(() => {
 
 // Product
 const productFooter = computed(() => {
-  switch (layout.value) {
-    /*case 'cart':
+  switch (props.layout) {
+    case 'cart':
       return CartItemFooter
     case 'check':
-      return CartItemFooterCheck*/
+      return CartItemFooterCheck
     case 'admin':
       return CartItemFooterAdmin
     default:
@@ -90,7 +91,7 @@ const productFooter = computed(() => {
 })
 </script>
 <template>
-  <Card v-if="product" :class="['py-0 relative card gap-0', props.display, gridClass]">
+  <Card v-if="product" :class="['py-0 relative card gap-0', gridClass, compLayout, props.layout]">
     <CardHeader class="card-header grid-cols-[1fr_auto] gap-x-4">
       <ProductTitle :hn="props.hn">
         <component :is="productTitleWrapper" v-bind="productTitleWrapperProps">
@@ -117,12 +118,12 @@ const productFooter = computed(() => {
     <img :src="product.image" :alt="imageAlt" class="object-contain img" />
 
     <!-- v-if="layout !== 'detail' && layout !== 'admin'" -->
-    <CardContent :class="['h-full', displayFooter === false ? 'pb-4' : undefined]">
+    <CardContent :class="['h-full card-content', displayFooter === false ? 'pb-4' : undefined]">
       {{ productContent.productDescription }}
     </CardContent>
 
     <component
-      class="card-footer flex py-6 justify-end-safe"
+      class="card-footer my-6"
       v-if="displayFooter"
       :is="productFooter"
       :layout

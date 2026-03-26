@@ -69,7 +69,6 @@ async function signOut() {
 </script>
 
 <template>
-  <pre>{{ session }}</pre>
   <div class="flex max-w-xl justify-between">
     <h1 class="mb-10 text-[30px]">Mon profil</h1>
     <Button class="button block" @click="signOut" :disabled="loading">Se déconnecter</Button>

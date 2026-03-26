@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
 const session = useSupabaseSession()
+const linkTitle = computed(() => (session.session.value?.user ? 'Mon profil' : 'Se connecter'))
 </script>
-<template v-if="session">
-  <RouterLink :to="{ name: 'auth' }" class="btn-sidebar btn-profile border"
-    ><span class="sr-only">Voir </span>Mon profil</RouterLink
-  >
+<template>
+  <RouterLink :to="{ name: 'auth' }" class="btn-sidebar btn-profile border">
+    {{ linkTitle }}
+  </RouterLink>
 </template>

@@ -2,6 +2,24 @@
 import { z } from "https://esm.sh/zod@4.1.11";
 
 // Add product
+export const productCatalogSchema = z.object({
+  id: z.number() .min(0, "L'id doit être positif"),
+  title: z.string().optional(),
+  price: z.number()
+    .refine((val:number) => val > 0, {
+      message: "Le prix est obligatoire",
+    })
+    .min(0, "Le prix doit être positif"),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  category: z.union([
+    z.enum(["electronics", "jewelery", "mens clothing", "womens clothing"]),
+    z.undefined()
+  ]).optional(),
+})
+export type productCatalog = z.infer<typeof productAddSchema>
+
+// Add product
 export const productAddSchema = z.object({
   id: z.number().optional(),
   title: z.string().min(1, "Le titre est obligatoire"),
@@ -11,9 +29,9 @@ export const productAddSchema = z.object({
     })
     .min(0, "Le prix doit être positif"),
   description: z.string().min(1, "La description est obligatoire"),
- image: z.string()
-  .min(1, "L'url de l'image est obligatoire")
-  .pipe(z.string().url("L'url est invalide")),
+  image: z.string()
+    .min(1, "L'url de l'image est obligatoire")
+    .pipe(z.string().url("L'url est invalide")),
   // category: z.string().min(1, "La catégorie est obligatoire"),
   category: z.union([
     z.enum(["electronics", "jewelery", "mens clothing", "womens clothing"]),

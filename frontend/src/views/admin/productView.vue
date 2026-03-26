@@ -27,7 +27,16 @@ productStore.setAdminDisplay(true)
           </RouterLink>
         </Button>
       </p>
-      <ProductList layout="admin" display="grid" :showItemId="true" :hn="3" />
+      <!--
+    <ul class="grid bg-background border border-b-0">
+      <li class="not-first:border-t p-5" v-for="item in products" :key="item.id">
+      <li class="" v-for="item in products" :key="item.id">
+        <productItem layout="admin" display="grid" :showItemId="true" :hn="3"/>
+      </li>
+    </ul>
+  -->
+
+      <ProductList layout="admin" :showItemId="true" :hn="3" />
     </TabsContent>
     <TabsContent value="commandes">
       <h2 class="sr-only">Gestion des commandes</h2>

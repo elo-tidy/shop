@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 // Types
-import type { ProductApi } from '@/typesold/Product'
+import { type productCatalog } from '@/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 // Composables
@@ -12,7 +12,7 @@ import { useCartStore } from '@/store/CartStore'
 
 // Props
 const props = defineProps<{
-  product: ProductApi
+  product: productCatalog
 }>()
 
 /**
@@ -35,8 +35,8 @@ const { product } = useProductModel(storeProduct)
     <div class="grid auto-cols-max grid-flow-col group-quantity mr-10">
       <p>
         Quantité :
-        <span class="nb-quantity">{{ product?.quantity! }}</span>
-        <span class="sr-only"> {{ product?.quantity! > 1 ? 'articles' : 'article' }}</span>
+        <span class="nb-quantity">{{ props.product?.quantity }}</span>
+        <span class="sr-only"> {{ props.product?.quantity > 1 ? 'articles' : 'article' }}</span>
       </p>
     </div>
   </CardFooter>

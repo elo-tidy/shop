@@ -23,7 +23,6 @@ import { useSupabaseSession } from '@/composables/useSupabaseSession'
 import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 
 // Data
-const { session } = useSupabaseSession()
 const { currentSessionIsAdmin } = useIsUserAdmin()
 </script>
 
@@ -51,7 +50,7 @@ const { currentSessionIsAdmin } = useIsUserAdmin()
             <li v-if="currentSessionIsAdmin">
               <dashboard />
             </li>
-            <li v-if="session">
+            <li>
               <userInfo />
             </li>
             <li>
