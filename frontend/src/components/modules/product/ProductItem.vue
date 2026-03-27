@@ -123,7 +123,7 @@ const productFooter = computed(() => {
     </CardContent>
 
     <component
-      class="card-footer my-6"
+      class="card-footer mt-6"
       v-if="displayFooter"
       :is="productFooter"
       :layout

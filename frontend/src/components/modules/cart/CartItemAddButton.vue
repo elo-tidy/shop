@@ -54,7 +54,7 @@ const customToast = defineComponent({
 })
 </script>
 <template>
-  <CardFooter class="card-footer flex justify-end-safe items-end">
+  <CardFooter class="card-footer flex justify-end-safe items-end mb-6">
     <Button type="button" @click="addThisProductToCart(product, 1)"
       >Ajouter au panier <span class="sr-only">le produit {{ product.title }}</span></Button
     >

@@ -22,6 +22,10 @@
     img {
       @apply p-4 w-full min-h-[250px] h-[250px] -order-1;
     }
+
+    .card-footer {
+      @apply z-1;
+    }
   }
 
   /********************/
@@ -81,7 +85,7 @@
     .card-header,
     .card-content,
     .card-footer {
-      @apply col-start-2;
+      @apply col-start-2 col-end-9;
     }
     .card-content {
       @apply line-clamp-1 overflow-hidden;
