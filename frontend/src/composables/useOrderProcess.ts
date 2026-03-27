@@ -25,6 +25,9 @@ import {
   convertDateFRtoISO,
 } from '../../../shared/composables/useDeliveryEstimation'
 import type { User } from '@supabase/supabase-js'
+import {
+  numberWithTwoDecimals,
+} from '@/utils/maths'
 
 const currentOrder = ref<Order | null>(null)
 const lastOrder = ref<Order | null>(null)
@@ -140,16 +143,16 @@ export function useOrderProcess() {
       id: '0',
       user_id: userId,
       cart_id: cart.id ?? '0',
-      total_price: productsPrice + (delivery?.transporter?.price ?? 0),
+      total_price: numberWithTwoDecimals(productsPrice + (delivery?.transporter?.price ?? 0)),
       payment_status: 0,
       payment_method: 'Carte bancaire',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       delivery_status: 0,
-      delivery_price: delivery?.transporter?.price ?? 0,
+      delivery_price: numberWithTwoDecimals(delivery?.transporter?.price ?? 0),
       delivery_carrier: delivery?.transporter?.name ?? '',
       delivery_date: 'Non encore estimée 2',
-      products_price: productsPrice,
+      products_price: numberWithTwoDecimals(productsPrice),
       payment_ID: paymentIntentId,
       carts: {
         id: cart.id ?? '0',
