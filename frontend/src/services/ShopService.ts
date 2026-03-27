@@ -21,11 +21,21 @@ import type {Database} from'@/types/database'
 export async function fetchAllProducts() : Promise<productAdd>{
   const { data, error } = await supabase
     .from('products')
-    .select()
+    // .select('*')
+    .select(`
+      *,
+      product_stock (quantity)
+    `);
   if (error) {
     throw new Error('Erreur lors du chargement des produits')
   }
-  return data
+  // extract stock within item
+  const mappedData = data.map((item: productAdd) => ({
+    ...item, 
+    stock: item.product_stock?.quantity ?? 0,
+  })).map(({product_stock, ...rest}) => rest )
+
+  return mappedData
   
 }
 

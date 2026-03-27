@@ -64,7 +64,7 @@ export const useProductStore = defineStore(
     })
 
     const getPublicProducts = computed(() => {
-      return products.value.filter((p:productAdd) => p.archived === false)
+      return products.value.filter((p:productAdd) => p.archived === false && p.stock > 0)
     })
 
     const filteredProducts = computed(() => {

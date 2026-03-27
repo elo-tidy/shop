@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 // Types
 import type { productCatalog } from '@/types/Product'
 // Components
-
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
@@ -34,7 +33,6 @@ const route = useRoute()
 const stepStore = usecheckoutStepper()
 
 // Layout
-// const layout = computed(() => props.layout ?? 'cart')
 const displayProductOnly = computed(() => !!props.productOnly)
 
 // Order
@@ -56,6 +54,7 @@ const products = computed<productCatalog[]>(() => {
     image: p.image,
     category: p.category,
     quantity: p.quantity ?? 1,
+    stock: p.stock ?? 0,
   }))
 })
 
@@ -81,9 +80,7 @@ const cta = computed(() => {
 
 <template>
   <div v-if="products.length" class="shoping-cart max-w-4xl">
-    <!-- <ul :class="['grid', layout !== 'check' ? 'border bg-background' : 'border-b']"> -->
     <ul class="grid border-t-0 border-b-0 gap-y-2">
-      <!-- <li class="not-first:border-t p-5" v-for="item in products" :key="item.id"> -->
       <li class="" v-for="item in products" :key="item.id">
         <productItem :product="item" :layout="props.layout" />
       </li>

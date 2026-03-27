@@ -1,11 +1,11 @@
-import type { ProductApi } from '@/typesold/Product'
+import type { productCatalog } from '@/types/Product'
 import type { Database, Tables } from './supabase'
 
 type SupabaseCartRow = Database['public']['Tables']['carts']['Insert']
 export interface CartType extends SupabaseCartRow {
   // cart_id?: string | null
   // products: InsertCartProduct[]
-  products: ProductApi[]
+  products: productCatalog[]
   // status: string | null
 }
 

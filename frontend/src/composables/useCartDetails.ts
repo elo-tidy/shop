@@ -2,8 +2,7 @@ import { computed, watchEffect, ref } from 'vue'
 import { useCartStore } from '@/store/CartStore'
 import { useOrderProcess } from '@/composables/useOrderProcess'
 import { Cart as CartModel } from '@/models/Cart'
-import type { CartType, Cart, InsertCartProduct } from '@/typesold/Cart'
-import type { ProductApi } from '@/typesold/Product'
+import type { CartType, Cart } from '@/types/Cart'
 
 export function useCartDetails() {
   const { effectiveOrder } = useOrderProcess()
@@ -21,7 +20,7 @@ export function useCartDetails() {
 
     return {
       cart_id: cartObj.id ?? null,
-      products: cartObj.carts_products.map((p: InsertCartProduct) => ({
+      products: cartObj.carts_products.map((p: Cart) => ({
         id: Number(p.product_id),
         title: p.title,
         price: p.price,
@@ -29,6 +28,7 @@ export function useCartDetails() {
         image: p.image,
         category: p.category,
         quantity: p.quantity,
+        stock: p.stock,
       })),
     }
   })

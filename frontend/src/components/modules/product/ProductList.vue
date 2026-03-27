@@ -21,6 +21,7 @@ const props = withDefaults(
   }>(),
   {
     display: 'grid',
+    layout: 'liste',
   },
 )
 

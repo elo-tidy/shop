@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineComponent, h, markRaw } from 'vue'
 // Types
-import type { productCatalog } from '../../../../../shared/types/Product'
+import type { productCatalog } from '@/types/Product'
 // Ui
 import { Button } from '@/components/ui/button'
 import { CardFooter } from '@/components/ui/card'

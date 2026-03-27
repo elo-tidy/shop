@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 
 import { useProductStore } from '@/store/ProductStore'
-import type { productCatalog } from '../../../shared/types/Product'
+import type { productCatalog } from '@/types/Product'
 
 const route = useRoute()
 const router = useRouter()

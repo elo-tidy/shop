@@ -256,6 +256,27 @@ export type Database = {
         }
         Relationships: []
       }
+      product_stock: {
+        Row: {
+          id: number
+          product_id: number
+          quantity: number | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          product_id: number
+          quantity?: number | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          product_id?: number
+          quantity?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           archived: boolean
@@ -284,7 +305,15 @@ export type Database = {
           price?: number
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "product_stock"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -315,7 +344,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_products_categories: {Returns: Json }
+      get_products_categories: { Args: never; Returns: Json }
     }
     Enums: {
       categories:

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 // types
 import type { productAdd, productDelete } from '@/types/Product'
 // Ui

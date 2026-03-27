@@ -1,10 +1,10 @@
-import type { ProductApi } from '@/typesold/Product'
+// Types
+import type { productCatalog } from '@/types/Product'
 
 export class Product {
-  private data: ProductApi
+  private data: productCatalog
 
-  constructor(data: ProductApi) {
-    // on conserve la référence réactive directement
+  constructor(data: productCatalog) {
     this.data = data
   }
 
@@ -36,6 +36,13 @@ export class Product {
     return this.data.quantity ?? 0
   }
 
+  get stock(): number {
+    return this.data.stock ?? 0
+  }
+  get archived(): boolean {
+    return this.data.archived ?? false
+  }
+
   get formattedPrice(): string {
     return `${this.price.toFixed(2)} €`
   }
@@ -54,5 +61,5 @@ export class Product {
 
   get itemQuantity(): number {
     return this.quantity
-  }
+  }  
 }

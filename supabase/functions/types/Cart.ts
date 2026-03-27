@@ -9,7 +9,6 @@ const productBaseSchema = z.object({
   description: z.string(),
   image: z.string(),
   category: categoryEnum,
-  stock: z.number().min(0),
 })
 
 // Products in cart
@@ -17,7 +16,7 @@ export const cartProductSchema = productBaseSchema.extend({
   id: z.string().optional(),
   cart_id: z.string().optional(),
   product_id: z.number(), 
-  quantity: z.number().min(1),  
+  quantity: z.number().min(1),
   created_at: z.string().optional(),
 })
 export type CartProduct = z.infer<typeof cartProductSchema>

@@ -1,8 +1,13 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, toRefs } from 'vue'
+// Types
+import type { productCatalog } from '@/types/Product'
+import type {CartType} from '@/types/Cart'
+//  Models
 import { Cart } from '@/models/Cart'
+// Stores
 import { usecheckoutStepper } from './OrderStepperStore'
-import type { ProductApi } from '@/typesold/Product'
+// Utils
 import {
   formatPriceWithTwoDecimals,
   priceFromEurosToCents,
@@ -13,7 +18,7 @@ export const useCartStore = defineStore(
   'cart',
   () => {
     // State
-    const cart = ref<Cart>(
+    const cart = ref<CartType>(
       new Cart({
         id: '',
         // status: null,
@@ -22,7 +27,7 @@ export const useCartStore = defineStore(
     )
 
     // Actions
-    function addToCart(product: ProductApi, itemQuantity: number) {
+    function addToCart(product: productCatalog, itemQuantity: number) {
       cart.value.addItemToCart(product, itemQuantity)
     }
 

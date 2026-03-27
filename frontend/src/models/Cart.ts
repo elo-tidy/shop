@@ -1,5 +1,5 @@
-import type { CartType } from '@/typesold/Cart'
-import type { ProductApi } from '@/typesold/Product'
+import type {CartType} from '@/types/Cart'
+import type { productCatalog } from '@/types/Product'
 
 export class Cart {
   products: CartType['products']
@@ -12,8 +12,8 @@ export class Cart {
     // this.status = data.status
   }
 
-  addItemToCart(product: ProductApi, itemQuantity: number) {
-    const existingProduct = this.products?.find((p) => p.id === product.id)
+  addItemToCart(product: productCatalog, itemQuantity: number) {
+    const existingProduct = this.products?.find((p:productCatalog) => p.id === product.id)
     if (existingProduct) {
       existingProduct.quantity = (existingProduct.quantity ?? 0) + itemQuantity
     } else {
@@ -22,11 +22,11 @@ export class Cart {
   }
 
   deleteItemFromCart(productId: number) {
-    this.products = this.products?.filter((p) => p.id !== productId)
+    this.products = this.products?.filter((p:productCatalog) => p.id !== productId)
   }
 
   updateItemQuantity(productId: number, addOrRemove: string) {
-    const product = this.products?.find((p) => p.id === productId)
+    const product = this.products?.find((p:productCatalog) => p.id === productId)
     if (product) {
       if (addOrRemove === 'add') {
         product.quantity = (product.quantity ?? 0) + 1
@@ -41,13 +41,13 @@ export class Cart {
   }
 
   get totalNumberOfItem(): number {
-    return this.products?.reduce((totalItems, product) => {
+    return this.products?.reduce((totalItems:number, product: productCatalog) => {
       return totalItems + product.quantity!
     }, 0)
   }
 
   get totalPrice(): number {
-    return this.products?.reduce((totalPrice, product) => {
+    return this.products?.reduce((totalPrice:number, product: productCatalog) => {
       return Math.round((totalPrice + product.quantity! * product.price) * 100) / 100
     }, 0)
   }

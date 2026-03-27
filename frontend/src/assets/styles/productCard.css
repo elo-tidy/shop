@@ -3,6 +3,12 @@
   .btn-icon {
     @apply w-[36px] h-[36px] bg-(--primary) text-(--color-background);
   }
+  .stock {
+    @apply top-[5px] left-[5px];
+    p {
+      @apply text-xs max-w-[120px] border bg-black/50;
+    }
+  }
   /********************/
   /*** catalog card ***/
   /********************/
@@ -15,8 +21,12 @@
         @apply absolute top-[0] left-[0] w-full h-full content-[''];
       }
       .price {
-        @apply absolute top-[0] right-[0] bg-transparent px-2 py-1;
+        @apply absolute px-2 py-1 top-[0] right-[0] bg-transparent;
       }
+    }
+
+    .stock {
+      @apply absolute px-2 py-1;
     }
 
     img {
@@ -51,6 +61,9 @@
     .card-footer {
       @apply col-start-3 col-end-8;
     }
+    .stock p {
+      @apply py-1 mr-2 px-2;
+    }
   }
 
   /*********************/
@@ -61,8 +74,16 @@
     .card-header {
       @apply mb-5;
     }
+    .card-header,
+    .card-content,
+    .card-footer {
+      @apply col-end-9;
+    }
     img {
       @apply col-end-3;
+    }
+    .stock {
+      @apply absolute top-auto bottom-[5px];
     }
   }
 
@@ -89,6 +110,9 @@
     }
     .card-content {
       @apply line-clamp-1 overflow-hidden;
+    }
+    .stock {
+      @apply absolute top-auto bottom-[5px] w-[80px];
     }
   }
 
@@ -134,6 +158,15 @@
   /******** admin ******/
   /*********************/
   &.admin {
+    &.stock-alert,
+    &.stock-null {
+      .stock p {
+        @apply bg-red-700;
+      }
+    }
+    &.stock-null {
+      @apply border-red-700 border-1 bg-red-700/20;
+    }
     @apply pl-2 pr-3 grid-cols-[auto_repeat(6,_1fr)_auto];
     .id {
       @apply col-start-1 col-end-2 mr-4 row-start-1 row-end-4 place-content-center;
@@ -141,9 +174,15 @@
     img {
       @apply col-start-2 col-end-3;
     }
+    .archived {
+      @apply col-start-8 col-end-8 row-start-1 row-end-4 place-content-center;
+    }
+    .stock {
+      @apply col-start-9 col-end-9 row-start-1 row-end-4 place-content-center;
+    }
 
     .card-footer {
-      @apply z-1 col-start-8 col-end-8 row-start-1 row-end-4;
+      @apply z-1 col-start-10 col-end-10 row-start-1 row-end-4 m-0 content-center;
       .btn-icon {
         @apply size-10 bg-no-repeat bg-size-[auto_1.5rem] bg-center overflow-hidden relative;
         &.delete {

@@ -55,7 +55,15 @@ const compLayout = computed(() =>
 
 // Product content details
 const productRef = toRef(props, 'product')
-const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
+const {
+  product: modelProduct,
+  formattedPrice,
+  imageAlt,
+  stock,
+  archived,
+} = useProductModel(productRef)
+
+// Component setup
 const productTitleWrapper = computed(() => {
   return props.layout !== 'detail' ? RouterLink : 'span'
 })
@@ -64,6 +72,29 @@ const productTitleWrapperProps = computed(() => {
     ? { to: `/product/${modelProduct.value.id}` }
     : null
 })
+
+// Wording
+const stockWording = computed(() => {
+  if (props.layout === 'detail' || props.layout === 'liste') {
+    if (stock.value === 1) {
+      return 'Un seul article en stock !'
+    }
+    if (stock.value <= 5) {
+      return `Plus que ${stock.value} articles en stock !`
+    }
+    return 'En stock'
+  }
+  return `Stock : ${stock.value}`
+})
+const stockClassAlert = computed((): string | undefined => {
+  if (props.layout === 'admin' && stock.value <= 5) {
+    if (stock.value === 0) {
+      return 'stock-null'
+    }
+    return 'stock-alert'
+  }
+})
+
 const productContent = computed(() => {
   return props.layout === 'detail' && modelProduct.value
     ? {
@@ -91,7 +122,10 @@ const productFooter = computed(() => {
 })
 </script>
 <template>
-  <Card v-if="product" :class="['py-0 relative card gap-0', gridClass, compLayout, props.layout]">
+  <Card
+    v-if="product"
+    :class="['py-0 relative card gap-0', gridClass, compLayout, props.layout, stockClassAlert]"
+  >
     <CardHeader class="card-header grid-cols-[1fr_auto] gap-x-4">
       <ProductTitle :hn="props.hn">
         <component :is="productTitleWrapper" v-bind="productTitleWrapperProps">
@@ -102,18 +136,27 @@ const productFooter = computed(() => {
         <CardDescription class="price text-primary max-w-[100px]">
           {{ formattedPrice }}
         </CardDescription>
-        <p
-          v-if="props.showItemId !== false && layout === 'admin' && productRef.archived"
-          class="text-xs border px-2 mr-4 py-1"
-        >
-          <span class="sr-only">Produit</span> archivé
-        </p>
       </div>
     </CardHeader>
 
     <div class="id" v-if="props.showItemId !== false && layout === 'admin'">
       <p><span class="sr-only">ID du produit : </span>{{ productRef.id }}</p>
     </div>
+    <div v-if="archived !== true" class="stock">
+      <p>{{ stockWording }}</p>
+    </div>
+    <div
+      v-if="props.showItemId !== false && layout === 'admin' && archived === true"
+      class="archived"
+    >
+      <p class="text-xs border px-2 mr-4 py-1"><span class="sr-only">Produit</span> archivé</p>
+    </div>
+    <p
+      v-if="stockClassAlert"
+      class="absolute top-[50%] right-0 translate-x-[calc(100%+2rem)] -translate-y-[50%] ml-2"
+    >
+      {{ stockClassAlert === 'stock-alert' ? 'Stock faible' : 'Stock épuisé' }}
+    </p>
 
     <img :src="product.image" :alt="imageAlt" class="object-contain img" />
 

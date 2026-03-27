@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 // Types
-import type { productCatalog } from '../../../../../shared/types/Product'
+import type { productCatalog } from '@/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 // Composables
 import { useProductModel } from '@/composables/useProductModel'
 import { useCartDetails } from '@/composables/useCartDetails'
+import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { useCartStore } from '@/store/CartStore'
-import { useOrderProcess } from '@/composables/useOrderProcess'
 
 // Props
 const props = defineProps<{
@@ -24,13 +24,13 @@ const props = defineProps<{
 
 const cartStore = useCartStore()
 const { cartData } = useCartDetails()
-const { effectiveOrder, deleteOrder, currentOrder, loadLastOrder, resetOrder } = useOrderProcess()
+const { resetOrder } = useOrderProcess()
 
 // Products from bdd first, from store then
 const storeProduct = computed(() => {
   const prod =
-    cartData.value?.products.find((p) => p.id === props.product?.id) ||
-    cartStore.cart.products.find((p) => p.id === props.product?.id)
+    cartData.value?.products.find((p: productCatalog) => p.id === props.product?.id) ||
+    cartStore.cart.products.find((p: productCatalog) => p.id === props.product?.id)
 
   if (!prod) return undefined
 
@@ -42,6 +42,7 @@ const storeProduct = computed(() => {
     image: prod.image,
     category: prod.category,
     quantity: prod.quantity,
+    stock: prod.stock,
   }
 })
 const { product } = useProductModel(storeProduct)
