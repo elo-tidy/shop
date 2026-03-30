@@ -71,14 +71,27 @@ Deno.serve((req) =>
       return jsonResponse({ message: "Produit archivé car utilisé dans un panier", data: archivedData });
     }
 
-    // si aucune cascade, on supprime
+    // On supprime les stocks avant le produit
+    const { data: stockData, error: stockError } = await supabaseClient
+      .from("product_stock")
+      .delete()
+      .eq("product_id", validatedId)
+      .select();
+    
+    if (stockError) return errorResponse(stockError.message, 400);      
+
+    // si aucune cascade, on supprime le produit
     const { data: deletedData, error: deletedError } = await supabaseClient
       .from("products")
       .delete()
       .eq("id", validatedId)
-      .select();
+      .select()
+      .single();
 
-    if (deletedError) return errorResponse(deletedError.message, 400);
-    return jsonResponse({ message: "Produit supprimé avec succès", data: deletedData });
+    if (deletedError) return errorResponse(deletedError.message, 400);     
+
+    const data = {...deletedData, stock : stockData[0].quantity}
+
+    return jsonResponse({ message: "Produit supprimé avec succès", data });
   })
 );

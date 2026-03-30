@@ -142,19 +142,16 @@ const productFooter = computed(() => {
     <div class="id" v-if="props.showItemId !== false && layout === 'admin'">
       <p><span class="sr-only">ID du produit : </span>{{ productRef.id }}</p>
     </div>
-    <div v-if="archived !== true" class="stock">
-      <p>{{ stockWording }}</p>
+    <div class="stock-archived grid">
+      <p class="stock">{{ stockWording }}</p>
+      <p
+        v-if="props.showItemId !== false && layout === 'admin' && archived === true"
+        class="archived text-xs border px-2 py-1"
+      >
+        <span class="sr-only">Produit</span> archivé
+      </p>
     </div>
-    <div
-      v-if="props.showItemId !== false && layout === 'admin' && archived === true"
-      class="archived"
-    >
-      <p class="text-xs border px-2 mr-4 py-1"><span class="sr-only">Produit</span> archivé</p>
-    </div>
-    <p
-      v-if="stockClassAlert"
-      class="absolute top-[50%] right-0 translate-x-[calc(100%+2rem)] -translate-y-[50%] ml-2"
-    >
+    <p v-if="stockClassAlert" class="stock-txt">
       {{ stockClassAlert === 'stock-alert' ? 'Stock faible' : 'Stock épuisé' }}
     </p>
 

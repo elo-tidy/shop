@@ -3,10 +3,10 @@
   .btn-icon {
     @apply w-[36px] h-[36px] bg-(--primary) text-(--color-background);
   }
-  .stock {
+  .stock-archived {
     @apply top-[5px] left-[5px];
-    p {
-      @apply text-xs max-w-[120px] border bg-black/50;
+    .stock {
+      @apply text-xs max-w-[120px]  border bg-black/50;
     }
   }
   /********************/
@@ -25,8 +25,11 @@
       }
     }
 
-    .stock {
-      @apply absolute px-2 py-1;
+    .stock-archived {
+      @apply absolute;
+      .stock {
+        @apply px-2 py-1;
+      }
     }
 
     img {
@@ -61,8 +64,11 @@
     .card-footer {
       @apply col-start-3 col-end-8;
     }
-    .stock p {
-      @apply py-1 mr-2 px-2;
+    .stock-archived {
+      @apply text-center;
+      .stock {
+        @apply py-1 px-2;
+      }
     }
   }
 
@@ -82,7 +88,7 @@
     img {
       @apply col-end-3;
     }
-    .stock {
+    .stock-archived {
       @apply absolute top-auto bottom-[5px];
     }
   }
@@ -111,7 +117,7 @@
     .card-content {
       @apply line-clamp-1 overflow-hidden;
     }
-    .stock {
+    .stock-archived {
       @apply absolute top-auto bottom-[5px] w-[80px];
     }
   }
@@ -158,27 +164,32 @@
   /******** admin ******/
   /*********************/
   &.admin {
+    .stock-txt {
+      @apply absolute top-[50%] right-0 translate-x-[calc(100%+2rem)] -translate-y-[50%] ml-2  pb-2 pt-10 bg-no-repeat bg-position-[50%_8px] text-(--primary) bg-size-[2rem_auto] font-bold;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --%3E%3Cpath fill='%23facc15' d='M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zm1.725-2h15.1L12 6zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15m0-2.5'/%3E%3C/svg%3E");
+    }
     &.stock-alert,
     &.stock-null {
-      .stock p {
+      @apply border-1 border-(--primary);
+      .stock {
         @apply bg-red-700;
       }
     }
     &.stock-null {
-      @apply border-red-700 border-1 bg-red-700/20;
+      @apply bg-(--primary)/20;
     }
-    @apply pl-2 pr-3 grid-cols-[auto_repeat(6,_1fr)_auto];
+    @apply pl-2 pr-3 grid-cols-[auto_repeat(6,_1fr)_120px_auto];
     .id {
       @apply col-start-1 col-end-2 mr-4 row-start-1 row-end-4 place-content-center;
     }
     img {
       @apply col-start-2 col-end-3;
     }
-    .archived {
-      @apply col-start-8 col-end-8 row-start-1 row-end-4 place-content-center;
-    }
-    .stock {
-      @apply col-start-9 col-end-9 row-start-1 row-end-4 place-content-center;
+    .stock-archived {
+      @apply col-start-8 col-end-8 row-start-1 row-end-4 place-content-center pr-6;
+      .archived {
+        @apply mt-2;
+      }
     }
 
     .card-footer {

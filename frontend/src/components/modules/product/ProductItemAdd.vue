@@ -30,8 +30,6 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 // Components
 import ProductCard from '@/components/modules/product/ProductItem.vue'
-// composable
-import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 // Api
 import { addProduct, updateProduct } from '@/api/products'
 // Store
@@ -74,22 +72,23 @@ const { handleSubmit, resetForm } = useForm<productAdd>({
     description: productToEdit?.description ?? '',
     image: productToEdit?.image ?? '',
     category: productToEdit?.category ?? undefined,
-    archived: productToEdit?.archived ?? undefined,
+    archived: productToEdit?.archived ?? false,
+    stock: productToEdit?.stock ?? 0,
   },
 })
 const onSubmit = handleSubmit(async (data) => {
   try {
     if (productToEdit) {
       // update product
-      const req = await updateProduct({ ...data, id: productToEdit.id })
+      const req = await updateProduct({ id: productToEdit.id, stock: productToEdit.stock, ...data })
       dataReq.value = req
-      productStore.updateProductInStore(req.data[0])
-      toast(`Produit "${req.data[0].title}" modifié avec succès`)
+      productStore.updateProductInStore(req.data)
+      toast(`Produit "${req.data.title}" modifié avec succès`)
     } else {
       // add product
       const req = await addProduct(data)
       dataReq.value = req
-      productStore.addProductToStore(dataReq.value.data[0])
+      productStore.addProductToStore(dataReq.value.data)
       toast('Produit ajouté au catalogue avec succès')
       resetForm()
     }
@@ -132,13 +131,6 @@ const onSubmit = handleSubmit(async (data) => {
                     disabled
                   />
                 </Field>
-
-                <!-- <FieldError
-                      v-if="errors.length"
-                      :errors="errors.map((e) => ({ message: e }))"
-                    /> -->
-                <!-- </Field> -->
-                <!-- </VeeField> -->
 
                 <VeeField v-slot="{ field, errors }" name="title">
                   <Field :data-invalid="!!errors.length">
@@ -240,6 +232,26 @@ const onSubmit = handleSubmit(async (data) => {
                   </Field>
                 </VeeField>
 
+                <VeeField v-slot="{ field, errors }" name="stock">
+                  <Field :data-invalid="!!errors.length">
+                    <FieldLabel for="stock">Stock </FieldLabel>
+                    <Input
+                      id="stock"
+                      v-bind="field"
+                      :default-value="field.value"
+                      class="inputField"
+                      type="number"
+                      step="1"
+                      min="0"
+                      :aria-invalid="!!errors.length"
+                    />
+                    <FieldError
+                      v-if="errors.length"
+                      :errors="errors.map((e) => ({ message: e }))"
+                    />
+                  </Field>
+                </VeeField>
+
                 <VeeField v-if="productToEdit?.id" v-slot="{ field, errors }" name="archived">
                   <FieldSet>
                     <FieldLegend>Produit archivé</FieldLegend>
@@ -296,7 +308,7 @@ const onSubmit = handleSubmit(async (data) => {
     </div>
     <div v-if="dataReq">
       <h2 class="mb-5 text-[23px]">Visuel du produit précédemment {{ labels.previewTitle }} :</h2>
-      <ProductCard :product="dataReq.data[0]" display="card" :displayFooter="false" :hn="3" />
+      <ProductCard :product="dataReq.data" display="card" :displayFooter="false" :hn="3" />
     </div>
   </div>
 </template>

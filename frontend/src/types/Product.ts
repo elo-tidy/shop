@@ -16,7 +16,7 @@ export const productCatalogSchema = z.object({
     z.enum(["electronics", "jewelery", "mens clothing", "womens clothing"]),
     z.undefined()
   ]).optional(),
-  stock: z.number().min(0).default(0)
+  stock: z.number().min(0, "La quantité doit être renseignée"),
 })
 export type productCatalog = z.infer<typeof productCatalogSchema>
 
@@ -41,7 +41,7 @@ export const productAddSchema = z.object({
     message: "La catégorie est obligatoire"
   }),
   archived: z.boolean().optional(),
-  stock: z.number().min(0).default(0)
+  stock: z.number().min(0, "La quantité doit être renseignée"),
   // product_stock:  z.object({
   //   quantity: z.number().min(0, "La quantité doit être renseignée")
   // })  

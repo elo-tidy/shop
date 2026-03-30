@@ -64,16 +64,33 @@ Deno.serve((req) =>
     if (productData.length === 0) return errorResponse("Produit introuvable", 404);
 
     // Isoler les data modifiables
-    const {id, ...updatableData} = body     
+    const {id, stock, ...updatableData} = body     
 
     // Modification du produit
-    const { data, error } = await supabaseClient
+    const { data : updateProductData , error : updateProductError } = await supabaseClient
       .from("products")
       .update(updatableData)
       .eq("id", body.id)
       .select();
 
-    if (error) return jsonResponse({ error }, 400);
+    if (updateProductError) return jsonResponse({ updateProductError }, 400);
+    // return jsonResponse({ message: "Produit modifié avec succès", updateProductData });
+
+    // Modification des stock
+    const { data : stockData, error:stockError } = await supabaseClient
+      .from("product_stock")
+      .update({quantity: body.stock})
+      .eq("product_id", body.id)
+      .select();      
+
+    if (stockError) return jsonResponse({ stockError }, 400);
+    // return jsonResponse({ message: "Stock modifié avec succès", stockData });
+
+    const {quantity, ...rest} = stockData[0]
+
+    const data = {...updateProductData[0], stock:quantity}
+
     return jsonResponse({ message: "Produit modifié avec succès", data });
+
   })
 );

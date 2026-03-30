@@ -47,7 +47,6 @@ export async function deleteProduct(product:productDelete) {
 }
 
 export async function updateProduct(product:productAdd) {
-  console.log("api", product)
   const { data, error } = await supabase.functions.invoke("products-update", {
     body: product,
     method: 'PATCH'

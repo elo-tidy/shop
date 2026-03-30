@@ -40,16 +40,30 @@ Deno.serve((req) =>
       return errorResponse("Invalid JSON body", 400);
     } 
 
-    // Insertion du produit
-    const { data, error } = await supabaseClient
-      .from("products")
-      .insert(body)
-      .select();
+    const {stock,...rest} = body
 
-    if (error) {
-      console.error("Insert product error:", { error: error.message, body });
-      return errorResponse(error.message, 400);
-    }
+    // Insertion du produit    
+    const { data : newProductData, error: newroductError } = await supabaseClient
+      .from("products")
+      .insert(rest)
+      .select()
+      .single();
+
+    if (newroductError) return jsonResponse({ newroductError }, 400);
+
+    // Insertion du stock
+    console.log("product_id", newProductData.id)
+    const { data:stockData , error:stockError } = await supabaseClient
+      .from("product_stock")
+      .insert({
+        product_id: newProductData.id,
+        quantity: stock
+      });    
+      
+    if (stockError) return jsonResponse({ stockError }, 400);
+
+    const data = {...newProductData, stock: stock}
+    console.log("data", data)
 
     // Réponse
     return new Response(JSON.stringify({ data }), { status: 201, headers });
