@@ -1,11 +1,13 @@
 import { z } from "https://esm.sh/zod@4.1.11";
-import {categoryEnum} from '@/types/Categories'
-import {productCatalogSchema} from '@/types/Product'
+import {categoryEnum} from '../types/Categories.ts'
+import {productCatalogSchema} from '../types/Product.ts'
+import {paymentStatusEnumSchema} from '../types/PaymentStatus.ts'
 
 // Product Base
 const productBaseSchema = z.object({
   title: z.string(),
   price: z.number(),
+  quantity: z.number(),
   description: z.string(),
   image: z.string(),
   category: categoryEnum,
@@ -35,9 +37,25 @@ export type Cart = z.infer<typeof cartSchema>
 // Frontend Cart
 export const cartTypeSchema = z.object({
   id: z.string().optional(),
-  products: z.array(productCatalogSchema),
+  products: z.array(productBaseSchema),
 })
 export type CartType = z.infer<typeof cartTypeSchema>
+
+
+// Backend Cart
+export const productBackEndSchema = z.object({
+  id: z.number() .min(0, "L'id doit être positif"),
+  quantity: z.number().min(0, "La quantité doit être renseignée"),
+  price: z.number().optional()
+})
+
+export const cartTypeBackEndSchema = z.object({
+  id: z.string().optional(),
+  delivery_carrier_id: z.string().min(1, "Le nom du transporteur est obligatoire"),
+  payment_intent_ID:z.string().min(1, "Le payment ID est obligatoire"),
+  products: z.array(productBackEndSchema),
+})
+export type CartBackEndType = z.infer<typeof cartTypeBackEndSchema>
 
 //  Order
 export const orderSchema = z.object({
@@ -49,7 +67,7 @@ export const orderSchema = z.object({
   total_price: z.number(),
   products_price: z.number(),
 
-  payment_status: z.number(),
+  payment_status: paymentStatusEnumSchema,
   payment_method: z.string(),
   payment_ID: z.string().nullable().optional(),
 

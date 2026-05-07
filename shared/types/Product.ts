@@ -1,5 +1,7 @@
 // import { z } from 'zod'
 import { z } from "https://esm.sh/zod@4.1.11";
+import {categoryEnum} from '@/types/Categories'
+
 
 // Add product
 export const productCatalogSchema = z.object({

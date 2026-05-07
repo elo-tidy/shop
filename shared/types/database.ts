@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -39,21 +34,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      cart_status: {
-        Row: {
-          id: number
-          name: string
-        }
-        Insert: {
-          id?: number
-          name: string
-        }
-        Update: {
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
       carts: {
         Row: {
           created_at: string
@@ -128,40 +108,14 @@ export type Database = {
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "carts_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
         ]
-      }
-      categories: {
-        Row: {
-          id: number
-          title: string | null
-        }
-        Insert: {
-          id?: number
-          title?: string | null
-        }
-        Update: {
-          id?: number
-          title?: string | null
-        }
-        Relationships: []
-      }
-      delivery_status: {
-        Row: {
-          description: string | null
-          id: number
-          label: string
-        }
-        Insert: {
-          description?: string | null
-          id?: number
-          label: string
-        }
-        Update: {
-          description?: string | null
-          id?: number
-          label?: string
-        }
-        Relationships: []
       }
       orders: {
         Row: {
@@ -174,7 +128,7 @@ export type Database = {
           id: string
           payment_ID: string | null
           payment_method: string
-          payment_status: number
+          payment_status: Database["public"]["Enums"]["payment_status"]
           products_price: number
           total_price: number
           updated_at: string | null
@@ -190,7 +144,7 @@ export type Database = {
           id?: string
           payment_ID?: string | null
           payment_method: string
-          payment_status: number
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price: number
           total_price: number
           updated_at?: string | null
@@ -206,7 +160,7 @@ export type Database = {
           id?: string
           payment_ID?: string | null
           payment_method?: string
-          payment_status?: number
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price?: number
           total_price?: number
           updated_at?: string | null
@@ -221,20 +175,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_delivery_status_fkey"
-            columns: ["delivery_status"]
-            isOneToOne: false
-            referencedRelation: "delivery_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_payment_status_fkey"
-            columns: ["payment_status"]
-            isOneToOne: false
-            referencedRelation: "payment_statuses"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -243,44 +183,58 @@ export type Database = {
           },
         ]
       }
-      payment_statuses: {
+      product_stock: {
         Row: {
-          description: string | null
           id: number
-          label: string
+          product_id: number
+          quantity: number | null
+          updated_at: string
         }
         Insert: {
-          description?: string | null
           id?: number
-          label: string
+          product_id: number
+          quantity?: number | null
+          updated_at?: string
         }
         Update: {
-          description?: string | null
           id?: number
-          label?: string
+          product_id?: number
+          quantity?: number | null
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "product_stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
-          category: number
-          description: string
+          archived: boolean
+          category: Database["public"]["Enums"]["categories"]
+          description: string | null
           id: number
           image: string | null
           price: number
           title: string
         }
         Insert: {
-          category: number
-          description: string
+          archived?: boolean
+          category: Database["public"]["Enums"]["categories"]
+          description?: string | null
           id?: number
           image?: string | null
           price: number
           title: string
         }
         Update: {
-          category?: number
-          description?: string
+          archived?: boolean
+          category?: Database["public"]["Enums"]["categories"]
+          description?: string | null
           id?: number
           image?: string | null
           price?: number
@@ -288,32 +242,35 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "products_category_fkey"
-            columns: ["category"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
+            foreignKeyName: "products_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "product_stock"
+            referencedColumns: ["product_id"]
           },
         ]
       }
       profiles: {
         Row: {
+          created_at: string | null
           id: string
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
-          username: string
+          username: string | null
         }
         Insert: {
+          created_at?: string | null
           id: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
-          username: string
+          username?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
-          username?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -322,9 +279,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_products_categories: { Args: never; Returns: Json }
     }
     Enums: {
+      cart_status: "active" | "abandoned" | "converted"
+      categories:
+        | "electronics"
+        | "jewelery"
+        | "mens clothing"
+        | "womens clothing"
+      delivery_status:
+        | "processing"
+        | "shipped"
+        | "in_delivery"
+        | "delivered"
+        | "returned"
+      payment_status: "unpaid" | "paid" | "failed" | "refunded"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -456,7 +426,23 @@ export const Constants = {
   },
   public: {
     Enums: {
+      cart_status: ["active", "abandoned", "converted"],
+      categories: [
+        "electronics",
+        "jewelery",
+        "mens clothing",
+        "womens clothing",
+      ],
+      delivery_status: [
+        "processing",
+        "shipped",
+        "in_delivery",
+        "delivered",
+        "returned",
+      ],
+      payment_status: ["unpaid", "paid", "failed", "refunded"],
       user_role: ["user", "admin"],
     },
   },
 } as const
+

@@ -34,21 +34,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      cart_status: {
-        Row: {
-          id: number
-          name: string
-        }
-        Insert: {
-          id?: number
-          name: string
-        }
-        Update: {
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
       carts: {
         Row: {
           created_at: string
@@ -123,40 +108,14 @@ export type Database = {
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "carts_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
         ]
-      }
-      categoriescat: {
-        Row: {
-          id: number
-          title: string | null
-        }
-        Insert: {
-          id?: number
-          title?: string | null
-        }
-        Update: {
-          id?: number
-          title?: string | null
-        }
-        Relationships: []
-      }
-      delivery_status: {
-        Row: {
-          description: string | null
-          id: number
-          label: string
-        }
-        Insert: {
-          description?: string | null
-          id?: number
-          label: string
-        }
-        Update: {
-          description?: string | null
-          id?: number
-          label?: string
-        }
-        Relationships: []
       }
       orders: {
         Row: {
@@ -169,7 +128,7 @@ export type Database = {
           id: string
           payment_ID: string | null
           payment_method: string
-          payment_status: number
+          payment_status: Database["public"]["Enums"]["payment_status"]
           products_price: number
           total_price: number
           updated_at: string | null
@@ -185,7 +144,7 @@ export type Database = {
           id?: string
           payment_ID?: string | null
           payment_method: string
-          payment_status: number
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price: number
           total_price: number
           updated_at?: string | null
@@ -201,7 +160,7 @@ export type Database = {
           id?: string
           payment_ID?: string | null
           payment_method?: string
-          payment_status?: number
+          payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price?: number
           total_price?: number
           updated_at?: string | null
@@ -216,20 +175,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_delivery_status_fkey"
-            columns: ["delivery_status"]
-            isOneToOne: false
-            referencedRelation: "delivery_status"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_payment_status_fkey"
-            columns: ["payment_status"]
-            isOneToOne: false
-            referencedRelation: "payment_statuses"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -237,24 +182,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      payment_statuses: {
-        Row: {
-          description: string | null
-          id: number
-          label: string
-        }
-        Insert: {
-          description?: string | null
-          id?: number
-          label: string
-        }
-        Update: {
-          description?: string | null
-          id?: number
-          label?: string
-        }
-        Relationships: []
       }
       product_stock: {
         Row: {
@@ -275,7 +202,15 @@ export type Database = {
           quantity?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "product_stock_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -347,11 +282,19 @@ export type Database = {
       get_products_categories: { Args: never; Returns: Json }
     }
     Enums: {
+      cart_status: "active" | "abandoned" | "converted"
       categories:
         | "electronics"
         | "jewelery"
         | "mens clothing"
         | "womens clothing"
+      delivery_status:
+        | "processing"
+        | "shipped"
+        | "in_delivery"
+        | "delivered"
+        | "returned"
+      payment_status: "unpaid" | "paid" | "failed" | "refunded"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -483,12 +426,21 @@ export const Constants = {
   },
   public: {
     Enums: {
+      cart_status: ["active", "abandoned", "converted"],
       categories: [
         "electronics",
         "jewelery",
         "mens clothing",
         "womens clothing",
       ],
+      delivery_status: [
+        "processing",
+        "shipped",
+        "in_delivery",
+        "delivered",
+        "returned",
+      ],
+      payment_status: ["unpaid", "paid", "failed", "refunded"],
       user_role: ["user", "admin"],
     },
   },
