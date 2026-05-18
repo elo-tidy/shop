@@ -2,9 +2,8 @@ import { getSupabaseClient } from "../utils/supabase.ts";
 import { requireUser } from "./requireUser.ts";
 
 export async function requireAdmin(req: Request) {
-  const user = await requireUser(req);
-  const supabaseClient = getSupabaseClient();
-
+  const { user, supabaseClient } = await requireUser(req);
+  
   const { data, error } = await supabaseClient
     .from("profiles")
     .select("role")

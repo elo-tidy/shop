@@ -1,9 +1,12 @@
 import { getUserFromToken } from "../jwt/getUser.ts";
+import { getSupabaseClient } from "../utils/supabase.ts";
 
 export async function requireUser(req: Request) {
-  const user = await getUserFromToken(
-    req.headers.get("Authorization") || undefined
-  );
+  const token = req.headers.get("Authorization") || undefined;
+  const user = await getUserFromToken(token);
 
-  return user;
+  if (!user) { throw new Error("Unauthorized"); }
+  const supabaseClient = getSupabaseClient();
+
+  return { user, supabaseClient };
 }

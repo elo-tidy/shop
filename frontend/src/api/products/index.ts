@@ -1,10 +1,5 @@
 import type {productAdd, productDelete} from '../../../../shared/types/Product'
 import { supabase } from '@/utils/supabase'
-// import { useSupabaseSession } from '@/composables/useSupabaseSession'
-// import type { Session } from '@supabase/supabase-js'
-
-// const {session} = useSupabaseSession()
-
 
 export async function addProduct(product:productAdd) {
   const { data, error } = await supabase.functions.invoke("products-create", {
