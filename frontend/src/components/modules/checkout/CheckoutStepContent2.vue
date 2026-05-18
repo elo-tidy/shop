@@ -2,9 +2,9 @@
 import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 // Type
-import type { CartType, Order } from '@/typesold/Cart'
+import type { CartProduct, CartType, Order, CartBackEndType } from '@/types/Cart'
 import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
-import type { DeliveryDetails } from '@/typesold/ShippingMode'
+import type { DeliveryDetails } from '@/types/ShippingMode'
 // UI
 import Button from '@/components/ui/button/Button.vue'
 import { toast } from 'vue-sonner'
@@ -13,15 +13,14 @@ import { useOrderProcess } from '@/composables/useOrderProcess'
 // Utils
 import { priceFromEurosToCents } from '@/utils/maths'
 // Service
-import {
-  fetchPaymentIntents,
-  getConfirmedPayment,
-  fetchPaymentDetails,
-} from '../../../../../shared/services/StripeServices'
+import { getConfirmedPayment } from '../../../../../shared/services/StripeServices'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
 import { usePaymentStore } from '@/store/StripeStore'
+// Api
+import { addOrder } from '@/api/order'
+import { createPaymentIntent, fetchPaymentDetails } from '@/api/payment'
 
 // Stripes
 import { loadStripe } from '@stripe/stripe-js'
@@ -95,6 +94,7 @@ async function handleSubmit() {
   }
 
   // Stripe payment success
+  /*
   if (stripeInstance) {
     const returned_url = 'http://localhost:5173/checkout'
     const { error } = await getConfirmedPayment(
@@ -112,6 +112,7 @@ async function handleSubmit() {
       // site first to authorize the payment, then redirected to the `return_url`.
     }
   }
+  */
 }
 
 // Stripe
@@ -160,6 +161,7 @@ const paymentComponent = ref()
 
 const stepStore = usecheckoutStepper()
 const cartStore = useCartStore()
+
 onBeforeMount(async () => {
   try {
     await loadStripe(stripeKey)
@@ -172,7 +174,7 @@ onBeforeMount(async () => {
   if (!effectiveOrder.value || !effectiveOrder.value.carts) return
 
   const cartDetail: CartType = {
-    products: effectiveOrder.value.carts.carts_products.map((p) => ({
+    products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
       id: p.product_id,
       title: p.title,
       price: p.price,
@@ -186,6 +188,7 @@ onBeforeMount(async () => {
   let bddOrder: Order | null = null
   try {
     bddOrder = await loadLastOrder()
+    console.log('Commande trouvée en BDD :', bddOrder)
   } catch (error) {
     console.error('Erreur récupération commande :', error)
   }
@@ -201,6 +204,7 @@ onBeforeMount(async () => {
   if (paymentStore.paymentIntentId) {
     try {
       const paymentIntent = await fetchPaymentDetails(paymentStore.paymentIntentId)
+      console.log('ID', paymentIntent)
       clientSecretRef.value = paymentIntent.client_secret
       paymentIntentIdRef.value = paymentStore.paymentIntentId
       console.log('PaymentIntent existant réutilisé :', paymentIntentIdRef.value)
@@ -210,13 +214,17 @@ onBeforeMount(async () => {
     }
   } else {
     try {
-      const { clientSecret, paymentIntentId } = await fetchPaymentIntents(
-        priceFromEurosToCents(effectiveOrder.value.total_price),
-        effectiveOrder.value.id,
-        effectiveOrder.value.user_id,
-        effectiveOrder.value.carts.id,
-        //bddOrder?.id, // metadata
-      )
+      const payload = {
+        amount: priceFromEurosToCents(effectiveOrder.value.total_price),
+        currency: 'eur',
+        metadata: {
+          orderId: String(effectiveOrder.value.id),
+          userId: String(effectiveOrder.value.user_id),
+          cartId: String(effectiveOrder.value.carts.id),
+        },
+      }
+      console.log('payload', payload.amount)
+      const { clientSecret, paymentIntentId } = await createPaymentIntent(payload)
 
       paymentStore.paymentIntentId = paymentIntentId
       paymentIntentIdRef.value = paymentIntentId
@@ -229,10 +237,56 @@ onBeforeMount(async () => {
     }
   }
 
+  /*if (paymentStore.paymentIntentId) {
+    try {
+      const paymentIntent = await fetchPaymentDetails(paymentStore.paymentIntentId)
+      clientSecretRef.value = paymentIntent.client_secret
+      paymentIntentIdRef.value = paymentStore.paymentIntentId
+    } catch (error) {
+      console.error('Erreur récupération PaymentIntent existant :', error)
+      return
+    }
+  } else {
+    try {
+      const payload = {
+        amount: priceFromEurosToCents(effectiveOrder.value.total_price),
+        currency: 'eur',
+        metadata: {
+          orderId: String(effectiveOrder.value.id),
+          userId: String(effectiveOrder.value.user_id),
+          cartId: String(effectiveOrder.value.carts.id),
+        },
+      }
+      console.log('test 3', effectiveOrder.value)
+      const { clientSecret, paymentIntentId } = await createPaymentIntent(payload)
+
+      console.log('Payload', payload)
+      console.log('clientSecret', clientSecret)
+      console.log('paymentIntentId', paymentIntentId)
+
+      paymentStore.paymentIntentId = paymentIntentId
+      paymentIntentIdRef.value = paymentIntentId
+      clientSecretRef.value = clientSecret
+
+      console.log('Nouveau PaymentIntent créé :', paymentIntentId)
+    } catch (error) {
+      console.error('Erreur création PaymentIntent :', error)
+      return
+    }
+  }*/
+
+  console.log('bddOrder', bddOrder)
   if (!bddOrder) {
     try {
-      const inserted = await insertOrder(cartDetail, paymentIntentIdRef.value!)
+      // const inserted = await insertOrder(cartDetail, paymentIntentIdRef.value!)
+      const orderDetail: CartBackEndType = {
+        products: cartDetail.products,
+        payment_intent_ID: paymentIntentIdRef.value!,
+        delivery_carrier_id: stepStore.livraisonDetails.transporter.id,
+      }
+      const inserted = await addOrder(orderDetail)
       if (!inserted) return
+
       bddOrder = await loadLastOrder()
       console.log('Commande insérée avec PaymentIntent :', paymentIntentIdRef.value)
     } catch (error) {
@@ -244,17 +298,17 @@ onBeforeMount(async () => {
   let isOrderIdentical
   try {
     if (Number(cartStore.getOrderPrice) === effectiveOrder.value.total_price) {
-      isOrderIdentical = false
+      isOrderIdentical = true
       console.log('Panier identique, pas de réinitialisation')
     } else {
-      isOrderIdentical = true
+      isOrderIdentical = false
       console.log('Panier différent, réinitialisation nécessaire')
     }
   } catch (error) {
     console.error('Erreur comparaison commande :', error)
   }
 
-  if (isOrderIdentical) {
+  if (!isOrderIdentical) {
     try {
       await resetOrder()
       console.log('Panier réinitialisé')

@@ -3,13 +3,14 @@ import { useRoute } from 'vue-router'
 // Types
 import type { CartType, Order, Cart } from '@/types/Cart'
 import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/types/ShippingMode'
-import type { Database } from '@/types/database'
+import type { Database } from '../types/database'
+import type { productCatalog } from '@/types/Product'
 // Stores
 import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { usePaymentStore } from '@/store/StripeStore'
 // Services
-import { fetchPaymentDetails, fetchPaymentIntents } from '../../../shared/services/StripeServices'
+import { fetchPaymentDetails } from '@/api/payment'
 import {
   inserOrderService,
   updatePaymentOrderService,
@@ -19,15 +20,12 @@ import {
   getUserProfile,
 } from '../../../shared/services/SupabaseServices'
 // Composable
-import {
-  estimatedDelivery,
-  convertDateFRtoISO,
-} from '../../../shared/composables/useDeliveryEstimation'
+import {estimatedDelivery} from '../../../shared/composables/useDeliveryEstimation'
 import type { User } from '@supabase/supabase-js'
 import {
   numberWithTwoDecimals,
 } from '@/utils/maths'
-import type { productCatalog } from '@/types/Product'
+
 
 const currentOrder = ref<Order | null>(null)
 const lastOrder = ref<Order | null>(null)
@@ -144,16 +142,16 @@ export function useOrderProcess() {
       id: '0',
       user_id: userId,
       cart_id: cart.id ?? '0',
-      total_price: Number(numberWithTwoDecimals(productsPrice + (delivery?.transporter?.price ?? 0))),
+      total_price: numberWithTwoDecimals(productsPrice + (delivery?.transporter?.price ?? 0)),
       payment_status: 0,
       payment_method: 'Carte bancaire',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       delivery_status: 0,
-      delivery_price: Number(numberWithTwoDecimals(delivery?.transporter?.price ?? 0)),
+      delivery_price: numberWithTwoDecimals(delivery?.transporter?.price ?? 0),
       delivery_carrier: delivery?.transporter?.name ?? '',
       delivery_date: 'Non encore estimée 2',
-      products_price: Number(numberWithTwoDecimals(productsPrice)),
+      products_price: numberWithTwoDecimals(productsPrice),
       payment_ID: paymentIntentId,
       carts: {
         id: cart.id ?? '0',
@@ -165,9 +163,6 @@ export function useOrderProcess() {
   }
 
   async function insertOrder(
-    // priceInCents: number,
-    // items: ProductApi[],
-    // payment_intent: string,
     cartDetail: CartType,
     paymentIntentId: string,
     forceInsert = false,
@@ -186,7 +181,7 @@ export function useOrderProcess() {
         return false
       }
 
-      const lastOrderFromDb = await getOrderService()
+      const lastOrderFromDb = await getOrderService(cartDetail.id)
       const alreadyInserted = !!lastOrderFromDb && lastOrderFromDb.cart_id === cartDetail.id
 
       if (forceInsert || !alreadyInserted) {
