@@ -24,7 +24,7 @@ export async function fetchAllProducts() : Promise<productAdd>{
     // .select('*')
     .select(`
       *,
-      product_stock (quantity)
+      product_stock!product_stock_product_id_fkey(quantity)
     `);
   if (error) {
     throw new Error('Erreur lors du chargement des produits')
