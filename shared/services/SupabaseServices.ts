@@ -1,16 +1,8 @@
 // Types
-import type {CartType, InsertCartProduct, Order} from "@/typesold/Cart";
-import type {Database, Tables, TablesInsert} from "@/typesold/supabase";
-// import type { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
-// Stores
-import {useCartStore} from "@/store/CartStore";
+import type {CartType, Order} from "@/types/Cart";
+import type {Database} from "../types/database";
 // Services
 import {fetchShippingOptions} from "@/services/ShippingOptions";
-// Composables
-import {
-	estimatedDelivery,
-	convertDateFRtoISO,
-} from "../composables/useDeliveryEstimation";
 // Utils
 import {supabase} from "@/utils/supabase";
 
@@ -71,133 +63,6 @@ export async function inserOrderService(
 	carrierId: string,
 	paymentIntentId: string
 ) {
-	// Skip if no products to insert
-	if (
-		!product_list ||
-		!product_list.products ||
-		product_list.products.length === 0
-	) {
-		console.warn("Aucun produit à insérer, arrêt de l'insertion.");
-		return;
-	}
-
-	// Current user session
-	const {data: sessionData, error: sessionError} = await getUserProfile();
-	if (sessionError || !sessionData) {
-		throw new Error("Utilisateur non connecté ou session invalide");
-	}
-	const userId = sessionData?.session?.user.id!;
-
-	// load last order if exists
-	const {data: lastOrder, error: lastOrderError} = await supabase
-		.from("orders")
-		.select("id, cart_id")
-		.eq("user_id", userId)
-		.order("created_at", {ascending: false})
-		.limit(1)
-		.maybeSingle();
-
-	if (lastOrderError) {
-		console.error(
-			"Erreur récupération dernière commande :",
-			lastOrderError
-		);
-	}
-	console.log(lastOrder);
-
-	// Check if lastOrder already in bdd
-	if (lastOrder && lastOrder.cart_id === product_list.id) {
-		console.log("Commande déjà insérée pour ce panier, rien à faire.");
-		return;
-	}
-
-	// Cart insertion in bdd
-	const {data: newCart, error: errorCart} = await supabase
-		.from("carts")
-		.insert({user_id: userId})
-		.select("id")
-		.single();
-
-	if (errorCart || !newCart) {
-		console.error("Erreur création panier :", errorCart);
-		throw new Error("Impossible de créer le panier");
-	}
-
-	const cartId = newCart.id;
-
-	// Carrier details
-	const carrierDetails = await getCarrierDetails(carrierId);
-	if (!carrierDetails) {
-		throw new Error("Impossible de récupérer les détails du transporteur");
-	}
-
-	// Insert cart's products
-	const cart_products: InsertCartProduct[] = product_list.products.map(
-		(product) => ({
-			cart_id: cartId,
-			product_id: product.id,
-			title: product.title,
-			price: product.price,
-			description: product.description,
-			image: product.image,
-			category: product.category,
-			quantity: product.quantity!,
-		})
-	);
-
-	const {error: errorProducts} = await supabase
-		.from("carts_products")
-		.insert(cart_products);
-	if (errorProducts) {
-		console.error("Erreur ajout produits :", errorProducts);
-		throw new Error("Impossible d'ajouter les produits au panier");
-	}
-
-	// Prices
-	const cart = useCartStore();
-	const totalPrice = cart.getOrderPrice;
-	const productsPrice = cart.getCartTotalPrice;
-
-	// Delivery details
-	const isoDateStr = convertDateFRtoISO(estimatedDelivery());
-	const deliveryDate = new Date(isoDateStr);
-	if (isNaN(deliveryDate.getTime())) {
-		throw new Error("Date de livraison invalide");
-	}
-	const isoStringDateOnly = deliveryDate.toISOString().split("T")[0];
-
-	// Order bdd insertion
-	const {data: newOrder, error: errorOrder} = await supabase
-		.from("orders")
-		.insert({
-			/*id:"",
-			user_id: userId,
-			cart_id: cartId,
-			total_price: totalPrice,
-			delivery_carrier: carrierDetails.transporter.id,
-			delivery_date: isoStringDateOnly,
-			delivery_price: carrierDetails.transporter.price,
-			products_price: productsPrice,
-			payment_status: 1,
-			payment_method: "Carte bancaire",*/
-			cart_id: cartId,
-			delivery_carrier: carrierDetails.transporter.id,
-			delivery_date: isoStringDateOnly,
-			delivery_price: carrierDetails.transporter.price,
-			payment_method: "Carte bancaire",
-			payment_status: 1,
-			products_price: Number(productsPrice),
-			total_price: Number(totalPrice),
-			user_id: userId,
-			payment_ID: paymentIntentId,
-		} as Database["public"]["Tables"]["orders"]["Insert"])
-		.select("id")
-		.single();
-
-	if (errorOrder) {
-		console.error("Erreur création commande :", errorOrder);
-		throw new Error("Impossible de créer la commande");
-	}
 }
 
 /*export async function updatePaymentOrderService(
@@ -245,7 +110,7 @@ export async function updatePaymentOrderService(
 
 	const {data, error} = await supabase
 		.from("orders")
-		.update({payment_status: 2, payment_ID: paymentId!})
+		.update({payment_status: "paid", payment_ID: paymentId!})
 		.eq("id", orderData.id!)
 		.select()
 		.single();
@@ -387,18 +252,18 @@ export async function getOrderService(
 				products_price,
 				payment_ID,
 				carts (
-				id,
-				carts_products (
 					id,
-					cart_id,
-					product_id,
-					title,
-					price,
-					quantity,
-					image,
-					category,
-					description
-				)
+					carts_products (
+						id,
+						cart_id,
+						product_id,
+						title,
+						price,
+						quantity,
+						image,
+						category,
+						description
+					)
 				)
 			`
 			)
@@ -406,6 +271,7 @@ export async function getOrderService(
 			.limit(1)
 			.maybeSingle();
 		if (error) throw error;
+		console.log("orderData", data);
 		return data;
 	}
 
@@ -452,7 +318,7 @@ export async function getOrderService(
 			`
 		)
 		.eq("user_id", userId)
-		.eq("payment_status", 1)
+		.eq("payment_status", "unpaid")
 		.order("created_at", {ascending: false})
 		.limit(1)
 		.maybeSingle();

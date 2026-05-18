@@ -1,0 +1,32 @@
+{
+  "delivery_modes": [
+    {
+      "id": "home_delivery",
+      "name": "Livraison à domicile",
+      "description": "Livraison directement chez vous, à l'adresse indiquée.",
+      "transporters": [
+        {
+          "id": "ups",
+          "name": "UPS",
+          "price": 10.5,
+          "currency": "€",
+          "estimated_delivery_time": "2-3 jours ouvrés"
+        },
+        {
+          "id": "dhl",
+          "name": "DHL Express",
+          "price": 15.0,
+          "currency": "€",
+          "estimated_delivery_time": "1-2 jours ouvrés"
+        },
+        {
+          "id": "colissimo",
+          "name": "Colissimo",
+          "price": 7.0,
+          "currency": "€",
+          "estimated_delivery_time": "3-5 jours ouvrés"
+        }
+      ]
+    }
+  ]
+}
