@@ -30,7 +30,7 @@ Deno.serve((req) =>
     const productId = Number(url.searchParams.get("id"));
     if (!productId) return errorResponse("L'id du produit est obligatoire", 400);
     
-    let validatedId: number;
+    let validatedId: productDelete['id'];
     try {
       validatedId = productDeleteSchema.parse({ id: productId }).id;        
     } catch (err) {
