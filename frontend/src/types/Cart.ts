@@ -44,9 +44,13 @@ export type CartType = z.infer<typeof cartTypeSchema>
 
 // Backend Cart
 export const productBackEndSchema = z.object({
-  id: z.number() .min(0, "L'id doit être positif"),
-  quantity: z.number().min(0, "La quantité doit être renseignée"),
-  price: z.number().optional()
+  id:z.number().int().positive(),
+  quantity: z.number().int().min(1, "La quantité doit être au moins 1"),
+  price: z.number().min(0, "Le prix doit être renseigné"),
+  title: z.string().min(1, "Le titre doit être renseigné"),
+  description: z.string().nullable(), 
+  image: z.string().url("URL invalide"),    
+  category: categoryEnum
 })
 
 export const cartTypeBackEndSchema = z.object({
