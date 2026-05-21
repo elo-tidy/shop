@@ -20,7 +20,7 @@ import { useCartStore } from '@/store/CartStore'
 import { usePaymentStore } from '@/store/StripeStore'
 // Api
 import { addOrder } from '@/api/order'
-import { createPaymentIntent, fetchPaymentDetails } from '@/api/payment'
+import { resolvePaymentIntent } from '@/api/payment'
 
 // Stripes
 import { loadStripe } from '@stripe/stripe-js'
@@ -48,6 +48,17 @@ const {
 // const cartDetail: CartType = { products: effectiveOrder.value.carts[0].carts_products }
 const currentTotalPrice = effectiveOrder.value.total_price
 const amount = priceFromEurosToCents(currentTotalPrice)
+const cartDetail: CartType = {
+  products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
+    id: p.product_id,
+    title: p.title,
+    price: p.price,
+    description: p.description ?? '',
+    image: p.image,
+    category: p.category,
+    quantity: p.quantity,
+  })),
+}
 
 // Pay button clic
 async function handleSubmit() {
@@ -57,28 +68,6 @@ async function handleSubmit() {
     toast('Le panier n’est pas encore chargé. Merci de réessayer.')
     return
   }
-
-  // Map cart before inserting in bdd
-  /*const cartDetail: CartType = {
-    products: effectiveOrder.value.carts.carts_products.map((p) => ({
-      id: p.product_id,
-      title: p.title,
-      price: p.price,
-      description: p.description ?? '',
-      image: p.image,
-      category: p.category,
-      quantity: p.quantity,
-    })),
-  }
-  // Insert order in bdd, stop stripe if not
-  const orderIsInserted = await insertOrder(cartDetail)
-  if (!orderIsInserted) {
-    console.error("La commande n'a pas été insérée, paiement stoppé.")
-    toast(
-      'Une erreur est survenue lors de l’enregistrement de votre commande. Votre paiement n’a pas été effectué. Merci de réessayer ou de nous contacter',
-    )
-    return
-  }*/
 
   // Confirm the PaymentIntent using the details collected by the Payment Element
   const stripeInstance = elementsComponent.value?.instance
@@ -162,162 +151,102 @@ const paymentComponent = ref()
 const stepStore = usecheckoutStepper()
 const cartStore = useCartStore()
 
-onBeforeMount(async () => {
+async function initStripe() {
+  await loadStripe(stripeKey)
+  stripeLoaded.value = true
+}
+
+async function loadLastBddOrder(): Promise<Order | null> {
   try {
-    await loadStripe(stripeKey)
-    stripeLoaded.value = true
+    const order = await loadLastOrder()
+    console.log('Commande trouvée en BDD :', order)
+    return order
   } catch (error) {
-    console.error('Erreur chargement Stripe :', error)
+    console.error('Erreur récupération commande :', error)
+    return null
+  }
+}
+async function createOrder(cartDetail: CartType, paymentIntentId: string): Promise<Order | null> {
+  const orderDetail: CartBackEndType = {
+    products: cartDetail.products,
+    payment_intent_ID: paymentIntentId,
+    delivery_carrier_id: stepStore.livraisonDetails.transporter.id,
+  }
+
+  const inserted = await addOrder(orderDetail)
+
+  if (!inserted) {
+    throw new Error('Insertion commande échouée')
+  }
+
+  console.log('Commande insérée avec PaymentIntent :', paymentIntentId)
+
+  return await loadLastOrder()
+}
+async function syncCartWithOrder(bddOrder: Order | null) {
+  if (!bddOrder) return
+
+  const isOrderIdentical = Number(cartStore.getOrderPrice) === Number(bddOrder.total_price)
+
+  if (isOrderIdentical) {
+    console.log('Panier identique, pas de réinitialisation')
     return
   }
 
-  if (!effectiveOrder.value || !effectiveOrder.value.carts) return
+  console.log('Panier différent, réinitialisation nécessaire')
 
-  const cartDetail: CartType = {
-    products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
-      id: p.product_id,
-      title: p.title,
-      price: p.price,
-      description: p.description ?? '',
-      image: p.image,
-      category: p.category,
-      quantity: p.quantity,
-    })),
-  }
+  await resetOrder()
 
-  let bddOrder: Order | null = null
+  console.log('Panier réinitialisé')
+}
+
+onBeforeMount(async () => {
   try {
-    bddOrder = await loadLastOrder()
-    console.log('Commande trouvée en BDD :', bddOrder)
-  } catch (error) {
-    console.error('Erreur récupération commande :', error)
-  }
+    if (!stepStore || !cartStore) return
 
-  const paymentStore = usePaymentStore()
+    await initStripe()
 
-  if (bddOrder?.payment_ID && !paymentStore.paymentIntentId) {
-    paymentStore.paymentIntentId = bddOrder.payment_ID
-    paymentIntentIdRef.value = bddOrder.payment_ID
-    console.log('PaymentIntent existant trouvé en BDD :', paymentIntentIdRef.value)
-  }
+    let bddOrder = await loadLastBddOrder()
 
-  if (paymentStore.paymentIntentId) {
-    try {
-      const paymentIntent = await fetchPaymentDetails(paymentStore.paymentIntentId)
-      console.log('ID', paymentIntent)
-      clientSecretRef.value = paymentIntent.client_secret
-      paymentIntentIdRef.value = paymentStore.paymentIntentId
-      console.log('PaymentIntent existant réutilisé :', paymentIntentIdRef.value)
-    } catch (error) {
-      console.error('Erreur récupération PaymentIntent existant :', error)
-      return
+    const currentOrder = bddOrder
+    //  products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
+
+    const cartDetail: CartType = {
+      products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
+        id: p.product_id,
+        title: p.title,
+        price: p.price,
+        description: p.description ?? '',
+        image: p.image,
+        category: p.category,
+        quantity: p.quantity,
+      })),
     }
-  } else {
-    try {
-      const payload = {
-        amount: priceFromEurosToCents(effectiveOrder.value.total_price),
-        currency: 'eur',
-        metadata: {
-          orderId: String(effectiveOrder.value.id),
-          userId: String(effectiveOrder.value.user_id),
-          cartId: String(effectiveOrder.value.carts.id),
-        },
-      }
-      console.log('payload', payload.amount)
-      const { clientSecret, paymentIntentId } = await createPaymentIntent(payload)
 
-      paymentStore.paymentIntentId = paymentIntentId
-      paymentIntentIdRef.value = paymentIntentId
-      clientSecretRef.value = clientSecret
+    const payment = await resolvePaymentIntent({
+      orderId: effectiveOrder.value.id,
+      amount: priceFromEurosToCents(effectiveOrder.value.total_price),
+      currency: 'eur',
+      paymentIntentId: bddOrder?.payment_ID ?? undefined,
+      metadata: {
+        cartId: effectiveOrder.value.carts.id,
+        userId: effectiveOrder.value.user_id,
+      },
+    })
 
-      console.log('Nouveau PaymentIntent créé :', paymentIntentId)
-    } catch (error) {
-      console.error('Erreur création PaymentIntent :', error)
-      return
+    clientSecretRef.value = payment.clientSecret
+    paymentIntentIdRef.value = payment.paymentIntentId
+
+    if (!currentOrder) {
+      bddOrder = await createOrder(cartDetail, payment.paymentIntentId)
     }
-  }
 
-  /*if (paymentStore.paymentIntentId) {
-    try {
-      const paymentIntent = await fetchPaymentDetails(paymentStore.paymentIntentId)
-      clientSecretRef.value = paymentIntent.client_secret
-      paymentIntentIdRef.value = paymentStore.paymentIntentId
-    } catch (error) {
-      console.error('Erreur récupération PaymentIntent existant :', error)
-      return
-    }
-  } else {
-    try {
-      const payload = {
-        amount: priceFromEurosToCents(effectiveOrder.value.total_price),
-        currency: 'eur',
-        metadata: {
-          orderId: String(effectiveOrder.value.id),
-          userId: String(effectiveOrder.value.user_id),
-          cartId: String(effectiveOrder.value.carts.id),
-        },
-      }
-      console.log('test 3', effectiveOrder.value)
-      const { clientSecret, paymentIntentId } = await createPaymentIntent(payload)
-
-      console.log('Payload', payload)
-      console.log('clientSecret', clientSecret)
-      console.log('paymentIntentId', paymentIntentId)
-
-      paymentStore.paymentIntentId = paymentIntentId
-      paymentIntentIdRef.value = paymentIntentId
-      clientSecretRef.value = clientSecret
-
-      console.log('Nouveau PaymentIntent créé :', paymentIntentId)
-    } catch (error) {
-      console.error('Erreur création PaymentIntent :', error)
-      return
-    }
-  }*/
-
-  console.log('bddOrder', bddOrder)
-  if (!bddOrder) {
-    try {
-      // const inserted = await insertOrder(cartDetail, paymentIntentIdRef.value!)
-      const orderDetail: CartBackEndType = {
-        products: cartDetail.products,
-        payment_intent_ID: paymentIntentIdRef.value!,
-        delivery_carrier_id: stepStore.livraisonDetails.transporter.id,
-      }
-      const inserted = await addOrder(orderDetail)
-      if (!inserted) return
-
-      bddOrder = await loadLastOrder()
-      console.log('Commande insérée avec PaymentIntent :', paymentIntentIdRef.value)
-    } catch (error) {
-      console.error('Erreur insertion commande :', error)
-      return
-    }
-  }
-
-  let isOrderIdentical
-  try {
-    if (Number(cartStore.getOrderPrice) === effectiveOrder.value.total_price) {
-      isOrderIdentical = true
-      console.log('Panier identique, pas de réinitialisation')
-    } else {
-      isOrderIdentical = false
-      console.log('Panier différent, réinitialisation nécessaire')
-    }
-  } catch (error) {
-    console.error('Erreur comparaison commande :', error)
-  }
-
-  if (!isOrderIdentical) {
-    try {
-      await resetOrder()
-      console.log('Panier réinitialisé')
-    } catch (error) {
-      console.error('Erreur réinitialisation commande :', error)
-      return
-    }
+    await syncCartWithOrder(bddOrder)
+  } catch (e) {
+    console.error('Checkout init error:', e)
   }
 })
+
 onMounted(() => {
   const route = useRoute()
   // Valid current step - got to next step

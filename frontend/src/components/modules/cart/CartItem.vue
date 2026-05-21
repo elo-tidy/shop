@@ -46,16 +46,7 @@ const products = computed<productCatalog[]>(() => {
   const firstCart = Array.isArray(carts) ? carts[0] : carts
   if (!firstCart?.carts_products || firstCart.carts_products.length === 0) return []
 
-  return firstCart.carts_products.map((p: productCatalog) => ({
-    id: p.id,
-    title: p.title,
-    price: p.price,
-    description: p.description ?? '',
-    image: p.image,
-    category: p.category,
-    quantity: p.quantity ?? 1,
-    stock: p.stock ?? 0,
-  }))
+  return firstCart.carts_products
 })
 
 // Cart

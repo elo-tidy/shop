@@ -10,7 +10,7 @@ import { useCartStore } from '@/store/CartStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { usePaymentStore } from '@/store/StripeStore'
 // Services
-import { fetchPaymentDetails } from '@/api/payment'
+import { resolvePaymentIntent } from '@/api/payment'
 import {
   inserOrderService,
   updatePaymentOrderService,
@@ -210,7 +210,7 @@ export function useOrderProcess() {
     loading.value = true
     error.value = false
 
-    const paymentDetails = await fetchPaymentDetails(payment_intent)
+    const paymentDetails = await resolvePaymentIntent(payment_intent)
     if (!paymentDetails) {
       console.warn('Aucun détail de paiement trouvé.')
       error.value = true

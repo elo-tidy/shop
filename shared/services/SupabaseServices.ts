@@ -1,5 +1,6 @@
 // Types
 import type {CartType, Order} from "@/types/Cart";
+import type {productCatalog} from "@/types/Product";
 import type {Database} from "../types/database";
 // Services
 import {fetchShippingOptions} from "@/services/ShippingOptions";
@@ -302,18 +303,22 @@ export async function getOrderService(
 				products_price,
 				payment_ID,
 				carts (
-				id,
-				carts_products (
 					id,
-					cart_id,
-					product_id,
-					title,
-					price,
-					quantity,
-					image,
-					category,
-					description
-				)
+					carts_products (
+						id,
+						cart_id,
+						product_id,
+						title,
+						price,
+						quantity,
+						image,
+						category,
+						description,
+						products (
+							id,
+							product_stock!product_stock_product_id_fkey(quantity)
+						)
+					)
 				)
 			`
 		)
@@ -324,5 +329,35 @@ export async function getOrderService(
 		.maybeSingle();
 
 	if (error) throw error;
-	return data;
+
+	const mappedData = data && {
+		id: data.id,
+		user_id: data.user_id,
+		cart_id: data.cart_id,
+		created_at: data.created_at,
+		updated_at: data.updated_at,
+		total_price: data.total_price,
+		payment_method: data.payment_method,
+		payment_status: data.payment_status,
+    	delivery_status: data.delivery_status,
+		delivery_carrier: data.delivery_carrier,
+		delivery_date: data.delivery_date,
+		delivery_price: data.delivery_price,
+		products_price: data.products_price,
+		payment_ID: data.payment_ID,
+		carts: {
+			id: data.carts.id,
+			carts_products: data.carts.carts_products.map((p: productCatalog) => ({
+				id: p.id,
+				title: p.title,
+				price: p.price,
+				description: p.description ?? '',
+				image: p.image,
+				category: p.category,
+				quantity: p.quantity ?? 1,
+				stock: p.products.product_stock.quantity ?? 0,
+			})),
+		}
+	}
+	return mappedData;
 }

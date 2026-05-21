@@ -1,42 +1,33 @@
-import type { PaymentIntentResponse } from '@/types/stripe'
-import type { PaymentDetails } from '@/types/stripe'
+
 import { supabase } from '@/utils/supabase'
 
-export type CreatePaymentIntentPayload = {
+type ResolvePaymentIntentInput = {
+  orderId: string
   amount: number
   currency: string
+  paymentIntentId?: string
   metadata?: Record<string, string>
 }
 
-export async function createPaymentIntent(
-  payload: CreatePaymentIntentPayload,
-): Promise<PaymentIntentResponse> {
-    console.log('payload api', payload)
-  const { data, error } = await supabase.functions.invoke('payment-create', {
-    method: 'POST',
-    body: payload,
-  })
-
-  console.log('api createPaymentIntent', data)
-
-  if (error) {
-    throw error
-  }
-
-  return data as PaymentIntentResponse
+type ResolvePaymentIntentResponse = {
+  clientSecret: string
+  paymentIntentId: string
 }
 
-export async function fetchPaymentDetails(
-  paymentIntentId: string,
-): Promise<PaymentDetails> {
-  const { data, error } = await supabase.functions.invoke('payment-retrieve', {
-    method: 'POST',
-    body: { payment_intent: paymentIntentId },
-  })
+export async function resolvePaymentIntent(
+  payload: ResolvePaymentIntentInput,
+): Promise<ResolvePaymentIntentResponse> {
+  const { data, error } = await supabase.functions.invoke(
+    'payment-resolve',
+    {
+      body: payload,
+    },
+  )
 
   if (error) {
-    throw error
+    console.error('resolvePaymentIntent error:', error)
+    throw new Error('Failed to resolve PaymentIntent')
   }
 
-  return data as PaymentDetails
+  return data as ResolvePaymentIntentResponse
 }

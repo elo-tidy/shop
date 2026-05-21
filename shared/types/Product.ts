@@ -1,6 +1,6 @@
 // import { z } from 'zod'
 import { z } from "https://esm.sh/zod@4.1.11";
-import {categoryEnum} from '@/types/Categories'
+import {categoryEnum} from '../types/Categories.ts'
 
 
 // Add product
