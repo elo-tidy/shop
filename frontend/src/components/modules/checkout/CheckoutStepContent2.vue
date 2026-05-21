@@ -44,6 +44,8 @@ const {
   deleteOrder,
 } = useOrderProcess()
 
+const stripeStore = usePaymentStore()
+
 // Cart
 // const cartDetail: CartType = { products: effectiveOrder.value.carts[0].carts_products }
 const currentTotalPrice = effectiveOrder.value.total_price
@@ -183,10 +185,20 @@ async function createOrder(cartDetail: CartType, paymentIntentId: string): Promi
 
   return await loadLastOrder()
 }
+
+const mapCart = (cart: CartType) => {
+  return cart.map((p: CartProduct) => ({
+    productId: p.id,
+    productQty: p.quantity,
+    productPrice: p.price,
+  }))
+}
 async function syncCartWithOrder(bddOrder: Order | null) {
   if (!bddOrder) return
 
-  const isOrderIdentical = Number(cartStore.getOrderPrice) === Number(bddOrder.total_price)
+  const mappedLocalCart = mapCart(cartStore.cart.products)
+  const mappedBddOrder = mapCart(bddOrder.carts.carts_products)
+  const isOrderIdentical = JSON.stringify(mappedLocalCart) === JSON.stringify(mappedBddOrder)
 
   if (isOrderIdentical) {
     console.log('Panier identique, pas de réinitialisation')
@@ -213,7 +225,7 @@ onBeforeMount(async () => {
 
     const cartDetail: CartType = {
       products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
-        id: p.product_id,
+        id: p.id,
         title: p.title,
         price: p.price,
         description: p.description ?? '',
@@ -223,11 +235,13 @@ onBeforeMount(async () => {
       })),
     }
 
+    console.log('paymentIntentId 2', stripeStore.paymentIntentId)
+
     const payment = await resolvePaymentIntent({
       orderId: effectiveOrder.value.id,
       amount: priceFromEurosToCents(effectiveOrder.value.total_price),
       currency: 'eur',
-      paymentIntentId: bddOrder?.payment_ID ?? undefined,
+      paymentIntentId: bddOrder?.payment_ID ?? stripeStore.paymentIntentId ?? undefined,
       metadata: {
         cartId: effectiveOrder.value.carts.id,
         userId: effectiveOrder.value.user_id,

@@ -131,6 +131,7 @@ export async function deleteOrderFromBdd(
 ): Promise<boolean> {
 	// Récupérer la commande
 	const orderData = await getOrderService(OrderID);
+	
 	if (!orderData || !orderData.id) {
 		console.error("Commande introuvable pour l'ID :", OrderID);
 		return false;
@@ -141,18 +142,7 @@ export async function deleteOrderFromBdd(
 
 	// Supprimer les produits liés au panier
 	if (orderData.cart_id) {
-		// Log avant suppression
-		const {data: existingProducts} = await supabase
-			.from("carts_products")
-			.select("*")
-			.eq("cart_id", orderData.cart_id);
-
-		console.log(
-			"Produits trouvés avant suppression :",
-			existingProducts?.length
-		);
-
-		// Supprime sans select
+	
 		const {error: errorProducts} = await supabase
 			.from("carts_products")
 			.delete()
@@ -165,34 +155,39 @@ export async function deleteOrderFromBdd(
 			);
 			return false;
 		}
-
-		// Vérification après suppression
-		const {data: afterDelete} = await supabase
-			.from("carts_products")
-			.select("*")
-			.eq("cart_id", orderData.cart_id);
-
-		console.log(
-			"Produits restants après suppression :",
-			afterDelete?.length
-		);
 	} else {
 		console.warn("Pas de cart_id associé, aucun produit à supprimer");
 	}
 
 	// Supprimer la commande
-	const {data: deletedOrder, error: errorOrder} = await supabase
-		.from("orders")
-		.delete()
-		.eq("id", orderData.id)
-		.select(); // récupère la commande supprimée
+	if (orderData.id) {
+		const {error: errorOrder} = await supabase
+			.from("orders")
+			.delete()
+			.eq("id", orderData.id)
+			.select(); // récupère la commande supprimée
 
-	if (errorOrder) {
-		console.error("Erreur de suppression de la commande :", errorOrder);
-		return false;
+		if (errorOrder) {
+			console.error("Erreur de suppression de la commande :", errorOrder);
+			return false;
+		}
+	} else {
+		console.warn("Pas de commande associée à cet id");
 	}
 
-	console.log("Commande supprimée :", deletedOrder);
+	// Supprimer le panier
+	const {data, error: errorCart} = await supabase
+		.from("carts")
+		.delete()
+		.eq("id", orderData.cart_id)
+		.select(); // récupère la commande supprimée
+
+	if (errorCart) {
+		console.error("Erreur de suppression du panier en bdd :", errorCart);
+		return false;
+	}	
+
+	console.log("Commande supprimée :", data);
 
 	return true;
 }
@@ -348,7 +343,7 @@ export async function getOrderService(
 		carts: {
 			id: data.carts.id,
 			carts_products: data.carts.carts_products.map((p: productCatalog) => ({
-				id: p.id,
+				id: p.product_id,
 				title: p.title,
 				price: p.price,
 				description: p.description ?? '',

@@ -122,8 +122,7 @@ export function useOrderProcess() {
     delivery?: DeliveryDetails | null,
   ): Order {
     const carts_products = cart.products.map((p:productCatalog) => ({
-      cart_id: String(cart.id ?? 0),
-      product_id: p.id,
+      id: p.id,
       title: p.title,
       price: p.price,
       description: p.description,
@@ -277,9 +276,14 @@ export function useOrderProcess() {
     }
   }*/
 
-  async function resetOrder(): Promise<boolean> {
-    const test = await loadLastOrder()
-    console.log('test reset', test)
+  async function resetOrder(): Promise<{success:boolean, pi:string|null}> {
+    const lastOrder = await loadLastOrder()
+
+    // On stock le pi pour le réutiliser
+    const paymentStore = usePaymentStore()
+    if(paymentStore.paymentIntentId === null) {
+      paymentStore.initWithExistingPi(lastOrder.payment_ID)
+    }
 
     if (currentOrder.value?.id && currentOrder.value.id !== '0') {
       const deleted = await deleteOrder(currentOrder.value.id)
@@ -287,8 +291,9 @@ export function useOrderProcess() {
         throw new Error('Erreur lors de la suppression de la commande')
       }
       currentOrder.value = await loadLastOrder()
+      return {success:true, pi:lastOrder.payment_ID}
     }
-    return true
+    return {success:false, pi:null}
   }
 
   return {

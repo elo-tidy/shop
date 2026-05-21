@@ -42,9 +42,19 @@ Deno.serve(async (req) => {
 
     
     if (body.paymentIntentId) {
+      console.log("update payment intent", body);
       try {
-        paymentIntent = await stripe.paymentIntents.retrieve(
+        paymentIntent = await stripe.paymentIntents.update(
           body.paymentIntentId,
+          {
+            amount: body.amount,
+            currency: body.currency,
+            payment_method_types: ["card"],
+            metadata: {
+              ...body.metadata,
+              orderId: body.orderId,
+            },
+          }
         );
       } catch {
         paymentIntent = null;

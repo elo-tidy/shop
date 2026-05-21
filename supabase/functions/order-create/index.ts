@@ -95,8 +95,6 @@ Deno.serve((req) =>
       const product = productsData.find(p => p.id === item.id)!;
       const stock = stocks.find(s => s.product_id === item.id)!;
 
-      console.log('product', product);
-
       if (stock.quantity < item.quantity) {
         throw new Error(`Stock insuffisant pour le produit ${item.id}`);
       }
@@ -146,8 +144,6 @@ Deno.serve((req) =>
         ...rest
       };
     });
-    console.log("cartProducts", cartProducts);
-    console.log(JSON.stringify(cartProducts, null, 2));
 
     const {data:productData, error: productsError } = await supaClient
       .from("carts_products")

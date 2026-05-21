@@ -9,9 +9,13 @@ export const usePaymentStore = defineStore(
     function resetPayment() {
       paymentIntentId.value = null
     }
+    function initWithExistingPi(pi:string) {
+      paymentIntentId.value = pi
+    }
 
     return {
       paymentIntentId,
+      initWithExistingPi,
       resetPayment,
     }
   },
