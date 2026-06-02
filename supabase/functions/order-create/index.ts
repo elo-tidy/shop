@@ -13,7 +13,7 @@ import {
   calculateProductsPrice,
   calculateTotalPrice
 } from "../utils/Cart.ts";
-
+import {numberWithTwoDecimals} from '../utils/maths.ts'
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
@@ -160,7 +160,7 @@ Deno.serve((req) =>
         cart_id: cart.id,
         delivery_carrier: transporter.id,
         delivery_date: isoStringDateOnly,
-        delivery_price: transporter.price,
+        delivery_price: numberWithTwoDecimals(transporter.price),
         payment_method: "Carte bancaire",
         products_price: productsPrice,
         total_price: totalPrice,

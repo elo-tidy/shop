@@ -1,9 +1,10 @@
 import { z } from "npm:zod";
 import type {CartProduct} from "../types/Cart.ts"
+import {numberWithTwoDecimals} from './maths.ts'
 
 // Calcul du prix des produits
 export function calculateProductsPrice(products: CartProduct[]): number {
-  return products.reduce((total, p) => total + p.price * p.quantity, 0);
+  return numberWithTwoDecimals(products.reduce((total, p) => total + p.price * p.quantity, 0));
 }
 
 // Calcul prix total avec livraison
@@ -13,5 +14,5 @@ export function calculateTotalPrice(
 ): number {
   const productsPrice = calculateProductsPrice(products);
   const deliveryPrice = delivery?.delivery_price ?? 0;
-  return productsPrice + deliveryPrice;
+  return numberWithTwoDecimals(Number(productsPrice) +  Number(deliveryPrice));
 }
