@@ -44,9 +44,9 @@ const products = computed<productCatalog[]>(() => {
   if (!carts) return []
 
   const firstCart = Array.isArray(carts) ? carts[0] : carts
-  if (!firstCart?.carts_products || firstCart.carts_products.length === 0) return []
+  if (!firstCart?.products || firstCart.products.length === 0) return []
 
-  return firstCart.carts_products
+  return firstCart.products
 })
 
 // Cart

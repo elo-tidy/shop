@@ -30,7 +30,7 @@ export const cartSchema = z.object({
   user_id: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().nullable().optional(),
-  carts_products: z.array(cartProductSchema),
+  products: z.array(cartProductSchema),
 })
 export type Cart = z.infer<typeof cartSchema>
 

@@ -6,6 +6,7 @@ import type {Database} from "../types/database";
 import {fetchShippingOptions} from "@/services/ShippingOptions";
 // Utils
 import {supabase} from "@/utils/supabase";
+import {numberWithTwoDecimals, formatPriceWithTwoDecimals} from "@/utils/maths";
 
 export async function sendMagicLink(email: string): Promise<void> {
 	const {error} = await supabase.auth.signInWithOtp({email});
@@ -250,7 +251,7 @@ export async function getOrderService(
 				payment_ID,
 				carts (
 					id,
-					carts_products (
+					products:carts_products (
 						id,
 						cart_id,
 						product_id,
@@ -301,7 +302,7 @@ export async function getOrderService(
 				payment_ID,
 				carts (
 					id,
-					carts_products (
+					products:carts_products (
 						id,
 						cart_id,
 						product_id,
@@ -333,18 +334,18 @@ export async function getOrderService(
 		cart_id: data.cart_id,
 		created_at: data.created_at,
 		updated_at: data.updated_at,
-		total_price: data.total_price,
+		total_price: numberWithTwoDecimals(data.total_price),
 		payment_method: data.payment_method,
 		payment_status: data.payment_status,
     	delivery_status: data.delivery_status,
 		delivery_carrier: data.delivery_carrier,
 		delivery_date: data.delivery_date,
-		delivery_price: data.delivery_price,
-		products_price: data.products_price,
+		delivery_price: numberWithTwoDecimals(data.delivery_price),
+		products_price: numberWithTwoDecimals(data.products_price),
 		payment_ID: data.payment_ID,
 		carts: {
 			id: data.carts.id,
-			carts_products: data.carts.carts_products.map((p: productCatalog) => ({
+			products: data.carts.products.map((p: productCatalog) => ({
 				id: p.product_id,
 				title: p.title,
 				price: p.price,

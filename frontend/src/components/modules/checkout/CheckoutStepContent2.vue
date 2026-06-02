@@ -55,11 +55,11 @@ const stripeStore = usePaymentStore()
 const route = useRoute()
 
 // Cart
-// const cartDetail: CartType = { products: effectiveOrder.value.carts[0].carts_products }
+// const cartDetail: CartType = { products: effectiveOrder.value.carts[0].products }
 const currentTotalPrice = effectiveOrder.value.total_price
 const amount = priceFromEurosToCents(currentTotalPrice)
 const cartDetail: CartType = {
-  products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
+  products: effectiveOrder.value.carts.products.map((p: CartProduct) => ({
     id: p.product_id,
     title: p.title,
     price: p.price,
@@ -208,7 +208,7 @@ async function createOrder(cartDetail: CartType, paymentIntentId: string): Promi
     throw new Error('Insertion commande échouée')
   }
 
-  console.log('Commande insérée avec PaymentIntent :', paymentIntentId)
+  console.log('Commande insérée avec PaymentIntent 1:', paymentIntentId)
 
   return await loadLastOrder()
 }
@@ -216,7 +216,7 @@ async function createOrder(cartDetail: CartType, paymentIntentId: string): Promi
 const mapOrder = (order: Order) => {
   return {
     delivery_carrier: order.delivery_carrier,
-    products: order.carts.carts_products.map((p: CartProduct) => ({
+    products: order.carts.products.map((p: CartProduct) => ({
       productId: p.id,
       productQty: p.quantity,
       productPrice: p.price,
@@ -243,6 +243,7 @@ async function syncCartWithOrder(bddOrder: Order | null) {
   console.log('Panier différent, réinitialisation nécessaire')
 
   await resetOrder()
+  await createOrder(localOrder.value.carts, localOrder.value.payment_ID)
 
   console.log('Panier réinitialisé')
 }
@@ -286,7 +287,7 @@ onBeforeMount(async () => {
     const currentOrder = bddOrder
 
     const cartDetail: CartType = {
-      products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
+      products: effectiveOrder.value.carts.products.map((p: CartProduct) => ({
         id: p.id,
         title: p.title,
         price: p.price,
@@ -310,11 +311,7 @@ onBeforeMount(async () => {
 
     if (!currentOrder) {
       bddOrder = await createOrder(cartDetail, payment.paymentIntentId)
-      console.log('Commande insérée avec PaymentIntent :', bddOrder)
-    } else {
-      console.log('ELSE Commande trouvée en BDD :', bddOrder)
     }
-
     await syncCartWithOrder(bddOrder)
   } catch (e) {
     console.error('Checkout init error:', e)

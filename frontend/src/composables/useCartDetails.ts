@@ -16,11 +16,11 @@ export function useCartDetails() {
     // carts peut être un objet ou un tableau
     const cartObj : Cart = Array.isArray(order.carts) ? order.carts[0] : order.carts
 
-    if (!cartObj?.carts_products?.length) return cartStore.cart || null
+    if (!cartObj?.products?.length) return cartStore.cart || null
 
     return {
       cart_id: cartObj.id ?? null,
-      products: cartObj.carts_products.map((p: Cart) => ({
+      products: cartObj.products.map((p: Cart) => ({
         id: Number(p.id),
         title: p.title,
         price: p.price,

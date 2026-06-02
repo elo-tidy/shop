@@ -124,11 +124,11 @@ export function useOrderProcess() {
   }
 
   // function updateQty(productId:CartProduct['id'], addOrRemove: string) {
-  //   effectiveOrder.value.carts.carts_products.find((product_id:CartProduct['id']) => product_id === productId)?.quantity
+  //   effectiveOrder.value.carts.products.find((product_id:CartProduct['id']) => product_id === productId)?.quantity
   // }
 
   function updateQty(product:CartProduct, addOrRemove: string) {    
-      effectiveOrder.value.carts.carts_products.find((p:CartProduct) => {
+      effectiveOrder.value.carts.products.find((p:CartProduct) => {
         if (p.id === product.id) {
           if (addOrRemove === 'add') {
             p.quantity = (product.quantity ?? 0) + 1
@@ -141,7 +141,7 @@ export function useOrderProcess() {
 
   function deleteProdut(productId:CartProduct['id']) {
     // delete this product in effectiveOrder
-    effectiveOrder.value.carts.carts_products = effectiveOrder.value.carts.carts_products.filter((p:CartProduct) => p.id !== productId)
+    effectiveOrder.value.carts.products = effectiveOrder.value.carts.products.filter((p:CartProduct) => p.id !== productId)
   }
 
   function createOrderFromCart(
@@ -149,7 +149,7 @@ export function useOrderProcess() {
     userId?: Database['public']['Tables']['profiles']['Row']['id'],
     delivery?: DeliveryDetails | null,
   ): Order {
-    const carts_products = cart.products.map((p:productCatalog) => ({
+    const products = cart.products.map((p:productCatalog) => ({
       id: p.id,
       title: p.title,
       price: p.price,
@@ -182,7 +182,7 @@ export function useOrderProcess() {
       payment_ID: paymentIntentId,
       carts: {
         id: cart.id ?? '0',
-        carts_products,
+        products,
       },
     }
 
