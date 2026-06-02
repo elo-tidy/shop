@@ -24,7 +24,7 @@ const props = defineProps<{
 
 const cartStore = useCartStore()
 const { cartData } = useCartDetails()
-const { resetOrder } = useOrderProcess()
+const { resetOrder, updateQty, deleteProdut } = useOrderProcess()
 
 // Products from bdd first, from store then
 const storeProduct = computed(() => {
@@ -49,14 +49,22 @@ const { product } = useProductModel(storeProduct)
 
 // Delete from cart
 const deleteThisProductfromCart = async (productId: number) => {
-  await resetOrder()
   cartStore.deleteFromCart(productId)
+  deleteProdut(productId)
 }
 
 // Update item quantity
-const updateItemQuantity = async (productId: number, addOrRemove: string) => {
-  await resetOrder()
+const updateItemQuantity = async (productId: number, addOrRemove: 'add' | 'remove') => {
+  if (limitUpdateQty(addOrRemove)) return
   cartStore.updateItemQuantity(productId, addOrRemove)
+  updateQty(productId, addOrRemove)
+}
+
+const limitUpdateQty = (addOrRemove?: 'add' | 'remove'): boolean => {
+  if (storeProduct.value?.quantity >= storeProduct.value?.stock && addOrRemove === 'add') {
+    return true
+  }
+  return false
 }
 </script>
 <template>
@@ -103,6 +111,7 @@ const updateItemQuantity = async (productId: number, addOrRemove: string) => {
       <!-- Add quantity -->
       <Button
         class="add-quantity"
+        :disabled="limitUpdateQty('add')"
         type="button"
         title="Augmenter la quantité de 1"
         :aria-controls="`item-quantity-id${product?.id}`"
