@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, toRef } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 // Type
 import type { productCatalog } from '@/types/Product'
 // Ui
@@ -13,6 +13,8 @@ import ProductTitle from '@/components/modules/product/ProductTitle.vue'
 import CartItemFooterAdmin from '@/components/modules/cart/CartItemFooterAdmin.vue'
 // Composables
 import { useProductModel } from '@/composables/useProductModel'
+// global
+const route = useRoute()
 
 // Props
 const props = withDefaults(
@@ -72,7 +74,7 @@ const productTitleWrapperProps = computed(() => {
     ? { to: `/product/${modelProduct.value.id}` }
     : null
 })
-
+const displayStock = computed(() => (route.query.redirect_status === 'succeeded' ? false : true))
 // Wording
 const stockWording = computed(() => {
   if (props.layout === 'detail' || props.layout === 'liste') {
@@ -143,7 +145,7 @@ const productFooter = computed(() => {
       <p><span class="sr-only">ID du produit : </span>{{ productRef.id }}</p>
     </div>
     <div class="stock-archived grid">
-      <p class="stock">{{ stockWording }}</p>
+      <p v-if="displayStock" class="stock">{{ stockWording }}</p>
       <p
         v-if="props.showItemId !== false && layout === 'admin' && archived === true"
         class="archived text-xs border px-2 py-1"

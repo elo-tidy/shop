@@ -225,6 +225,7 @@ export async function getCarrierDetails(carrierId: string) {
 }
 
 export async function getOrderService(
+	payment_status?: "paid",
 	orderId?: Order["id"]
 ): Promise<Order | null> {
 	// Get last order with id if given
@@ -264,6 +265,7 @@ export async function getOrderService(
 			`
 			)
 			.eq("id", orderId)
+			.in("payment_status", payment_status === "paid" ? ["paid"] : ["pending", "failed"])
 			.limit(1)
 			.maybeSingle();
 		if (error) throw error;
@@ -318,7 +320,7 @@ export async function getOrderService(
 			`
 		)
 		.eq("user_id", userId)
-		.eq("payment_status", "unpaid")
+		.in("payment_status", payment_status === "paid" ? ["paid"] : ["pending", "failed"])
 		.order("created_at", {ascending: false})
 		.limit(1)
 		.maybeSingle();
