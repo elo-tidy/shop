@@ -37,42 +37,65 @@ Deno.serve(async (req) => {
 
   const stripe = new Stripe(stripeKey);
 
-  try {
-    let paymentIntent: Stripe.PaymentIntent | null = null;
+  const createPi = async() => {
+    return stripe.paymentIntents.create({
+      amount: body.amount,
+      currency: body.currency,
+      payment_method_types: ["card"]
+    });
+  }
 
-    
-    if (body.paymentIntentId) {
-      console.log("update payment intent", body);
-      try {
-        paymentIntent = await stripe.paymentIntents.update(
-          body.paymentIntentId,
-          {
-            amount: body.amount,
-            currency: body.currency,
-            payment_method_types: ["card"],
-            metadata: {
-              ...body.metadata,
-              orderId: body.orderId,
-            },
-          }
-        );
-      } catch {
-        paymentIntent = null;
-      }
+  const updatePi = async(piId:Stripe.PaymentIntent["id"], metadataOnly:string | null) => {
+
+    if (metadataOnly === "metadataOnly") {
+      return stripe.paymentIntents.update(piId, {
+        metadata: body.metadata,
+      });
     }
 
-    if (!paymentIntent) {
-      paymentIntent = await stripe.paymentIntents.create({
-        amount: body.amount,
-        currency: body.currency,
-        payment_method_types: ["card"],
-        metadata: {
-          ...body.metadata,
-          orderId: body.orderId,
-        },
-      });
+    return stripe.paymentIntents.update(piId, {
+      amount: body.amount,
+      currency: body.currency,
+      payment_method_types: ["card"],      
+      metadata: body.metadata,
+    });
+  }
 
-    } 
+  try {
+    let paymentIntent: Stripe.PaymentIntent | null = null
+
+    const paymentIntentId = body.paymentIntentId
+
+    console.log("update payment intent", body)
+
+    // Si pas de pi, on en crée un
+    if (!paymentIntentId) {
+      paymentIntent = await createPi()
+    } else {
+
+      // sinon on le récupère et on maj
+      let pi: Stripe.PaymentIntent | null = null
+
+      try {
+        pi = await stripe.paymentIntents.retrieve(paymentIntentId)
+      } catch (err) {
+        console.error("Invalid PaymentIntent ID:", paymentIntentId, err)
+        pi = null
+      }
+
+      // fallback si PI introuvable
+      if (!pi) {
+        paymentIntent = await createPi()
+      } else if (pi.status === "succeeded") {
+        // PI déjà payé → metadata only
+        paymentIntent = await updatePi(pi.id, "metadataOnly")
+        console.log("PI modifiée après paiement")
+      } else {
+        // PI modifiable
+        paymentIntent = await updatePi(pi.id)
+        console.log("PI modifiée avant")
+      }
+    }
 
     return jsonResponse(
       {
@@ -80,9 +103,10 @@ Deno.serve(async (req) => {
         paymentIntentId: paymentIntent.id,
       },
       200,
-    );
+    )
+
   } catch (err) {
-    console.error("Stripe error:", err);
-    return errorResponse("Stripe failure", 500);
+    console.error("Stripe error:", err)
+    return errorResponse("Stripe failure", 500)
   }
 });

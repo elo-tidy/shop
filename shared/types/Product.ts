@@ -43,7 +43,7 @@ export const productAddSchema = z.object({
     message: "La catégorie est obligatoire"
   }),
   archived: z.boolean().optional(),
-  stock: z.number().min(0).default(0)
+  stock: z.number().min(0),
   // product_stock:  z.object({
   //   quantity: z.number().min(0, "La quantité doit être renseignée")
   // })  

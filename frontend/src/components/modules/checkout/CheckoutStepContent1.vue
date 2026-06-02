@@ -50,6 +50,12 @@ const selectThisCarrier = async (
   }
 
   stepStore.setLivraisonDetails(payload)
+
+  effectiveOrder.value.delivery_carrier = payload.transporter.name
+  effectiveOrder.value.delivery_price = payload.transporter.price
+  effectiveOrder.value.delivery_mode = payload.deliveryMode
+  effectiveOrder.value.delivery_mode_id = payload.deliveryModeId
+
   console.log(payload)
   deliveryDetails.value = payload
 }

@@ -1,7 +1,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { CartType, Order, Cart } from '@/types/Cart'
+import type { CartType, Order, Cart, CartProduct } from '@/types/Cart'
 import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/types/ShippingMode'
 import type { Database } from '../types/database'
 import type { productCatalog } from '@/types/Product'
@@ -37,7 +37,7 @@ export function useOrderProcess() {
   const stepStore = usecheckoutStepper()
 
   const payment = ref<any>(null)
-  const formattedDate = ref('')
+  // const formattedDate = ref('')
 
   // const currentOrder = ref<Order | null>(null)
   // const lastOrder = ref<Order | null>(null)
@@ -56,7 +56,8 @@ export function useOrderProcess() {
   const deliveryDate = computed(() =>
     // estimatedDelivery(transporterInfo.value?.estimated_delivery_time ?? 0),
     estimatedDelivery(),
-  )
+  )  
+
   const userId = ref<Database['public']['Tables']['profiles']['Row']['id'] | undefined>('')
   async function loadUserId() {
     const profile = await getUserProfile()
@@ -76,10 +77,18 @@ export function useOrderProcess() {
     return createOrderFromCart(cart, userId.value, delivery)
   })
 
+  const localOrder = computed<Order>(() => {
+    const cart = cartStore.cart
+    const delivery = stepStore.livraisonDetails
+    return createOrderFromCart(cart, userId.value, delivery)
+  })
+
   /** Charge la dernière commande depuis la BDD */
-  async function loadLastOrder(): Promise<Order | null> {
+  async function loadLastOrder(payment_status?:"paid"): Promise<Order | null> {
+
+    console.log('loadLastOrder', payment_status)
     try {
-      const order = await getOrderService()
+      const order = await getOrderService(payment_status)
       console.log('loadLastOrder', order)
 
       if (!order) {
@@ -90,10 +99,10 @@ export function useOrderProcess() {
       }
 
       // BDD last order
-      lastOrder.value = order
+      // lastOrder.value = order
       currentOrder.value = order
 
-      if (order.delivery_carrier) {
+      if (order.delivery_carrier && payment_status === 'paid' ) {
         const details = await getCarrierDetails(order.delivery_carrier)
         if (details) {
           const selectedMode = details.deliveryMode
@@ -114,7 +123,26 @@ export function useOrderProcess() {
     }
   }
 
-  //
+  // function updateQty(productId:CartProduct['id'], addOrRemove: string) {
+  //   effectiveOrder.value.carts.carts_products.find((product_id:CartProduct['id']) => product_id === productId)?.quantity
+  // }
+
+  function updateQty(product:CartProduct, addOrRemove: string) {    
+      effectiveOrder.value.carts.carts_products.find((p:CartProduct) => {
+        if (p.id === product.id) {
+          if (addOrRemove === 'add') {
+            p.quantity = (product.quantity ?? 0) + 1
+          } else {
+            p.quantity = Math.max((product.quantity ?? 0) - 1, 0)
+          }
+        }
+      })
+  }
+
+  function deleteProdut(productId:CartProduct['id']) {
+    // delete this product in effectiveOrder
+    effectiveOrder.value.carts.carts_products = effectiveOrder.value.carts.carts_products.filter((p:CartProduct) => p.id !== productId)
+  }
 
   function createOrderFromCart(
     cart: CartType,
@@ -148,7 +176,7 @@ export function useOrderProcess() {
       updated_at: new Date().toISOString(),
       delivery_status: 0,
       delivery_price: numberWithTwoDecimals(delivery?.transporter?.price ?? 0),
-      delivery_carrier: delivery?.transporter?.name ?? '',
+      delivery_carrier: delivery?.transporter?.id ?? '',
       delivery_date: 'Non encore estimée 2',
       products_price: numberWithTwoDecimals(productsPrice),
       payment_ID: paymentIntentId,
@@ -157,6 +185,7 @@ export function useOrderProcess() {
         carts_products,
       },
     }
+
 
     return order
   }
@@ -201,6 +230,7 @@ export function useOrderProcess() {
     }
   }
 
+  /*
   async function updatePaymentOrder(
     orderId: Order['id'],
     payment_intent: string,
@@ -236,6 +266,7 @@ export function useOrderProcess() {
       loading.value = false
     }
   }
+  */
 
   // Delete Products of order
   async function deleteOrder(orderId: Order['id']): Promise<boolean> {
@@ -279,6 +310,8 @@ export function useOrderProcess() {
   async function resetOrder(): Promise<{success:boolean, pi:string|null}> {
     const lastOrder = await loadLastOrder()
 
+    console.log('resetOrder', lastOrder)
+
     // On stock le pi pour le réutiliser
     const paymentStore = usePaymentStore()
     if(paymentStore.paymentIntentId === null) {
@@ -287,6 +320,7 @@ export function useOrderProcess() {
 
     if (currentOrder.value?.id && currentOrder.value.id !== '0') {
       const deleted = await deleteOrder(currentOrder.value.id)
+      console.log('deleted', currentOrder.value.id)
       if (!deleted) {
         throw new Error('Erreur lors de la suppression de la commande')
       }
@@ -296,22 +330,26 @@ export function useOrderProcess() {
     return {success:false, pi:null}
   }
 
+
   return {
     effectiveOrder,
     currentOrder,
+    localOrder,
     payment_intent,
     deliveryDate,
     deliveryDetails,
     transporterInfo,
     payment,
-    formattedDate,
+    // formattedDate,
     loading,
     error,
     insertOrder,
-    updatePaymentOrder,
+    // updatePaymentOrder,
     loadLastOrder,
     createOrderFromCart,
     resetOrder,
     deleteOrder,
+    updateQty,
+    deleteProdut,
   }
 }

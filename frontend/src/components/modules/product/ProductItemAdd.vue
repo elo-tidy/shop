@@ -73,7 +73,7 @@ const { handleSubmit, resetForm } = useForm<productAdd>({
     image: productToEdit?.image ?? '',
     category: productToEdit?.category ?? undefined,
     archived: productToEdit?.archived ?? false,
-    stock: productToEdit?.stock ?? 0,
+    stock: productToEdit?.stock ?? '',
   },
 })
 const onSubmit = handleSubmit(async (data) => {

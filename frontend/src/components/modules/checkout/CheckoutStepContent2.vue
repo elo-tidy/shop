@@ -3,17 +3,22 @@ import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 // Type
 import type { CartProduct, CartType, Order, CartBackEndType } from '@/types/Cart'
-import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
+import type {
+  Stripe,
+  StripeElementsOptionsMode,
+  StripePaymentElementOptions,
+} from '@stripe/stripe-js'
 import type { DeliveryDetails } from '@/types/ShippingMode'
 // UI
 import Button from '@/components/ui/button/Button.vue'
 import { toast } from 'vue-sonner'
 // Composables
 import { useOrderProcess } from '@/composables/useOrderProcess'
+import { useDeliveryDetails } from '@/composables/useDeliveryDetails'
 // Utils
 import { priceFromEurosToCents } from '@/utils/maths'
 // Service
-import { getConfirmedPayment } from '../../../../../shared/services/StripeServices'
+// import { getConfirmedPayment } from '../../../../../shared/services/StripeServices'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
@@ -36,8 +41,9 @@ const {
   effectiveOrder,
   payment_intent,
   loadLastOrder,
-  updatePaymentOrder,
+  // updatePaymentOrder,
   currentOrder,
+  localOrder,
   createOrderFromCart,
   resetOrder,
 
@@ -45,6 +51,8 @@ const {
 } = useOrderProcess()
 
 const stripeStore = usePaymentStore()
+
+const route = useRoute()
 
 // Cart
 // const cartDetail: CartType = { products: effectiveOrder.value.carts[0].carts_products }
@@ -61,10 +69,9 @@ const cartDetail: CartType = {
     quantity: p.quantity,
   })),
 }
-
 // Pay button clic
+const stripeResponse = ref(null)
 async function handleSubmit() {
-  console.log('handleSubmit ', effectiveOrder.value)
   if (!effectiveOrder.value || !effectiveOrder.value.carts) {
     console.error('Aucune commande disponible pour créer le panier.')
     toast('Le panier n’est pas encore chargé. Merci de réessayer.')
@@ -84,16 +91,37 @@ async function handleSubmit() {
     return
   }
 
+  // Stripe Metadata update
+  const orderId = effectiveOrder.value.id
+  const currency = 'eur'
+  const cartId = effectiveOrder.value.carts.id
+  const userId = effectiveOrder.value.user_id
+  const paymentIntentId = effectiveOrder.value.payment_ID
+  await resolvePayment(orderId, amount, currency, cartId, userId, paymentIntentId)
+
   // Stripe payment success
-  /*
   if (stripeInstance) {
     const returned_url = 'http://localhost:5173/checkout'
-    const { error } = await getConfirmedPayment(
-      stripeInstance,
+    // const { error } = await getConfirmedPayment(
+    //   stripeInstance,
+    //   elements,
+    //   clientSecretRef.value,
+    //   returned_url,
+    // )
+    const { error } = await stripeInstance.confirmPayment({
       elements,
-      clientSecretRef.value,
-      returned_url,
-    )
+      clientSecret: clientSecretRef.value,
+      confirmParams: {
+        return_url: returned_url,
+        payment_method_data: {
+          billing_details: {
+            address: {
+              country: 'FR',
+            },
+          },
+        },
+      },
+    })
 
     if (error) {
       console.error('Stripe error:', error.message)
@@ -103,7 +131,6 @@ async function handleSubmit() {
       // site first to authorize the payment, then redirected to the `return_url`.
     }
   }
-  */
 }
 
 // Stripe
@@ -142,7 +169,6 @@ const paymentElementOptions = ref<StripePaymentElementOptions>({
     },
   },
 })
-const stripeLoaded = ref<boolean>(false)
 const clientSecretRef = ref<string | null>('')
 const paymentIntentIdRef = ref<string | null>('')
 
@@ -155,7 +181,8 @@ const cartStore = useCartStore()
 
 async function initStripe() {
   await loadStripe(stripeKey)
-  stripeLoaded.value = true
+  // stripeLoaded.value = true
+  stripeStore.setStripeLoaded(true)
 }
 
 async function loadLastBddOrder(): Promise<Order | null> {
@@ -186,19 +213,27 @@ async function createOrder(cartDetail: CartType, paymentIntentId: string): Promi
   return await loadLastOrder()
 }
 
-const mapCart = (cart: CartType) => {
-  return cart.map((p: CartProduct) => ({
-    productId: p.id,
-    productQty: p.quantity,
-    productPrice: p.price,
-  }))
+const mapOrder = (order: Order) => {
+  return {
+    delivery_carrier: order.delivery_carrier,
+    products: order.carts.carts_products.map((p: CartProduct) => ({
+      productId: p.id,
+      productQty: p.quantity,
+      productPrice: p.price,
+    })),
+  }
 }
+
 async function syncCartWithOrder(bddOrder: Order | null) {
   if (!bddOrder) return
 
-  const mappedLocalCart = mapCart(cartStore.cart.products)
-  const mappedBddOrder = mapCart(bddOrder.carts.carts_products)
+  // const mappedLocalCart = mapOrder(cartStore.cart.products, carrierName.value)
+  const mappedLocalCart = mapOrder(localOrder.value)
+  const mappedBddOrder = mapOrder(bddOrder)
   const isOrderIdentical = JSON.stringify(mappedLocalCart) === JSON.stringify(mappedBddOrder)
+
+  console.log('local', mappedLocalCart)
+  console.log('bdd', mappedBddOrder)
 
   if (isOrderIdentical) {
     console.log('Panier identique, pas de réinitialisation')
@@ -212,16 +247,43 @@ async function syncCartWithOrder(bddOrder: Order | null) {
   console.log('Panier réinitialisé')
 }
 
+const resolvePayment = async (
+  orderId: string,
+  amount: number,
+  currency: string,
+  cartId: string,
+  userId: string,
+  paymentIntentId?: string,
+) => {
+  return await resolvePaymentIntent({
+    orderId: orderId,
+    amount: amount,
+    currency: currency,
+    paymentIntentId: paymentIntentId,
+    metadata: {
+      orderId: orderId,
+      cartId: cartId,
+      userId: userId,
+    },
+  })
+}
+
 onBeforeMount(async () => {
+  // Etape de confirmation si succes de paiement
+  if (route.query.redirect_status === 'succeeded') {
+    stepStore.incrementStep(2)
+    stepStore.validStep(3)
+    return
+  }
+
   try {
     if (!stepStore || !cartStore) return
 
-    await initStripe()
-
     let bddOrder = await loadLastBddOrder()
 
+    await initStripe()
+
     const currentOrder = bddOrder
-    //  products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
 
     const cartDetail: CartType = {
       products: effectiveOrder.value.carts.carts_products.map((p: CartProduct) => ({
@@ -234,25 +296,23 @@ onBeforeMount(async () => {
         quantity: p.quantity,
       })),
     }
+    const orderId = effectiveOrder.value.id
+    const currency = 'eur'
+    const cartId = effectiveOrder.value.carts.id
+    const userId = effectiveOrder.value.user_id
 
-    console.log('paymentIntentId 2', stripeStore.paymentIntentId)
-
-    const payment = await resolvePaymentIntent({
-      orderId: effectiveOrder.value.id,
-      amount: priceFromEurosToCents(effectiveOrder.value.total_price),
-      currency: 'eur',
-      paymentIntentId: bddOrder?.payment_ID ?? stripeStore.paymentIntentId ?? undefined,
-      metadata: {
-        cartId: effectiveOrder.value.carts.id,
-        userId: effectiveOrder.value.user_id,
-      },
-    })
+    const paymentIntentId = bddOrder?.payment_ID ?? stripeStore.paymentIntentId ?? undefined
+    const payment = await resolvePayment(orderId, amount, currency, cartId, userId, paymentIntentId)
 
     clientSecretRef.value = payment.clientSecret
-    paymentIntentIdRef.value = payment.paymentIntentId
+    paymentIntentIdRef.value =
+      bddOrder?.payment_ID ?? stripeStore.paymentIntentId ?? payment.paymentIntentId ?? undefined
 
     if (!currentOrder) {
       bddOrder = await createOrder(cartDetail, payment.paymentIntentId)
+      console.log('Commande insérée avec PaymentIntent :', bddOrder)
+    } else {
+      console.log('ELSE Commande trouvée en BDD :', bddOrder)
     }
 
     await syncCartWithOrder(bddOrder)
@@ -260,19 +320,10 @@ onBeforeMount(async () => {
     console.error('Checkout init error:', e)
   }
 })
-
-onMounted(() => {
-  const route = useRoute()
-  // Valid current step - got to next step
-  if (route.query.redirect_status === 'succeeded') {
-    stepStore.incrementStep(2)
-    stepStore.validStep(3)
-  }
-})
 </script>
 <template>
   <StripeElements
-    v-if="stripeLoaded && clientSecretRef"
+    v-if="stripeStore.stripeLoaded && clientSecretRef"
     :key="clientSecretRef"
     :stripe-key="stripeKey"
     :elements-options="elementsOptions"

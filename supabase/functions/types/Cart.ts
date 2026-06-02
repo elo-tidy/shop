@@ -48,8 +48,8 @@ export const productBackEndSchema = z.object({
   quantity: z.number().int().min(1, "La quantité doit être au moins 1"),
   price: z.number().min(0, "Le prix doit être renseigné"),
   title: z.string().min(1, "Le titre doit être renseigné"),
-  description: z.string().nullable(), 
-  image: z.string().url("URL invalide"),    
+  description: z.string().nullable(),
+  image: z.string().url("URL invalide"),
   category: categoryEnum
 })
 
