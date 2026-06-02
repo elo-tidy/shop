@@ -66,39 +66,39 @@ export type Database = {
       carts_products: {
         Row: {
           cart_id: string
-          category: string
+          category: string | null
           created_at: string
-          description: string
+          description: string | null
           id: string
-          image: string
+          image: string | null
           price: number
           product_id: number
           quantity: number
-          title: string
+          title: string | null
         }
         Insert: {
           cart_id?: string
-          category: string
+          category?: string | null
           created_at?: string
-          description: string
+          description?: string | null
           id?: string
-          image: string
+          image?: string | null
           price: number
           product_id: number
           quantity: number
-          title: string
+          title?: string | null
         }
         Update: {
           cart_id?: string
-          category?: string
+          category?: string | null
           created_at?: string
-          description?: string
+          description?: string | null
           id?: string
-          image?: string
+          image?: string | null
           price?: number
           product_id?: number
           quantity?: number
-          title?: string
+          title?: string | null
         }
         Relationships: [
           {
@@ -111,7 +111,7 @@ export type Database = {
           {
             foreignKeyName: "carts_products_product_id_fkey"
             columns: ["product_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
@@ -124,12 +124,13 @@ export type Database = {
           delivery_carrier: string
           delivery_date: string
           delivery_price: number
-          delivery_status: number | null
+          delivery_status: Database["public"]["Enums"]["delivery_status"] | null
           id: string
           payment_ID: string | null
           payment_method: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           products_price: number
+          stripe_event_id: string | null
           total_price: number
           updated_at: string | null
           user_id: string
@@ -140,12 +141,15 @@ export type Database = {
           delivery_carrier: string
           delivery_date: string
           delivery_price: number
-          delivery_status?: number | null
+          delivery_status?:
+            | Database["public"]["Enums"]["delivery_status"]
+            | null
           id?: string
           payment_ID?: string | null
           payment_method: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price: number
+          stripe_event_id?: string | null
           total_price: number
           updated_at?: string | null
           user_id?: string
@@ -156,12 +160,15 @@ export type Database = {
           delivery_carrier?: string
           delivery_date?: string
           delivery_price?: number
-          delivery_status?: number | null
+          delivery_status?:
+            | Database["public"]["Enums"]["delivery_status"]
+            | null
           id?: string
           payment_ID?: string | null
           payment_method?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           products_price?: number
+          stripe_event_id?: string | null
           total_price?: number
           updated_at?: string | null
           user_id?: string
@@ -294,7 +301,7 @@ export type Database = {
         | "in_delivery"
         | "delivered"
         | "returned"
-      payment_status: "unpaid" | "paid" | "failed" | "refunded"
+      payment_status: "pending" | "paid" | "failed" | "refunded"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -440,7 +447,7 @@ export const Constants = {
         "delivered",
         "returned",
       ],
-      payment_status: ["unpaid", "paid", "failed", "refunded"],
+      payment_status: ["pending", "paid", "failed", "refunded"],
       user_role: ["user", "admin"],
     },
   },

@@ -40,3 +40,4 @@ coverage
 # MacOS
 .DS_Store
 
+supabase/_backups/
