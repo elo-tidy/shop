@@ -58,7 +58,7 @@
     "npm-run-all2": "^8.0.4",
     "prettier": "3.5.3",
     "semantic-release": "^24.2.9",
-    "supabase": "^2.72.4",
+    "supabase": "^2.106.0",
     "typescript": "~5.8.3",
     "vite": "^7.1.9",
     "vite-plugin-vue-devtools": "^7.7.7",
