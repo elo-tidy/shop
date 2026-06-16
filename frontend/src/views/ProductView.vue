@@ -9,21 +9,21 @@ import type { productCatalog } from '@/types/Product'
 
 const route = useRoute()
 const router = useRouter()
-const store = useProductStore()
+const productStore = useProductStore()
 
 const product = ref<productCatalog | null>(null)
 
 onMounted(async () => {
-  const id = route.params.id?.toString()
+  const id = Number(route.params.id)
 
   if (!id) {
     return router.replace('/404')
   }
 
-  let found = store.getProductById(id)
+  let found = productStore.getProductById(id)
   if (!found) {
-    await store.loadProducts()
-    found = store.getProductById(id)
+    await productStore.loadProducts()
+    found = productStore.getProductById(id)
   }
 
   if (!found) {

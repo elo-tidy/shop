@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 // Types
-import { productAddSchema, type productAdd } from '@/types/Product'
+import { productFormSchema, type productCatalog, type productForm } from '@/types/Product'
 // UI
 import {
   Field,
@@ -34,16 +34,17 @@ import ProductCard from '@/components/modules/product/ProductItem.vue'
 import { addProduct, updateProduct } from '@/api/products'
 // Store
 import { useProductStore } from '@/store/ProductStore'
+import type { cartProduct } from '@/types/Cart'
 
 // Props
 const props = defineProps<{
-  id?: productAdd['id']
+  id?: productCatalog['id']
 }>()
 
 // Data
 const addProductForm = ref()
 const storedProduct = useProductStore()
-const productToEdit: productAdd = props.id ? storedProduct.getProductById(props.id) : null
+const productToEdit = props.id ? storedProduct.getProductById(props.id) : null
 // const currentSessionIsAdmin = useIsUserAdmin()
 const dataReq = ref()
 const productStore = useProductStore()
@@ -63,24 +64,24 @@ const labels = productToEdit
     }
 
 // Submit form
-const { handleSubmit, resetForm } = useForm<productAdd>({
-  validationSchema: toTypedSchema(productAddSchema),
+const { handleSubmit, resetForm } = useForm<productForm>({
+  validationSchema: toTypedSchema(productFormSchema),
   initialValues: {
-    // id: productToEdit?.id ?? 0,
     title: productToEdit?.title ?? '',
-    price: productToEdit?.price ?? '',
+    price: productToEdit?.price ?? 0,
     description: productToEdit?.description ?? '',
     image: productToEdit?.image ?? '',
     category: productToEdit?.category ?? undefined,
     archived: productToEdit?.archived ?? false,
-    stock: productToEdit?.stock ?? '',
+    stock: productToEdit?.stock ?? 0,
   },
 })
 const onSubmit = handleSubmit(async (data) => {
   try {
     if (productToEdit) {
       // update product
-      const req = await updateProduct({ id: productToEdit.id, stock: productToEdit.stock, ...data })
+      const req = await updateProduct({ id: productToEdit.id, ...data })
+      // const req = await updateProduct(productToEdit)
       dataReq.value = req
       productStore.updateProductInStore(req.data)
       toast(`Produit "${req.data.title}" modifié avec succès`)
@@ -268,7 +269,7 @@ const onSubmit = handleSubmit(async (data) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-true"
-                            :value="true"
+                            value="true"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
@@ -281,14 +282,17 @@ const onSubmit = handleSubmit(async (data) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-false"
-                            :value="false"
+                            value="false"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
                       </FieldLabel>
                     </RadioGroup>
 
-                    <FieldError v-if="errors.length" :errors="errors" />
+                    <FieldError
+                      v-if="errors.length"
+                      :errors="errors.map((e) => ({ message: e }))"
+                    />
                   </FieldSet>
                 </VeeField>
 

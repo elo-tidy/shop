@@ -1,6 +1,5 @@
 // Types
 import type { productCatalog } from '@/types/Product'
-
 export class Product {
   private data: productCatalog
 
@@ -9,15 +8,15 @@ export class Product {
   }
 
   get id(): number {
-    return this.data.id ?? 0
+    return this.data.id
   }
 
   get title(): string {
-    return this.data.title ?? ''
+    return this.data.title 
   }
 
   get price(): number {
-    return this.data.price ?? 0
+    return this.data.price
   }
 
   get description(): string {
@@ -30,15 +29,12 @@ export class Product {
 
   get category(): string {
     return this.data.category ?? ''
-  }
-
-  get quantity(): number {
-    return this.data.quantity ?? 0
-  }
+  }  
 
   get stock(): number {
-    return this.data.stock ?? 0
+    return this.data.stock
   }
+
   get archived(): boolean {
     return this.data.archived ?? false
   }
@@ -58,8 +54,4 @@ export class Product {
   get imageAlt(): string {
     return `Image du produit : ${this.title}`
   }
-
-  get itemQuantity(): number {
-    return this.quantity
-  }  
 }

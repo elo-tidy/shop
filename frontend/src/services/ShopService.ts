@@ -15,34 +15,36 @@ export async function fetchAllProductCategories() {
 }*/
 
 import { supabase } from "@/utils/supabase";
-import {productAddSchema, type productAdd} from '@/types/Product'
-import type {Database} from'@/types/database'
+import { type productCatalog, productCatalogSchema } from "@/types/Product";
+import type { CartType } from "@/types/Cart";
+import type { Database } from "../../../shared/types/database";
 
-export async function fetchAllProducts() : Promise<productAdd>{
+export async function fetchAllProducts(): Promise<productCatalog[]> {
   const { data, error } = await supabase
-    .from('products')
+    .from("products")
     // .select('*')
     .select(`
       *,
       product_stock!product_stock_product_id_fkey(quantity)
     `);
   if (error) {
-    throw new Error('Erreur lors du chargement des produits')
+    throw new Error("Erreur lors du chargement des produits");
   }
   // extract stock within item
-  const mappedData = data.map((item: productAdd) => ({
-    ...item, 
+  const mappedData = data.map((item) => ({
+    ...item,
     stock: item.product_stock?.quantity ?? 0,
-  })).map(({product_stock, ...rest}) => rest )
+  })).map(({ product_stock, ...rest }) => rest);
 
-  return mappedData
-  
+  return mappedData;
 }
 
-export async function fetchAllProductCategories() : Promise<Database['public']['Enums']['categories'][]> {
-  const { data, error } = await supabase.rpc('get_products_categories');
-   if (error) {
-    throw new Error('Erreur lors du chargement des catégories')
+export async function fetchAllProductCategories(): Promise<
+  Database["public"]["Enums"]["categories"][]
+> {
+  const { data, error } = await supabase.rpc("get_products_categories");
+  if (error) {
+    throw new Error("Erreur lors du chargement des catégories");
   }
-  return data
+  return (data ?? []) as Database["public"]["Enums"]["categories"][];
 }

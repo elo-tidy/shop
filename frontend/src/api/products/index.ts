@@ -1,7 +1,7 @@
-import type {productAdd, productDelete} from '../../../../shared/types/Product'
+import type {productForm, productDelete} from '@/types/Product'
 import { supabase } from '@/utils/supabase'
 
-export async function addProduct(product:productAdd) {
+export async function addProduct(product:productForm) {
   const { data, error } = await supabase.functions.invoke("products-create", {
     body: product,
     method: 'POST'
@@ -11,25 +11,6 @@ export async function addProduct(product:productAdd) {
   }
   return data
 }
-
-/*
-export async function deleteProduct(product:productDelete) {
-  // console.log('session',session.value?.access_token)
-  const { data, error } = await supabase.functions.invoke("products-delete", {   
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${session.value?.access_token}`,
-      "Accept": "application/json"
-    },
-    body: product,
-    method: 'DELETE'
-  })
-  if (error) {
-    throw error
-  }
-  return data
-}
-  */
 
 export async function deleteProduct(product:productDelete) {
   const { data, error } = await supabase.functions.invoke(`products-delete?id=${product.id}`, {
@@ -41,7 +22,7 @@ export async function deleteProduct(product:productDelete) {
   return data 
 }
 
-export async function updateProduct(product:productAdd) {
+export async function updateProduct(product:productForm) {
   const { data, error } = await supabase.functions.invoke("products-update", {
     body: product,
     method: 'PATCH'

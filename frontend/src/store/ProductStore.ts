@@ -1,20 +1,40 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 // Types
-import type { productAdd } from '../types/Product'
+import type { productCatalog } from '../types/Product'
 // Services
 import { fetchAllProducts } from '../services/ShopService'
 
 export const useProductStore = defineStore(
   'product',
   () => {
+
     // State
     const adminDisplay = ref(false)   
-    const products = ref<productAdd[]>([])
+    const products = ref<productCatalog[]>([])
     const isLoading = ref(false)
     const error = ref<string | null>(null)
     const currentCategory = ref<string | null>(null)
     const productsNb = computed(():number => products.value.length)
+
+    // Getters
+    const getProductById = computed(() => (id: productCatalog['id']) => {
+      return products.value.find((product) => product.id === id)
+
+    })
+    const getPublicProducts = computed(() => {
+      return products.value.filter((p) => p.archived === false && p.stock > 0)
+    })
+    const filteredProducts = computed(() => {
+      if( adminDisplay.value === true) {
+        return currentCategory.value
+        ? products.value.filter((p) => p.category === currentCategory.value)
+        : products.value
+      }
+      return currentCategory.value
+        ? getPublicProducts.value.filter((p) => p.category === currentCategory.value)
+        : getPublicProducts.value
+    })
 
     // Actions
     async function loadProducts() {
@@ -24,7 +44,7 @@ export const useProductStore = defineStore(
       error.value = null
 
       try {
-        const data: productAdd[] = await fetchAllProducts()
+        const data = await fetchAllProducts()
         products.value = data
       } catch (err: any) {
         console.error('Erreur lors du fetch des produits', err)
@@ -33,52 +53,25 @@ export const useProductStore = defineStore(
         isLoading.value = false
       }
     }
-
     function updateCurrentCategory(category: string | null) {
       currentCategory.value = category
     }
-
-    function addProductToStore(product: productAdd) {
+    function addProductToStore(product: productCatalog) {
       products.value.push(product)
       // products.value = [...products.value, product]
     }
-
     function removeProductFromStore(id: number) {
-      const index = products.value.findIndex((p:productAdd) => p.id === id)
+      const index = products.value.findIndex((p) => p.id === id)
       if (index !== -1) {
         products.value.splice(index, 1)
       }
     }
-
-    function updateProductInStore(product: productAdd) {
-      products.value = products.value.map((p:productAdd) => p.id === product.id ? product : p)     
+    function updateProductInStore(product: productCatalog) {
+      products.value = products.value.map((p) => p.id === product.id ? product : p)     
     }
-
     function setAdminDisplay(isAdmin: boolean) {
       adminDisplay.value = isAdmin
     }
-
-    // Getters
-    const getProductById = computed(() => (id: string) => {
-      return products.value.find((product:productAdd) => product.id.toString() === id)
-    })
-
-    const getPublicProducts = computed(() => {
-      return products.value.filter((p:productAdd) => p.archived === false && p.stock > 0)
-    })
-
-    const filteredProducts = computed(() => {
-
-      if( adminDisplay.value === true) {
-        return currentCategory.value
-        ? products.value.filter((p:productAdd) => p.category === currentCategory.value)
-        : products.value
-      }
-
-      return currentCategory.value
-        ? getPublicProducts.value.filter((p:productAdd) => p.category === currentCategory.value)
-        : getPublicProducts.value
-    })
 
     return {
       products,
@@ -86,16 +79,15 @@ export const useProductStore = defineStore(
       error,
       currentCategory,
       productsNb,
-
+      getProductById,
+      filteredProducts,
       loadProducts,
       updateCurrentCategory,
       addProductToStore,
       removeProductFromStore,
       updateProductInStore,
       setAdminDisplay,
-
-      getProductById,
-      filteredProducts,
+      
     }
   },
   {

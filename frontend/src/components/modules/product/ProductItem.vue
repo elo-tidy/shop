@@ -3,6 +3,7 @@ import { computed, toRef } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 // Type
 import type { productCatalog } from '@/types/Product'
+import type { cartProduct, CartType } from '@/types/Cart'
 // Ui
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 // Components
@@ -19,7 +20,7 @@ const route = useRoute()
 // Props
 const props = withDefaults(
   defineProps<{
-    product: productCatalog
+    product: productCatalog | cartProduct
     layout?: 'admin' | 'detail' | 'liste' | 'cart' | 'check'
     display?: 'grid' | 'card'
     hn?: 1 | 2 | 3 | 4
@@ -56,14 +57,11 @@ const compLayout = computed(() =>
   layout.value === 'detail' ? 1 : layout.value === 'admin' ? 4 : undefined*/
 
 // Product content details
-const productRef = toRef(props, 'product')
-const {
-  product: modelProduct,
-  formattedPrice,
-  imageAlt,
-  stock,
-  archived,
-} = useProductModel(productRef)
+function isProduct(p: any): p is productCatalog {
+  return 'stock' in p
+}
+const productRef = computed(() => (isProduct(props.product) ? props.product : null))
+const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
 
 // Component setup
 const productTitleWrapper = computed(() => {
@@ -78,19 +76,19 @@ const displayStock = computed(() => (route.query.redirect_status === 'succeeded'
 // Wording
 const stockWording = computed(() => {
   if (props.layout === 'detail' || props.layout === 'liste') {
-    if (stock.value === 1) {
+    if (modelProduct.value?.stock === 1) {
       return 'Un seul article en stock !'
     }
-    if (stock.value <= 5) {
-      return `Plus que ${stock.value} articles en stock !`
+    if (modelProduct.value?.stock && modelProduct.value?.stock <= 5) {
+      return `Plus que ${modelProduct.value?.stock} articles en stock !`
     }
     return 'En stock'
   }
-  return `Stock : ${stock.value}`
+  return `Stock : ${modelProduct.value?.stock}`
 })
 const stockClassAlert = computed((): string | undefined => {
-  if (props.layout === 'admin' && stock.value <= 5) {
-    if (stock.value === 0) {
+  if (props.layout === 'admin' && modelProduct.value?.stock && modelProduct.value?.stock <= 5) {
+    if (modelProduct.value?.stock === 0) {
       return 'stock-null'
     }
     return 'stock-alert'
@@ -104,8 +102,8 @@ const productContent = computed(() => {
         productTitle: modelProduct.value.title,
       }
     : {
-        productDescription: modelProduct.value!.shortDesc,
-        productTitle: modelProduct.value!.shortTitle,
+        productDescription: modelProduct.value?.shortDesc,
+        productTitle: modelProduct.value?.shortTitle,
       }
 })
 
@@ -142,12 +140,12 @@ const productFooter = computed(() => {
     </CardHeader>
 
     <div class="id" v-if="props.showItemId !== false && layout === 'admin'">
-      <p><span class="sr-only">ID du produit : </span>{{ productRef.id }}</p>
+      <p><span class="sr-only">ID du produit : </span>{{ product.id }}</p>
     </div>
     <div class="stock-archived grid">
       <p v-if="displayStock" class="stock">{{ stockWording }}</p>
       <p
-        v-if="props.showItemId !== false && layout === 'admin' && archived === true"
+        v-if="props.showItemId !== false && layout === 'admin' && product.archived === true"
         class="archived text-xs border px-2 py-1"
       >
         <span class="sr-only">Produit</span> archivé
@@ -157,7 +155,7 @@ const productFooter = computed(() => {
       {{ stockClassAlert === 'stock-alert' ? 'Stock faible' : 'Stock épuisé' }}
     </p>
 
-    <img :src="product.image" :alt="imageAlt" class="object-contain img" />
+    <img :src="product.image ?? ''" :alt="imageAlt" class="object-contain img" />
 
     <!-- v-if="layout !== 'detail' && layout !== 'admin'" -->
     <CardContent :class="['h-full card-content', displayFooter === false ? 'pb-4' : undefined]">
