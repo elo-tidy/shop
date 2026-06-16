@@ -1,63 +1,30 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
 // Types
-import type { ShippingMode, Transporter, DeliveryMode } from '@/typesold/ShippingMode'
+import type { ShippingMode, Transporter } from '@/types/ShippingMode'
 // Ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 // Components
 // import CheckoutPickupMap from './CheckoutPickupMap.vue'
-// Composables
-import { useOrderProcess } from '@/composables/useOrderProcess'
 // Utils
 import { numberWithTwoDecimals } from '@/utils/maths'
 // Services
 import { fetchShippingOptions } from '@/services/ShippingOptions'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
-import { usePaymentStore } from '@/store/StripeStore'
-
-/**
- * Data : Ref -
- */
-
-const { paymentIntentId } = usePaymentStore()
+import { useOrderStore } from '@/store/OrderStore'
 
 // Ref
 const shippingOptions = ref<ShippingMode | null>(null)
 const activeTab = ref<string>('home_delivery')
 
 // Transporter details
-const { deliveryDetails, deleteOrder, effectiveOrder, loadLastOrder, currentOrder, resetOrder } =
-  useOrderProcess()
 const stepStore = usecheckoutStepper()
-const currentCarrier = computed(() => stepStore.getLivraisonDetails?.transporter.id)
-const selectThisCarrier = async (
-  transporter: Transporter,
-  deliveryMode: string,
-  deliveryModeId: string,
-): Promise<void> => {
-  const payload = {
-    transporter,
-    deliveryMode,
-    deliveryModeId,
-  }
-  console.log('effectiveOrder.value.id', effectiveOrder.value.id)
-  // Update orderTable
-  if (paymentIntentId) {
-    await resetOrder()
-    // await updateOrderTable(paymentIntentId)
-  }
-
-  stepStore.setLivraisonDetails(payload)
-
-  effectiveOrder.value.delivery_carrier = payload.transporter.name
-  effectiveOrder.value.delivery_price = payload.transporter.price
-  effectiveOrder.value.delivery_mode = payload.deliveryMode
-  effectiveOrder.value.delivery_mode_id = payload.deliveryModeId
-
-  console.log(payload)
-  deliveryDetails.value = payload
+const orderStore = useOrderStore()
+const currentCarrier = computed(() => orderStore.deliveryDetails?.transporter.id)
+const selectCarrier = async (transporterId: string): Promise<void> => {
+  await orderStore.setLivraisonDetails(transporterId)
 }
 
 // Map
@@ -106,7 +73,7 @@ onMounted(async () => {
               'flex flex-col w-full h-auto bg-background border text-foreground gap-0 items-start pl-15',
               currentCarrier === transporter.id ? 'selected' : null,
             ]"
-            @click="selectThisCarrier(transporter, shippingOption.name, shippingOption.id)"
+            @click="selectCarrier(transporter.id)"
           >
             <span class="flex justify-between w-full">
               <span class="label">{{ transporter.name }}</span>

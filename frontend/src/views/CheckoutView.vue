@@ -1,20 +1,26 @@
 <script lang="ts" setup>
+import { computed, onMounted } from 'vue'
 // Types
-import type { stepType } from '@/typesold/Stepper'
+import type { stepType } from '@/types/Stepper'
 // Ui
 import { Button } from '@/components/ui/button'
 import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'
 import Step from '@/components/modules/checkout/CheckoutStep.vue'
 import CheckoutSummary from '@/components/modules/checkout/CheckoutSummary.vue'
-// Composables
-import { useCartDetails } from '@/composables/useCartDetails'
+import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { useOrderStore } from '@/store/OrderStore'
+import { useCartStore } from '@/store/CartStore'
 
 /**
  * Data : Step navigation
  */
-const { cartData: productInCart } = useCartDetails()
+// const { effectiveOrder, loadCarrierInfo, carrierInfo } = useOrderProcess()
+const orderStore = useOrderStore()
+const cartStore = useCartStore()
+const productInCart = computed(() => cartStore.cart)
+
 const stepStore = usecheckoutStepper()
 const steps: stepType[] = stepStore.steps
 
@@ -27,6 +33,9 @@ const nextStep = (stepNumber: number): void => {
 const prevtStep = (): void => {
   stepStore.decrementStep()
 }
+onMounted(async () => {
+  // await loadCarrierInfo()
+})
 </script>
 <template>
   <div id="checkout" class="grid gap-10 grid-cols-2" v-if="productInCart">
@@ -64,7 +73,7 @@ const prevtStep = (): void => {
           type="button"
           class="btn"
           @click="nextStep(stepStore.step)"
-          :disabled="!stepStore.livraisonDetails?.transporter.id && stepStore.step === 1"
+          :disabled="!orderStore.deliveryDetails?.transporter.id && stepStore.step === 1"
           >Passer à l'étape suivante</Button
         >
       </div>

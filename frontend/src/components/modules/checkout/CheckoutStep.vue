@@ -18,10 +18,6 @@ const props = defineProps<{
   title: string
 }>()
 
-/**
- * Data : step components init
- */
-
 // Step init
 const stepStore = usecheckoutStepper()
 const stepProp = computed(() => ({
@@ -29,7 +25,7 @@ const stepProp = computed(() => ({
   contentId: props.step,
 }))
 
-// Components
+// Components init
 const content: Record<number, Component> = {
   0: CheckoutStepContent0,
   1: CheckoutStepContent1,

@@ -2,15 +2,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { stepType } from '@/typesold/Stepper'
-import type { Transporter, DeliveryDetailsWrapper, DeliveryDetails } from '@/typesold/ShippingMode'
+import type { Transporter, DeliveryDetailsWrapper, DeliveryDetails, DeliveryMode } from '@/types/ShippingMode'
+import {getCarrierDetails} from '@/services/CarrierService'
 
 export const usecheckoutStepper = defineStore(
   'checkoutStepper',
   () => {
     // state
     const step = ref(0)
-    const livraisonDetails = ref<DeliveryDetails | null>(null)
-
+    // const livraisonDetails = ref<{deliveryMode: DeliveryMode['name'], transporter:Transporter} | null>(null)
     const steps = ref<stepType[]>([
       {
         id: 'informations_client',
@@ -44,49 +44,46 @@ export const usecheckoutStepper = defineStore(
 
     // Getters
     const getSteps = computed(() => steps.value)
-    const getLivraisonDetails = computed(() => livraisonDetails.value)
+    // const getLivraisonDetails = computed(() => livraisonDetails.value)
 
     // Actions
     function validStep(stepNumber: number): void {
       steps.value[stepNumber].stepValidated = true
     }
-
     function changeStep(stepNumber: number): void {
       step.value = stepNumber
     }
-
     function incrementStep(stepNumber: number): void {
       validStep(stepNumber)
       step.value++
     }
-
     function decrementStep(): void {
       step.value--
     }
-
-    function setLivraisonDetails(payload: DeliveryDetails) {
-      livraisonDetails.value = payload
-    }
-
+    // async function setLivraisonDetails(transporterId: Transporter["id"]) {
+    //   livraisonDetails.value = await getCarrierDetails(transporterId)      
+    // }
+    // function clearLivraisonDetails() {
+    //   livraisonDetails.value = null      
+    // }
     function resetStepper(): void {
       step.value = 0
-      livraisonDetails.value = null
+      // clearLivraisonDetails()
       steps.value.forEach((step) => (step.stepValidated = false))
     }
 
     return {
       step,
       steps,
-      livraisonDetails,
-
+      // livraisonDetails,
       getSteps,
-      getLivraisonDetails,
-
+      // getLivraisonDetails,
       validStep,
       changeStep,
       incrementStep,
       decrementStep,
-      setLivraisonDetails,
+      // setLivraisonDetails,
+      // clearLivraisonDetails,
       resetStepper,
     }
   },

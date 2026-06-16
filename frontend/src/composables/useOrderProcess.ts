@@ -1,355 +1,208 @@
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-// Types
-import type { CartType, Order, Cart, CartProduct } from '@/types/Cart'
-import type { DeliveryDetailsWrapper, Transporter, DeliveryDetails } from '@/types/ShippingMode'
-import type { Database } from '../types/database'
-import type { productCatalog } from '@/types/Product'
+
+import { useSupabaseSession } from './useSupabaseSession'
+
 // Stores
 import { useCartStore } from '@/store/CartStore'
+import { useOrderStore } from '@/store/OrderStore'
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { usePaymentStore } from '@/store/StripeStore'
+
 // Services
-import { resolvePaymentIntent } from '@/api/payment'
 import {
-  inserOrderService,
-  updatePaymentOrderService,
+  addOrder,
+} from '@/api/order'
+
+import {
   getOrderService,
-  getCarrierDetails,
   deleteOrderFromBdd,
-  getUserProfile,
 } from '../../../shared/services/SupabaseServices'
-// Composable
-import {estimatedDelivery} from '../../../shared/composables/useDeliveryEstimation'
-import type { User } from '@supabase/supabase-js'
+
 import {
-  numberWithTwoDecimals,
-} from '@/utils/maths'
+  resolvePaymentIntent
+} from '@/api/payment'
 
+import { stripePromise } from '@/utils/stripe'
 
-const currentOrder = ref<Order | null>(null)
-const lastOrder = ref<Order | null>(null)
-const deliveryDetails = ref<DeliveryDetails | null>(null)
+import type { cartProduct, CartType, Order } from '@/types/Cart'
+import type { Transporter } from '@/types/ShippingMode'
+import type { productCatalog } from '@/types/Product'
+
+/* -------------------------------------------------- */
+/* STATE                                              */
+/* -------------------------------------------------- */
 
 export function useOrderProcess() {
+
   const route = useRoute()
+
   const cartStore = useCartStore()
+  const orderStore = useOrderStore()
   const stepStore = usecheckoutStepper()
+  const paymentStore = usePaymentStore()
 
-  const payment = ref<any>(null)
-  // const formattedDate = ref('')
-
-  // const currentOrder = ref<Order | null>(null)
-  // const lastOrder = ref<Order | null>(null)
-  // const deliveryDetails = ref<DeliveryDetails | null>(null)
-
-  const error = ref(false)
+  // States
   const loading = ref(false)
-  const orderAlreadyInserted = ref(false)
-
+  const error = ref(false)
   const payment_intent = String(route.query.payment_intent || '')
 
-  const transporterInfo = computed<Transporter | null>(
-    () => deliveryDetails.value?.transporter ?? null,
-  )
-
-  const deliveryDate = computed(() =>
-    // estimatedDelivery(transporterInfo.value?.estimated_delivery_time ?? 0),
-    estimatedDelivery(),
-  )  
-
-  const userId = ref<Database['public']['Tables']['profiles']['Row']['id'] | undefined>('')
-  async function loadUserId() {
-    const profile = await getUserProfile()
-    userId.value = profile.data.session?.user.id
-    return userId.value
-  }
-  loadUserId()
-
-  /** Computed pour gérer l’ordre effectif : BDD si dispo sinon store */
-  const effectiveOrder = computed<Order>(() => {
-    if (currentOrder.value) return currentOrder.value
-    // if (lastOrder.value) return lastOrder.value
-
-    // Génère un ordre basé sur le store
-    const cart = cartStore.cart
-    const delivery = stepStore.livraisonDetails
-    return createOrderFromCart(cart, userId.value, delivery)
-  })
-
-  const localOrder = computed<Order>(() => {
-    const cart = cartStore.cart
-    const delivery = stepStore.livraisonDetails
-    return createOrderFromCart(cart, userId.value, delivery)
-  })
-
-  /** Charge la dernière commande depuis la BDD */
-  async function loadLastOrder(payment_status?:"paid"): Promise<Order | null> {
-
-    console.log('loadLastOrder', payment_status)
+  // Order displays ans mutations
+  async function loadLastOrder(
+    payment_status?: 'paid'
+  ): Promise<Order | null> {
     try {
       const order = await getOrderService(payment_status)
-      console.log('loadLastOrder', order)
-
-      if (!order) {
-        if (stepStore.livraisonDetails) {
-          deliveryDetails.value = stepStore.livraisonDetails
-        }
-        return null
-      }
-
-      // BDD last order
-      // lastOrder.value = order
-      currentOrder.value = order
-
-      if (order.delivery_carrier && payment_status === 'paid' ) {
-        const details = await getCarrierDetails(order.delivery_carrier)
-        if (details) {
-          const selectedMode = details.deliveryMode
-          deliveryDetails.value = {
-            transporter: details.transporter,
-            deliveryMode: selectedMode?.name ?? 'Standard',
-            deliveryModeId: selectedMode?.id ?? '',
-          }
-          stepStore.setLivraisonDetails(deliveryDetails.value)
-        }
-      }
-      console.log('currentOrder mis à jour DANS composable', order)
+      if (!order) return null
+      orderStore.setOrder(order)
       return order
     } catch (err) {
-      console.error('Erreur loadLastOrder :', err)
+      console.error(err)
       error.value = true
       return null
     }
   }
-
-  // function updateQty(productId:CartProduct['id'], addOrRemove: string) {
-  //   effectiveOrder.value.carts.products.find((product_id:CartProduct['id']) => product_id === productId)?.quantity
-  // }
-
-  function updateQty(product:CartProduct, addOrRemove: string) {    
-      effectiveOrder.value.carts.products.find((p:CartProduct) => {
-        if (p.id === product.id) {
-          if (addOrRemove === 'add') {
-            p.quantity = (product.quantity ?? 0) + 1
-          } else {
-            p.quantity = Math.max((product.quantity ?? 0) - 1, 0)
-          }
-        }
-      })
-  }
-
-  function deleteProdut(productId:CartProduct['id']) {
-    // delete this product in effectiveOrder
-    effectiveOrder.value.carts.products = effectiveOrder.value.carts.products.filter((p:CartProduct) => p.id !== productId)
-  }
-
-  function createOrderFromCart(
+  async function createOrder(
     cart: CartType,
-    userId?: Database['public']['Tables']['profiles']['Row']['id'],
-    delivery?: DeliveryDetails | null,
-  ): Order {
-    const products = cart.products.map((p:productCatalog) => ({
-      id: p.id,
-      title: p.title,
-      price: p.price,
-      description: p.description,
-      image: p.image,
-      category: p.category,
-      quantity: p.quantity ?? 1,
-      stock: p.stock ?? 0,
-    }))
+    carrierId: Transporter["id"],
+    paymentIntentId: string
+  ): Promise<Order> {
 
-    const productsPrice = cart.products.reduce((total:Cart['price'], p:productCatalog) => {
-      return total + p.price * (p.quantity ?? 1)
-    }, 0)
-
-    const { paymentIntentId } = usePaymentStore()
-    const order = {
-      id: '0',
-      user_id: userId,
-      cart_id: cart.id ?? '0',
-      total_price: numberWithTwoDecimals(productsPrice + (delivery?.transporter?.price ?? 0)),
-      payment_status: 0,
-      payment_method: 'Carte bancaire',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      delivery_status: 0,
-      delivery_price: numberWithTwoDecimals(delivery?.transporter?.price ?? 0),
-      delivery_carrier: delivery?.transporter?.id ?? '',
-      delivery_date: 'Non encore estimée 2',
-      products_price: numberWithTwoDecimals(productsPrice),
+    const order = await addOrder({
+      products: cart.products,
       payment_ID: paymentIntentId,
-      carts: {
-        id: cart.id ?? '0',
-        products,
-      },
-    }
+      // delivery_carrier: orderStore.getdeliveryDetails.transporter.id,
+      delivery_carrier: carrierId,
+    })
+    if (!order) throw new Error('Order creation failed')
 
+      console.log('Order created:', order)
+
+    orderStore.setOrder(order)
 
     return order
   }
-
-  async function insertOrder(
-    cartDetail: CartType,
-    paymentIntentId: string,
-    forceInsert = false,
-  ): Promise<boolean> {
-    loading.value = true
-    error.value = false
-
+  async function deleteOrder(orderId: Order['id']) {
     try {
-      if (!deliveryDetails.value) {
-        await loadLastOrder()
-      }
-
-      const carrierId = stepStore.livraisonDetails?.transporter?.id
-      if (!carrierId) {
-        console.warn("Aucun transporteur trouvé, impossible d'insérer la commande.")
-        return false
-      }
-
-      const lastOrderFromDb = await getOrderService(cartDetail.id)
-      const alreadyInserted = !!lastOrderFromDb && lastOrderFromDb.cart_id === cartDetail.id
-
-      if (forceInsert || !alreadyInserted) {
-        await inserOrderService(cartDetail, carrierId, paymentIntentId)
-        // cartStore.clearCartStore()
-      } else {
-        console.log('Commande déjà insérée, rien à faire.')
-      }
-
-      await loadLastOrder()
-      return true
+      return await deleteOrderFromBdd(orderId)
     } catch (err) {
-      console.error('Erreur dans insertOrder :', err)
+      console.error(err)
       error.value = true
       return false
-    } finally {
-      loading.value = false
     }
   }
+  async function resetOrder(order?: Order | null) {
 
-  /*
-  async function updatePaymentOrder(
-    orderId: Order['id'],
-    payment_intent: string,
-  ): Promise<boolean> {
-    console.log('updatePaymentOrder', orderId)
-    loading.value = true
-    error.value = false
-
-    const paymentDetails = await resolvePaymentIntent(payment_intent)
-    if (!paymentDetails) {
-      console.warn('Aucun détail de paiement trouvé.')
-      error.value = true
-      loading.value = false
-      return false
-    }
-
-    payment.value = paymentDetails
-    formattedDate.value = new Date(paymentDetails.created * 1000).toLocaleString('fr-FR')
-
-    try {
-      const isOrderUpdated = await updatePaymentOrderService(orderId, payment_intent)
-      if (!isOrderUpdated) {
-        error.value = true
-        return false
-      }
-      currentOrder.value = isOrderUpdated
-      return true
-    } catch (err) {
-      console.error('Erreur dans updatePaymentOrder :', err)
-      error.value = true
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
-  */
-
-  // Delete Products of order
-  async function deleteOrder(orderId: Order['id']): Promise<boolean> {
-    try {
-      const isOrderDeleted = await deleteOrderFromBdd(orderId)
-
-      if (!isOrderDeleted) {
-        error.value = true
-        return false
-      }
-      // currentOrder.value = isOrderDeleted
-      return true
-    } catch (err) {
-      console.error('Erreur dans la suppression de la commande :', err)
-      error.value = true
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // Update order table
-  /*async function updateOrderTable(paymentIntentId: string): Promise<boolean> {
-    try {
-      const isOrderUpdated = await updateOrderFromBdd(paymentIntentId)
-
-      if (!isOrderUpdated) {
-        error.value = true
-        return false
-      }
-      return true
-    } catch (err) {
-      console.error('Erreur dans la suppression de la commande :', err)
-      error.value = true
-      return false
-    } finally {
-      loading.value = false
-    }
-  }*/
-
-  async function resetOrder(): Promise<{success:boolean, pi:string|null}> {
-    const lastOrder = await loadLastOrder()
-
-    console.log('resetOrder', lastOrder)
-
-    // On stock le pi pour le réutiliser
+    const last = order ?? await loadLastOrder()
+    if (!last) return false
     const paymentStore = usePaymentStore()
-    if(paymentStore.paymentIntentId === null) {
-      paymentStore.initWithExistingPi(lastOrder.payment_ID)
+
+    if (
+      !paymentStore.paymentIntentId &&
+      last.payment_ID
+    ) {
+      paymentStore.initWithExistingPi(last.payment_ID)
     }
 
-    if (currentOrder.value?.id && currentOrder.value.id !== '0') {
-      const deleted = await deleteOrder(currentOrder.value.id)
-      console.log('deleted', currentOrder.value.id)
-      if (!deleted) {
-        throw new Error('Erreur lors de la suppression de la commande')
-      }
-      currentOrder.value = await loadLastOrder()
-      return {success:true, pi:lastOrder.payment_ID}
+    const current = orderStore.orderModel
+    if (!current) return false
+    const deleted = await deleteOrder(current.data.id)
+
+    if (!deleted) {
+      throw new Error('Order deletion failed')
     }
-    return {success:false, pi:null}
+    orderStore.resetOrderDraft()
+
+    return true
   }
 
+  // Stripe payment
+  async function resolveOrderPayment() {
+    const order = orderStore.orderModel?.data
+    const amount = orderStore.totalPriceInCents
+    if (!order) throw new Error('Order missing')
+
+    const payload = {
+      orderId: order.id ?? '',
+      cartId: order.cart_id,
+      userId: order.user_id,
+      paymentIntentId: order.payment_ID ?? '',
+      amount: amount,
+      currency: 'eur',
+      // metadata: {
+      //   orderId: order.id,
+      //   cartId: order.cart_id,
+      //   userId: order.user_id,
+      // },
+    }
+    
+    orderStore.setOrder(order)
+    
+    return await resolvePaymentIntent(payload)
+  }
+  async function verifyStripePayment(clientSecret: string) {
+    const stripe = await stripePromise
+    if (!stripe) return null
+    return await stripe.retrievePaymentIntent(clientSecret)
+  }
+  async function confirmPaidOrder() {
+    const data = await loadLastOrder('paid')
+    if(!data) return
+    orderStore.setOrder(data)
+    return data
+  }
+
+  // Map Orders to compare
+  function mapOrder(order: Order | {delivery_carrier: string, cart:CartType}) {
+    return {
+      delivery_carrier: order.delivery_carrier,
+      products: order.cart.products.map((p:cartProduct) => ({
+        id: p.id,
+        quantity: p.quantity,
+      })),
+    }
+  }
+  async function syncCartWithOrder() {
+
+    // Get transporter
+    const transporterId = orderStore.deliveryDetails?.transporter?.id
+    if (!transporterId) {
+      throw new Error('Missing transporter before order creation')
+    }
+
+    // Get local - bdd order and compare
+    const bddOrder = await loadLastOrder()
+    const localOrder = {
+      delivery_carrier: transporterId,
+      cart: cartStore.cart
+    }
+    if(!bddOrder) return
+   
+    const mappedBdd = mapOrder(bddOrder)
+    const mappedLocal = mapOrder(localOrder)
+    const isIdentical = JSON.stringify(mappedLocal) === JSON.stringify(mappedBdd)    
+    if (isIdentical) return
+
+    // If bdd and local order are different, re-create order
+    await resetOrder(bddOrder)
+    await createOrder(
+      cartStore.cart,
+      transporterId,
+      paymentStore.paymentIntentId!
+    )
+  }
 
   return {
-    effectiveOrder,
-    currentOrder,
-    localOrder,
-    payment_intent,
-    deliveryDate,
-    deliveryDetails,
-    transporterInfo,
-    payment,
-    // formattedDate,
     loading,
     error,
-    insertOrder,
-    // updatePaymentOrder,
+    payment_intent,
     loadLastOrder,
-    createOrderFromCart,
-    resetOrder,
+    createOrder,
     deleteOrder,
-    updateQty,
-    deleteProdut,
+    resetOrder,
+    resolveOrderPayment,
+    verifyStripePayment,
+    confirmPaidOrder,
+    syncCartWithOrder,
   }
 }

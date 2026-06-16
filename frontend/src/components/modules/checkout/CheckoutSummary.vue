@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // Types
 import type { Component } from 'vue'
-import type { stepType } from '@/typesold/Stepper'
+import type { stepType } from '@/types/Stepper'
 interface SummaryContent {
   title: string
   component: Component
@@ -13,22 +13,21 @@ import CheckoutSummaryContent0 from '@/components/modules/checkout/CheckoutSumma
 import CheckoutSummaryContent1 from '@/components/modules/checkout/CheckoutSummaryContent1.vue'
 // Store
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { useOrderStore } from '@/store/OrderStore'
 
 // Props
 const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 
-/**
- * Data : stepstore - component content -
- */
-
+// Data
 const stepStore = usecheckoutStepper()
+const orderStore = useOrderStore()
 
-// Content
+// Content init
 const contents: Record<number, SummaryContent> = {
   0: {
-    title: 'Mon panier',
+    title: `${orderStore.isPaid ? 'Commande validée' : 'Panier'}`,
     cta: 'mon panier',
     component: CheckoutSummaryContent0,
   },
@@ -47,7 +46,7 @@ const isStepVisible = (i: number, steps: stepType[]): boolean => {
     <h2 class="text-[23px] px-10 pt-5">Récapitulatif de ma commande</h2>
     <div class="px-10 mb-5 max-h-[calc(100dvh-48px-74.5px-calc(var(--spacing)*5)))] overflow-auto">
       <template v-for="(sumContent, index) in contents" :key="index">
-        <template v-if="isStepVisible(index, stepStore.getSteps)">
+        <template v-if="isStepVisible(Number(index), stepStore.getSteps)">
           <checkoutSummaryContent
             :GoToStep="props.GoToStep"
             :data="sumContent"

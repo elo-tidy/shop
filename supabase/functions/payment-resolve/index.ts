@@ -26,6 +26,7 @@ Deno.serve(async (req) => {
   let body;
   try {
     body = schema.parse(await req.json());
+    console.log("body", body);
   } catch (e) {
     return errorResponse("Invalid body", 400);
   }
@@ -49,24 +50,29 @@ Deno.serve(async (req) => {
 
     if (metadataOnly === "metadataOnly") {
       return stripe.paymentIntents.update(piId, {
-        metadata: body.metadata,
+        metadata: {
+          orderId: body.orderId,
+          cartId: body.cartId,
+          userId: body.userId,
+        },
       });
     }
 
     return stripe.paymentIntents.update(piId, {
       amount: body.amount,
       currency: body.currency,
-      payment_method_types: ["card"],      
-      metadata: body.metadata,
+      payment_method_types: ["card"],  
+      metadata: {
+        orderId: body.orderId,
+        cartId: body.cartId,
+        userId: body.userId,
+      },
     });
   }
 
   try {
     let paymentIntent: Stripe.PaymentIntent | null = null
-
     const paymentIntentId = body.paymentIntentId
-
-    console.log("update payment intent", body)
 
     // Si pas de pi, on en crée un
     if (!paymentIntentId) {
@@ -78,6 +84,7 @@ Deno.serve(async (req) => {
 
       try {
         pi = await stripe.paymentIntents.retrieve(paymentIntentId)
+        console.log("PI:", pi)
       } catch (err) {
         console.error("Invalid PaymentIntent ID:", paymentIntentId, err)
         pi = null
@@ -89,11 +96,9 @@ Deno.serve(async (req) => {
       } else if (pi.status === "succeeded") {
         // PI déjà payé → metadata only
         paymentIntent = await updatePi(pi.id, "metadataOnly")
-        console.log("PI modifiée après paiement")
       } else {
         // PI modifiable
         paymentIntent = await updatePi(pi.id)
-        console.log("PI modifiée avant")
       }
     }
 

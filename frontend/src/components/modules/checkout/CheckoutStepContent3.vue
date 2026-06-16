@@ -1,43 +1,22 @@
 <script setup lang="ts">
-import { onMounted, computed, onBeforeMount, ref } from 'vue'
+import { onMounted, computed, ref, onBeforeMount } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
+// Types
+import type { Order } from '@/types/Cart'
 // Composables
 import { useOrderProcess } from '@/composables/useOrderProcess'
+import { convertISOtoDateFR } from '../../../../../shared/composables/useDeliveryEstimation'
 // Store
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
 import { usePaymentStore } from '@/store/StripeStore'
-import { useProductStore } from '@/store/ProductStore'
-// Utils
-import { stripePromise } from '@/utils/stripe'
-import { priceFromEurosToCents } from '@/utils/maths'
-// Api
-import { resolvePaymentIntent } from '@/api/payment'
-
-/**
- * Data : order detail - delivery
- */
-const route = useRoute()
+import { useOrderStore } from '@/store/OrderStore'
 
 // Data Order details
-const {
-  payment_intent,
-  payment,
-  // formattedDate,
-  effectiveOrder,
-  deliveryDetails,
-  deliveryDate,
-  loading,
-  error,
-  currentOrder,
-  // updatePaymentOrder,
-  loadLastOrder,
-} = useOrderProcess()
+const { loadLastOrder, verifyStripePayment, confirmPaidOrder } = useOrderProcess()
 
 // Data delivery
-const deliveryMode = computed(() => deliveryDetails.value?.deliveryMode)
-const shippingDate = computed(() => deliveryDate.value)
-const formattedDate = new Date(effectiveOrder.value.created_at).toLocaleString('fr-FR')
+const orderStore = useOrderStore()
 
 // Payment status
 const stripePaymentReturn = ref<{ state: string; message: string }>({
@@ -45,47 +24,49 @@ const stripePaymentReturn = ref<{ state: string; message: string }>({
   message: 'Validation du paiement en cours',
 })
 const displayDetailsOrder = ref(false)
-
-onBeforeMount(async () => {
-  await loadLastOrder()
-})
+const paidOrder = ref<Order | null>(null)
 
 // Update order payment status to paid after payment_intent - load order details
 const stepper = usecheckoutStepper()
 const cartStore = useCartStore()
 const paymentStore = usePaymentStore()
-const productStore = useProductStore()
+
+const route = useRoute()
 
 onMounted(async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const clientSecret = urlParams.get('payment_intent_client_secret')
-
-  const stripe = await stripePromise
-
-  if (!stripe) {
-    console.error('Stripe failed to initialize')
-    return
-  }
 
   if (!clientSecret) {
     console.error('clientSecret missing')
     return
   }
 
-  const { paymentIntent, error } = await stripe.retrievePaymentIntent(clientSecret)
+  const result = await verifyStripePayment(clientSecret)
+  if (!result?.paymentIntent) return
 
-  if (error) {
-    console.error('Stripe error:', error)
-    return
-  }
-
-  switch (paymentIntent.status) {
+  switch (result.paymentIntent?.status) {
     case 'succeeded':
       stripePaymentReturn.value = {
         state: 'success',
         message: '',
       }
       displayDetailsOrder.value = true
+
+      // Load last paid order and reload order store
+      const data = await confirmPaidOrder()
+      if (!data) throw new Error('Order not found')
+      paidOrder.value = data
+
+      // Clear cart and reload with paid order products
+      cartStore.clearCartStore()
+      const paidProducts = computed(() => paidOrder.value?.cart.products ?? [])
+      paidProducts.value.forEach((product: Order['carts']['products'][number]) => {
+        cartStore.addToCart(product, product.quantity)
+      })
+
+      // Reset StripeStore
+      paymentStore.resetPayment()
       break
 
     case 'processing':
@@ -97,55 +78,47 @@ onMounted(async () => {
 
     default:
       stripePaymentReturn.value = {
-        state: paymentIntent.status,
+        state: result.paymentIntent?.status ?? 'failed',
         message: 'Paiement échoué',
       }
-  }
-
-  if (route.query.redirect_status === 'succeeded') {
-    cartStore.clearCartStore()
-    paymentStore.resetPayment()
-    currentOrder.value = await loadLastOrder('paid')
   }
 })
 
 // Reset StepStore before route leaving - reset local order
-
 onBeforeRouteLeave(async () => {
   if (route.query.redirect_status === 'succeeded') {
     stepper.resetStepper()
-    currentOrder.value = await loadLastOrder()
+    orderStore.clearOrder()
+    cartStore.clearCartStore()
   }
 })
 </script>
 
 <template>
-  <!-- statut du paiement -->
   <div v-if="stripePaymentReturn.state === 'processing'" :class="stripePaymentReturn.state">
     <p>{{ stripePaymentReturn.message }}</p>
   </div>
 
-  <div v-if="displayDetailsOrder">
-    <p>Merci pour votre commande !</p>
-
-    <h3 class="text-[18px] mt-5">Détails de la commande :</h3>
+  <div v-if="displayDetailsOrder && paidOrder">
+    <h3 class="text-[18px] underline">Détails de la commande :</h3>
     <div class="mt-2">
-      <p><strong>Commande numéro :</strong> {{ effectiveOrder?.id }}</p>
-      <p><strong>Date :</strong> {{ formattedDate }}</p>
-      <p><strong>Montant :</strong> {{ effectiveOrder?.total_price }} €</p>
-      <p><strong>Moyen de paiement :</strong> {{ effectiveOrder?.payment_method }}</p>
-      <p><strong>Paiement n°:</strong> {{ effectiveOrder.payment_ID }}</p>
+      <p>
+        <strong>Commande numéro :</strong>
+        {{ paidOrder.id }}
+      </p>
+      <p><strong>Date :</strong> {{ convertISOtoDateFR(paidOrder.created_at) }}</p>
+      <p><strong>Montant :</strong> {{ paidOrder.total_price }} €</p>
+      <p><strong>Moyen de paiement :</strong> {{ paidOrder.payment_method }}</p>
+      <p><strong>Paiement n°:</strong> {{ paidOrder.payment_ID }}</p>
     </div>
 
-    <h3 class="text-[18px] mt-5">Modalités de livraison :</h3>
+    <h3 class="text-[18px] mt-5 underline">Modalités de livraison :</h3>
     <div class="mt-2">
-      <p><strong>Mode de livraison :</strong> {{ deliveryMode }}</p>
-      <p><strong>Transporteur :</strong> {{ effectiveOrder.delivery_carrier }}</p>
+      <p><strong>Mode de livraison :</strong> {{ orderStore.deliveryDetails?.deliveryMode }}</p>
+      <p><strong>Transporteur :</strong> {{ paidOrder.delivery_carrier }}</p>
       <p>
-        <strong>Frais de transport :</strong>
-        {{ effectiveOrder.delivery_price }} €
+        <strong>Livraison estimée le :</strong> {{ convertISOtoDateFR(paidOrder.delivery_date) }}
       </p>
-      <p><strong>Livraison estimée le :</strong> {{ shippingDate }}</p>
     </div>
   </div>
 </template>

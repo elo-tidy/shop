@@ -1,8 +1,8 @@
-// Stores
-import {usecheckoutStepper} from "../../frontend/src/store/OrderStepperStore";
+export function estimatedDelivery(createdAt: Date , delivery_time: string): string |null {
 
-export function estimatedDelivery(): string {
-	const stepStore = usecheckoutStepper();
+	if (!createdAt || delivery_time == null) {
+		return null
+	}
 
 	const options: Intl.DateTimeFormatOptions = {
 		weekday: "long",
@@ -11,21 +11,20 @@ export function estimatedDelivery(): string {
 		day: "numeric",
 	};
 	// Current date
-	const today: Date = new Date(Date.now());
+	const baseDate: Date = new Date(createdAt);
 
 	// Number of days to be delivered
 	const processing: number = 2;
-	const deliveryDaysInfo: string | undefined =
-		stepStore.getLivraisonDetails?.transporter.estimated_delivery_time;
+	const deliveryDaysInfo: string | undefined = delivery_time;
 	const extractDeliveryDays: number[] =
 		deliveryDaysInfo?.match(/\d+/g)?.map((n) => parseInt(n, 10)) || [];
 	const deliveryMaxDays: number | null =
 		extractDeliveryDays.length > 0
 			? Math.max(...extractDeliveryDays)
 			: null;
-	const deliveryDay: number = deliveryMaxDays! + processing;
+	const deliveryDay: number = deliveryMaxDays ?? 0 + processing;
 
-	const newDate: Date = new Date(today);
+	const newDate: Date = new Date(baseDate);
 	let daysAdded: number = 0;
 	while (daysAdded < deliveryDay) {
 		newDate.setDate(newDate.getDate() + 1);

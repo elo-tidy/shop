@@ -5,31 +5,29 @@ import { Button } from '@/components/ui/button'
 // Composables
 import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { useOrderStore } from '@/store/OrderStore'
+// Utils
+import { numberWithTwoDecimals } from '@/utils/maths'
 
 // Props
 const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 
-/**
- * Data : step edition -
- */
+// Data
+const orderStore = useOrderStore()
+// const { carrierInfo, isConfirmed, deliveryPrice } = useOrderProcess()
 
 // Step edition
-const stepStore = usecheckoutStepper()
-const isEditable = computed(() => {
-  return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
-})
+const isEditable = computed(() => !orderStore.isPaid)
 
 // Delivery date
-const { deliveryDetails } = useOrderProcess()
 </script>
 <template>
   <div class="grid grid-cols-2 gap-2">
     <div class="flex flex-col justify-between h-full items-start">
       <p class="mb-2">
-        <strong>{{ deliveryDetails?.deliveryMode }}</strong> :
+        <strong>{{ orderStore.deliveryDetails?.deliveryMode }}</strong> :
       </p>
       <address>
         Studio <br />
@@ -51,12 +49,12 @@ const { deliveryDetails } = useOrderProcess()
     <div class="flex flex-col justify-between h-full items-start">
       <div>
         <p class="mb-2"><strong>Transporteur :</strong></p>
-        <p>{{ deliveryDetails?.transporter.name }}</p>
+        <p>{{ orderStore.deliveryDetails?.transporter?.name }}</p>
         <p>
           Frais :
-          {{ deliveryDetails?.transporter.price }} €
+          {{ numberWithTwoDecimals(orderStore.deliveryDetails?.transporter.price ?? 0) }} €
         </p>
-        <p>Livraison en {{ deliveryDetails?.transporter.estimated_delivery_time }}</p>
+        <p>Livraison en {{ orderStore.deliveryDetails?.transporter.estimated_delivery_time }}</p>
       </div>
 
       <Button

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // Types
-import type { CartType } from '@/typesold/Cart'
-import type { stepType } from '@/typesold/Stepper'
+import type { CartType } from '@/types/Cart'
+import type { stepType } from '@/types/Stepper'
 // Ui
 import { Stepper, StepperItem, StepperSeparator, StepperTrigger } from '@/components/ui/stepper'
 import { Button } from '@/components/ui/button'
@@ -13,10 +13,6 @@ const props = defineProps<{
   productInCart: CartType
   GoToStep: (stepNumber: number) => void
 }>()
-
-/**
- * Data : step store -
- */
 
 // Steps details
 const stepStore = usecheckoutStepper()
@@ -71,7 +67,7 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
       :step="stepItem.step"
       :completed="stepItem.stepValidated"
       :disabled="!isStepClickable(stepItem, index)"
-      :aria-current="stepStore.step === stepItem.step ? 'step' : undefined"
+      :aria-current="stepStore.step === stepItem.step ? 'step' : null"
       :aria-label="`Étape ${stepItem.step + 1} sur ${steps.length} : ${stepItem.description}`"
       :data-index="index"
       :data-store="stepStore.steps.length - 1"
@@ -81,7 +77,7 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
         class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary"
       />
 
-      <StepperTrigger as-child :aria-describedby="undefined" :aria-labelledby="undefined">
+      <StepperTrigger as-child>
         <Button
           :variant="getStepState(index) !== 'inactive' ? 'default' : 'outline'"
           size="icon"
@@ -90,7 +86,7 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
             getStepState(index),
             stepStore.step === stepItem.step
               ? 'ring-2 ring-ring ring-offset-2 ring-offset-background'
-              : undefined,
+              : null,
           ]"
           @click="GoToStep(stepItem.step)"
           :title="`Revenir à l'${stepItem.title} - ${stepItem.description}`"

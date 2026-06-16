@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 // Types
 import type { Component } from 'vue'
 interface SummaryContent {
@@ -7,10 +7,8 @@ interface SummaryContent {
   component: Component
   cta: string
 }
-// Composables
-import { useOrderProcess } from '@/composables/useOrderProcess'
-// Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
+// Store
+import { useOrderStore } from '@/store/OrderStore'
 
 // Props
 const props = defineProps<{
@@ -18,24 +16,17 @@ const props = defineProps<{
   data: SummaryContent
   index: number
 }>()
-
-/**
- * Data : props - estimated delivery date - step edition
- */
-
-// Props
 const title = computed(() => props.data.title)
 const id = computed(() => props.index)
 const currentContent = computed(() => props.data.component)
 
 // Delivery estimated date
-const { deliveryDate } = useOrderProcess()
+const orderStore = useOrderStore()
+const deliveryDate = computed(() => orderStore.deliveryDetails?.deliveryDate)
+const isPaid = computed(() => orderStore.isPaid)
 
 // Enable step edition if order is not completed
-const stepStore = usecheckoutStepper()
-const isEditable = computed((): boolean => {
-  return stepStore.getSteps.findLastIndex((step) => step.stepValidated === true) !== 3
-})
+const isEditable = computed(() => !isPaid.value)
 </script>
 
 <template>
