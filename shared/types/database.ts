@@ -66,43 +66,43 @@ export type Database = {
       carts_products: {
         Row: {
           cart_id: string
-          category: string | null
+          category: Database["public"]["Enums"]["categories"]
           created_at: string
-          description: string | null
+          description: string
           id: string
-          image: string | null
+          image: string
           price: number
           product_id: number
           quantity: number
-          title: string | null
+          title: string
         }
         Insert: {
-          cart_id?: string
-          category?: string | null
+          cart_id: string
+          category: Database["public"]["Enums"]["categories"]
           created_at?: string
-          description?: string | null
+          description: string
           id?: string
-          image?: string | null
+          image: string
           price: number
           product_id: number
           quantity: number
-          title?: string | null
+          title: string
         }
         Update: {
           cart_id?: string
-          category?: string | null
+          category?: Database["public"]["Enums"]["categories"]
           created_at?: string
-          description?: string | null
+          description?: string
           id?: string
-          image?: string | null
+          image?: string
           price?: number
           product_id?: number
           quantity?: number
-          title?: string | null
+          title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "cart_products_cart_id_fkey"
+            foreignKeyName: "carts_products_cart_id_fkey"
             columns: ["cart_id"]
             isOneToOne: false
             referencedRelation: "carts"
@@ -119,12 +119,12 @@ export type Database = {
       }
       orders: {
         Row: {
-          cart_id: string
+          cart_id: string | null
           created_at: string
           delivery_carrier: string
           delivery_date: string
           delivery_price: number
-          delivery_status: Database["public"]["Enums"]["delivery_status"] | null
+          delivery_status: Database["public"]["Enums"]["delivery_status"]
           id: string
           payment_ID: string | null
           payment_method: string
@@ -136,14 +136,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          cart_id?: string
+          cart_id?: string | null
           created_at?: string
           delivery_carrier: string
           delivery_date: string
           delivery_price: number
-          delivery_status?:
-            | Database["public"]["Enums"]["delivery_status"]
-            | null
+          delivery_status?: Database["public"]["Enums"]["delivery_status"]
           id?: string
           payment_ID?: string | null
           payment_method: string
@@ -152,17 +150,15 @@ export type Database = {
           stripe_event_id?: string | null
           total_price: number
           updated_at?: string | null
-          user_id?: string
+          user_id: string
         }
         Update: {
-          cart_id?: string
+          cart_id?: string | null
           created_at?: string
           delivery_carrier?: string
           delivery_date?: string
           delivery_price?: number
-          delivery_status?:
-            | Database["public"]["Enums"]["delivery_status"]
-            | null
+          delivery_status?: Database["public"]["Enums"]["delivery_status"]
           id?: string
           payment_ID?: string | null
           payment_method?: string
@@ -177,7 +173,7 @@ export type Database = {
           {
             foreignKeyName: "orders_cart_id_fkey"
             columns: ["cart_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
@@ -193,21 +189,21 @@ export type Database = {
       product_stock: {
         Row: {
           id: number
-          product_id: number
+          product_id: number | null
           quantity: number | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           id?: number
-          product_id: number
+          product_id?: number | null
           quantity?: number | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
           id?: number
-          product_id?: number
+          product_id?: number | null
           quantity?: number | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -221,7 +217,7 @@ export type Database = {
       }
       products: {
         Row: {
-          archived: boolean
+          archived: boolean | null
           category: Database["public"]["Enums"]["categories"]
           description: string | null
           id: number
@@ -230,7 +226,7 @@ export type Database = {
           title: string
         }
         Insert: {
-          archived?: boolean
+          archived?: boolean | null
           category: Database["public"]["Enums"]["categories"]
           description?: string | null
           id?: number
@@ -239,7 +235,7 @@ export type Database = {
           title: string
         }
         Update: {
-          archived?: boolean
+          archived?: boolean | null
           category?: Database["public"]["Enums"]["categories"]
           description?: string | null
           id?: number
@@ -247,15 +243,7 @@ export type Database = {
           price?: number
           title?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "products_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "product_stock"
-            referencedColumns: ["product_id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -287,9 +275,16 @@ export type Database = {
     }
     Functions: {
       get_products_categories: { Args: never; Returns: Json }
+      process_paid_order: {
+        Args: {
+          p_order_id: string
+          p_payment_intent_id: string
+          p_stripe_event_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
-      cart_status: "active" | "abandoned" | "converted"
       categories:
         | "electronics"
         | "jewelery"
@@ -433,7 +428,6 @@ export const Constants = {
   },
   public: {
     Enums: {
-      cart_status: ["active", "abandoned", "converted"],
       categories: [
         "electronics",
         "jewelery",

@@ -5,7 +5,7 @@
     "src/**/*",
     "src/**/*.vue",
     "../shared/services/SupabaseServices.ts",
-    "../shared/services/StripeServices.ts"
+    "../shared/types/database.ts"
   ],
   "exclude": ["frontend/src/**/__tests__/*"],
   "compilerOptions": {
