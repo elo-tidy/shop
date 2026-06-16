@@ -1,14 +1,12 @@
-export type PaymentIntentResponse = {
-  clientSecret: string
-  paymentIntentId: string
+export interface ResolvePaymentIntentInput {
+  orderId: string;
+  amount: number;
+  currency: string;
+  paymentIntentId?: string;
+  metadata?: Record<string, string>;
 }
-export type PaymentDetails = {
-  id: string
-  object: 'payment_intent'
-  amount: number
-  currency: string
-  created: number
-  payment_method_types: string[]
-  status: string
-  client_secret: string
+
+export interface ResolvePaymentIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
 }
