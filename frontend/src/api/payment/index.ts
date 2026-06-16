@@ -23,11 +23,9 @@ export async function resolvePaymentIntent(
       body: payload,
     },
   )
-
   if (error) {
     console.error('resolvePaymentIntent error:', error)
     throw new Error('Failed to resolve PaymentIntent')
   }
-
   return data as ResolvePaymentIntentResponse
 }

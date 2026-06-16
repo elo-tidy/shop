@@ -10,6 +10,5 @@ export async function addOrder(order:CartBackEndType) {
   if (error) {
     throw error
   }
-  console.log("api order data", data)
   return data
 }

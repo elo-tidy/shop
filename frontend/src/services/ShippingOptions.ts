@@ -1,4 +1,4 @@
-import type { ShippingMode } from '@/typesold/ShippingMode'
+import type { ShippingMode } from '@/types/ShippingMode'
 const BASE_URL = '/data/shipping-options.json'
 
 export async function fetchShippingOptions(): Promise<ShippingMode> {

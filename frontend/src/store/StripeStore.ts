@@ -5,9 +5,12 @@ import { ref } from 'vue'
 export const usePaymentStore = defineStore(
   'payment',
   () => {
+
+    // State
     const paymentIntentId = ref<string | null>(null)
     const stripeLoaded = ref<boolean>(true)
 
+    // Actions
     function resetPayment() {
       paymentIntentId.value = null
       setStripeLoaded(true)
@@ -18,7 +21,6 @@ export const usePaymentStore = defineStore(
     }
     function setStripeLoaded(arg:boolean) {
       stripeLoaded.value = arg
-      console.log('stripeLoaded', arg)
     }
     
     return {
