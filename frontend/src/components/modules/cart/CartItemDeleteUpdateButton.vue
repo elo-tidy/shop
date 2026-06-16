@@ -1,74 +1,34 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 // Types
+import type { cartProduct } from '@/types/Cart'
 import type { productCatalog } from '@/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 // Composables
+import { useCartProcess } from '@/composables/useCartProcess'
 import { useProductModel } from '@/composables/useProductModel'
-import { useCartDetails } from '@/composables/useCartDetails'
-import { useOrderProcess } from '@/composables/useOrderProcess'
-// Stores
-import { useCartStore } from '@/store/CartStore'
 
 // Props
 const props = defineProps<{
-  product: productCatalog
+  product: productCatalog | cartProduct
   layout?: 'detail' | 'cart' | 'check'
 }>()
 
 /**
  * Data :
  */
-
-const cartStore = useCartStore()
-const { cartData } = useCartDetails()
-const { resetOrder, updateQty, deleteProdut } = useOrderProcess()
-
-// Products from bdd first, from store then
-const storeProduct = computed(() => {
-  const prod =
-    cartData.value?.products.find((p: productCatalog) => p.id === props.product?.id) ||
-    cartStore.cart.products.find((p: productCatalog) => p.id === props.product?.id)
-
-  if (!prod) return undefined
-
-  return {
-    id: prod.id,
-    title: prod.title,
-    price: prod.price,
-    description: prod.description,
-    image: prod.image,
-    category: prod.category,
-    quantity: prod.quantity,
-    stock: prod.stock,
-  }
+const { deleteThisProductfromCart, updateItemQuantity, limitUpdateQty } = useCartProcess()
+function isCartProduct(p: productCatalog | cartProduct): p is cartProduct {
+  return 'quantity' in p
+}
+const product = computed(() => {
+  return isCartProduct(props.product) ? props.product : null
 })
-const { product } = useProductModel(storeProduct)
-
-// Delete from cart
-const deleteThisProductfromCart = async (productId: number) => {
-  cartStore.deleteFromCart(productId)
-  deleteProdut(productId)
-}
-
-// Update item quantity
-const updateItemQuantity = async (productId: number, addOrRemove: 'add' | 'remove') => {
-  if (limitUpdateQty(addOrRemove)) return
-  cartStore.updateItemQuantity(productId, addOrRemove)
-  updateQty(productId, addOrRemove)
-}
-
-const limitUpdateQty = (addOrRemove?: 'add' | 'remove'): boolean => {
-  if (storeProduct.value?.quantity >= storeProduct.value?.stock && addOrRemove === 'add') {
-    return true
-  }
-  return false
-}
 </script>
 <template>
-  <CardFooter class="mt-6">
+  <CardFooter class="mt-6" v-if="product">
     <div
       class="grid auto-cols-max grid-flow-col group-quantity mr-10"
       role="group"
@@ -78,32 +38,32 @@ const limitUpdateQty = (addOrRemove?: 'add' | 'remove'): boolean => {
         Quantité :
         <span
           class="nb-quantity"
-          :id="`item-quantity-id${product?.id}`"
+          :id="`item-quantity-id${product.id}`"
           aria-live="polite"
           aria-atomic="true"
-          >{{ product?.itemQuantity }}</span
+          >{{ product.quantity }}</span
         >
-        <span class="sr-only"> {{ product?.itemQuantity! > 1 ? 'articles' : 'article' }}</span>
+        <span class="sr-only"> {{ product.quantity > 1 ? 'articles' : 'article' }}</span>
       </p>
 
       <!-- Less quantity or delete if 1 -->
       <Button
-        v-if="product?.itemQuantity === 1"
+        v-if="product.quantity === 1"
         class="delete-item remove-quantity btn-icon"
         type="button"
         title="Supprimer l'article"
-        @click="deleteThisProductfromCart(product?.id)"
-        :aria-controls="`item-delete-${product?.id}`"
+        @click="deleteThisProductfromCart(product.id)"
+        :aria-controls="`item-delete-${product.id}`"
       >
-        <span class="sr-only">Supprimer l'article {{ product?.title }}</span>
+        <span class="sr-only">Supprimer l'article {{ product.title }}</span>
       </Button>
       <Button
         v-else
         class="remove-quantity btn-icon"
         type="button"
         title="Diminuer la quantité de 1"
-        :aria-controls="`item-quantity-id${product?.id}`"
-        @click="updateItemQuantity(product?.id!, 'remove')"
+        :aria-controls="`item-quantity-id${product.id}`"
+        @click="updateItemQuantity(product.id, 'remove')"
       >
         <span class="sr-only">Diminuer la quantité de 1</span>-
       </Button>
@@ -111,11 +71,11 @@ const limitUpdateQty = (addOrRemove?: 'add' | 'remove'): boolean => {
       <!-- Add quantity -->
       <Button
         class="add-quantity"
-        :disabled="limitUpdateQty('add')"
+        :disabled="limitUpdateQty(product.id, 'add')"
         type="button"
         title="Augmenter la quantité de 1"
-        :aria-controls="`item-quantity-id${product?.id}`"
-        @click="updateItemQuantity(product?.id!, 'add')"
+        :aria-controls="`item-quantity-id${product.id}`"
+        @click="updateItemQuantity(product.id, 'add')"
       >
         <span class="sr-only">Augmenter la quantité de 1</span>+
       </Button>
@@ -126,8 +86,8 @@ const limitUpdateQty = (addOrRemove?: 'add' | 'remove'): boolean => {
       class="delete-item ml-10"
       variant="link"
       type="button"
-      @click="deleteThisProductfromCart(product?.id!)"
-      >Supprimer <span class="sr-only">le produit {{ product?.title }}</span></Button
+      @click="deleteThisProductfromCart(product.id)"
+      >Supprimer <span class="sr-only">le produit {{ product.title }}</span></Button
     >
   </CardFooter>
 </template>

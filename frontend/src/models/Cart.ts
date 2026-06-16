@@ -1,54 +1,84 @@
-import type {CartType} from '@/types/Cart'
-import type { productCatalog } from '@/types/Product'
-
+import type { cartProduct, CartType} from '@/types/Cart'
 export class Cart {
-  products: CartType['products']
-  cart_id: string | null
-  // status: string | null
 
-  constructor(data: CartType) {
-    this.products = data.products
-    this.cart_id = data.id ?? null
-    // this.status = data.status
+  constructor(private cart: CartType) {} 
+
+  get data(): CartType { 
+    return this.cart 
   }
 
-  addItemToCart(product: productCatalog, itemQuantity: number) {
-    const existingProduct = this.products?.find((p:productCatalog) => p.id === product.id)
-    if (existingProduct) {
-      existingProduct.quantity = (existingProduct.quantity ?? 0) + itemQuantity
-    } else {
-      this.products?.push({ ...product, quantity: itemQuantity })
-    }
+  get id() {
+    return this.cart.id
   }
 
-  deleteItemFromCart(productId: number) {
-    this.products = this.products?.filter((p:productCatalog) => p.id !== productId)
+  get products() {
+    return this.cart.products
   }
 
-  updateItemQuantity(productId: number, addOrRemove: string) {
-    const product = this.products?.find((p:productCatalog) => p.id === productId)
-    if (product) {
-      if (addOrRemove === 'add') {
-        product.quantity = (product.quantity ?? 0) + 1
-      } else {
-        product.quantity = Math.max((product.quantity ?? 0) - 1, 0)
-      }
-    }
-  }
-
-  deleteItemsFromCart() {
-    this.products.splice(0)
-  }
-
+  
   get totalNumberOfItem(): number {
-    return this.products?.reduce((totalItems:number, product: productCatalog) => {
-      return totalItems + product.quantity!
+    return this.cart.products.reduce((totalItems:number, product: cartProduct) => {
+      return totalItems + (product.quantity ?? 0)
     }, 0)
   }
 
-  get totalPrice(): number {
-    return this.products?.reduce((totalPrice:number, product: productCatalog) => {
-      return Math.round((totalPrice + product.quantity! * product.price) * 100) / 100
-    }, 0)
+  get totalPrice(): number{
+    return this.cart.products.reduce((totalPrice:number, product: cartProduct) => {
+      return Math.round((totalPrice + (product.quantity ?? 0) * product.price) * 100) / 100
+    }, 0) 
   }
+
+  getProduct(productId: number) {
+    return this.cart.products.find(p => p.id === productId)
+  }
+
+
+  getItemQuantity(productId: number): cartProduct['quantity']  {
+    const product = this.getProduct(productId)
+    return product?.quantity ?? 0
+  }    
+
+  getItemArchivedStatus(productId: number): cartProduct['archived']  {
+    const product = this.getProduct(productId)
+    return product?.archived ?? false
+  }  
+
+  addItemToCart(product: cartProduct, itemQuantity: number) {
+    if (itemQuantity <= 0) return
+    const existingProduct = this.getProduct(product.id)
+
+    if (!existingProduct) {
+      this.cart.products.push({ ...product, quantity: itemQuantity })
+      return
+    }
+     existingProduct.quantity += itemQuantity
+  }
+
+  deleteItemFromCart(productId: cartProduct['id']){
+    const index = this.cart.products.findIndex(p => p.id === productId)
+    if (index !== -1) this.cart.products.splice(index, 1)
+  }
+
+  updateItemQuantity(productId: number, addOrRemove: 'add' | 'remove') {
+    addOrRemove === 'add'
+      ? this.increaseQuantity(productId)
+      : this.decreaseQuantity(productId)
+  }
+
+  increaseQuantity(productId: number) {
+    const product = this.getProduct(productId)
+    if (!product) return
+    product.quantity = (product.quantity ?? 0) + 1
+  }
+
+  decreaseQuantity(productId: number) {
+    const product = this.getProduct(productId)
+    if(!product) return
+    product.quantity = Math.max((product.quantity ?? 0) - 1, 0)
+  }
+  clearCart() {
+    this.cart.products.splice(0)
+  }
+
+ 
 }

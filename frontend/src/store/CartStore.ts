@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref, computed, toRefs } from 'vue'
+import { ref, computed, toRefs, reactive } from 'vue'
 // Types
 import type { productCatalog } from '@/types/Product'
-import type {CartType} from '@/types/Cart'
+import type {CartType, cartProduct} from '@/types/Cart'
 //  Models
 import { Cart } from '@/models/Cart'
 // Stores
@@ -18,61 +18,51 @@ export const useCartStore = defineStore(
   'cart',
   () => {
     // State
-    const cart = ref<CartType>(
+    const cart = reactive(
       new Cart({
         id: '',
-        // status: null,
         products: [],
-      }),
+      } as CartType)
     )
 
-    // Actions
-    function addToCart(product: productCatalog, itemQuantity: number) {
-      cart.value.addItemToCart(product, itemQuantity)
-    }
-
-    function deleteFromCart(productId: number) {
-      cart.value.deleteItemFromCart(productId)
-    }
-
-    function updateItemQuantity(productId: number, addOrRemove: string) {
-      cart.value.updateItemQuantity(productId, addOrRemove)
-    }
-
-    function clearCartStore() {
-      cart.value.deleteItemsFromCart()
-    }
-
     // Getters
-    const getCartTotalItems = computed(() => cart.value.totalNumberOfItem)
-    const getCartTotalPrice = computed(() => {
-      return formatPriceWithTwoDecimals(cart.value.totalPrice)
-    })
-    const getCartTotalPriceInCents = computed(() => priceFromEurosToCents(cart.value.totalPrice))
+    const getCartTotalItems = computed(() => cart.totalNumberOfItem)
+    const getCartTotalPrice = computed(() => cart.totalPrice)
+    // const getCartTotalPriceInCents = computed(() => priceFromEurosToCents(cart.totalPrice))
+    const getCartProducts = computed(() => cart.products)
+    const getItemQuantity = (productId: cartProduct['id']) =>  cart.getItemQuantity(productId)
+    const getItemArchivedStatus = (productId: cartProduct['id']) => cart.getItemArchivedStatus(productId)
 
-    const getShippingPrice = computed((): string => {
-      const stepStore = usecheckoutStepper()
-      const price = stepStore.getLivraisonDetails?.transporter.price ?? 0
-      return numberWithTwoDecimals(price)
-    })
-    const getOrderPrice = computed(() => {
-      const cartPrice = Number(getCartTotalPrice.value)
-      const shipping = Number(getShippingPrice.value)
-      const price = cartPrice + shipping
-      return formatPriceWithTwoDecimals(price)
-    })
+    // Actions
+    function addToCart(product: cartProduct, itemQuantity: number) {
+      cart.addItemToCart(product, itemQuantity)
+    }
+    function deleteFromCart(productId: number) {
+      cart.deleteItemFromCart(productId)
+    }
+    function updateItemQuantity(productId: number, addOrRemove: 'add' | 'remove') {
+      cart.updateItemQuantity(productId, addOrRemove)
+    }
+    function clearCartStore() {
+      cart.clearCart()
+    }
+    const getCartProductsById = (productId: productCatalog['id']) => {
+      return cart.getProduct(productId)
+    }
 
     return {
-      cart,
+      cart,      
+      getCartTotalItems,
+      getCartTotalPrice,
+      // getCartTotalPriceInCents,
+      getCartProducts,
       addToCart,
       deleteFromCart,
       updateItemQuantity,
       clearCartStore,
-      getCartTotalItems,
-      getCartTotalPrice,
-      getCartTotalPriceInCents,
-      getShippingPrice,
-      getOrderPrice,
+      getItemQuantity,
+      getItemArchivedStatus,
+      getCartProductsById,
     }
   },
   {
