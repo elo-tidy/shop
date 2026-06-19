@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { productCatalog } from '@/types/Product'
-import type { cartProduct, Order } from '@/types/Cart'
+import type { productCatalog } from '@shared/types/Product'
+import type { cartProduct, Order } from '@shared/types/Cart'
 // Components
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables

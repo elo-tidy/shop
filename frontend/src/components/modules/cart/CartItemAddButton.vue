@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // Types
-import type { cartProduct } from '@/types/Cart'
+import type { cartProduct } from '@shared/types/Cart'
 // Ui
 import { Button } from '@/components/ui/button'
 import { CardFooter } from '@/components/ui/card'

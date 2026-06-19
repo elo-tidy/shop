@@ -1,57 +1,62 @@
-import { defineStore } from 'pinia'
-import { ref, computed, toRefs, reactive } from 'vue'
+import { defineStore } from "pinia";
+import { computed, reactive, ref, toRefs } from "vue";
 // Types
-import type { productCatalog } from '@/types/Product'
-import type {CartType, cartProduct} from '@/types/Cart'
+import type { productCatalog } from "@shared/types/Product";
+import type { cartProduct, CartType } from "@shared/types/Cart";
 //  Models
-import { Cart } from '@/models/Cart'
+import { Cart } from "@/models/Cart";
 // Stores
-import { usecheckoutStepper } from './OrderStepperStore'
+import { usecheckoutStepper } from "./OrderStepperStore";
 // Utils
 import {
   formatPriceWithTwoDecimals,
-  priceFromEurosToCents,
   numberWithTwoDecimals,
-} from '@/utils/maths'
+  priceFromEurosToCents,
+} from "@/utils/maths";
 
 export const useCartStore = defineStore(
-  'cart',
+  "cart",
   () => {
     // State
     const cart = reactive(
       new Cart({
-        id: '',
+        id: "",
         products: [],
-      } as CartType)
-    )
+      } as CartType),
+    );
 
     // Getters
-    const getCartTotalItems = computed(() => cart.totalNumberOfItem)
-    const getCartTotalPrice = computed(() => cart.totalPrice)
+    const getCartTotalItems = computed(() => cart.totalNumberOfItem);
+    const getCartTotalPrice = computed(() => cart.totalPrice);
     // const getCartTotalPriceInCents = computed(() => priceFromEurosToCents(cart.totalPrice))
-    const getCartProducts = computed(() => cart.products)
-    const getItemQuantity = (productId: cartProduct['id']) =>  cart.getItemQuantity(productId)
-    const getItemArchivedStatus = (productId: cartProduct['id']) => cart.getItemArchivedStatus(productId)
+    const getCartProducts = computed(() => cart.products);
+    const getItemQuantity = (productId: cartProduct["id"]) =>
+      cart.getItemQuantity(productId);
+    const getItemArchivedStatus = (productId: cartProduct["id"]) =>
+      cart.getItemArchivedStatus(productId);
 
     // Actions
     function addToCart(product: cartProduct, itemQuantity: number) {
-      cart.addItemToCart(product, itemQuantity)
+      cart.addItemToCart(product, itemQuantity);
     }
     function deleteFromCart(productId: number) {
-      cart.deleteItemFromCart(productId)
+      cart.deleteItemFromCart(productId);
     }
-    function updateItemQuantity(productId: number, addOrRemove: 'add' | 'remove') {
-      cart.updateItemQuantity(productId, addOrRemove)
+    function updateItemQuantity(
+      productId: number,
+      addOrRemove: "add" | "remove",
+    ) {
+      cart.updateItemQuantity(productId, addOrRemove);
     }
     function clearCartStore() {
-      cart.clearCart()
+      cart.clearCart();
     }
-    const getCartProductsById = (productId: productCatalog['id']) => {
-      return cart.getProduct(productId)
-    }
+    const getCartProductsById = (productId: productCatalog["id"]) => {
+      return cart.getProduct(productId);
+    };
 
     return {
-      cart,      
+      cart,
       getCartTotalItems,
       getCartTotalPrice,
       // getCartTotalPriceInCents,
@@ -63,9 +68,9 @@ export const useCartStore = defineStore(
       getItemQuantity,
       getItemArchivedStatus,
       getCartProductsById,
-    }
+    };
   },
   {
     persist: true,
   },
-)
+);

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // Types
-import type { CartType } from '@/types/Cart'
+import type { CartType } from '@shared/types/Cart'
 import type { stepType } from '@/types/Stepper'
 // Ui
 import { Stepper, StepperItem, StepperSeparator, StepperTrigger } from '@/components/ui/stepper'

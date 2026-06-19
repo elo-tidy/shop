@@ -1,57 +1,59 @@
 // Types
-import type { productCatalog } from '@/types/Product'
+import type { productCatalog } from "@shared/types/Product";
 export class Product {
-  private data: productCatalog
+  private data: productCatalog;
 
   constructor(data: productCatalog) {
-    this.data = data
+    this.data = data;
   }
 
   get id(): number {
-    return this.data.id
+    return this.data.id;
   }
 
   get title(): string {
-    return this.data.title 
+    return this.data.title;
   }
 
   get price(): number {
-    return this.data.price
+    return this.data.price;
   }
 
   get description(): string {
-    return this.data.description ?? ''
+    return this.data.description ?? "";
   }
 
   get image(): string {
-    return this.data.image ?? ''
+    return this.data.image ?? "";
   }
 
   get category(): string {
-    return this.data.category ?? ''
-  }  
+    return this.data.category ?? "";
+  }
 
   get stock(): number {
-    return this.data.stock
+    return this.data.stock;
   }
 
   get archived(): boolean {
-    return this.data.archived ?? false
+    return this.data.archived ?? false;
   }
 
   get formattedPrice(): string {
-    return `${this.price.toFixed(2)} €`
+    return `${this.price.toFixed(2)} €`;
   }
 
   get shortTitle(): string {
-    return this.title.length > 40 ? this.title.slice(0, 37) + '…' : this.title
+    return this.title.length > 40 ? this.title.slice(0, 37) + "…" : this.title;
   }
 
   get shortDesc(): string {
-    return this.description.length > 100 ? this.description.slice(0, 97) + '…' : this.description
+    return this.description.length > 100
+      ? this.description.slice(0, 97) + "…"
+      : this.description;
   }
 
   get imageAlt(): string {
-    return `Image du produit : ${this.title}`
+    return `Image du produit : ${this.title}`;
   }
 }

@@ -1,21 +1,16 @@
-import { z } from "npm:zod";
+import { z } from "zod";
 import { AuthMiddleware } from "../_shared/jwt/default.ts";
 import { handleCors } from "../_shared/utils/handleCors.ts";
-import { jsonResponse, errorResponse } from "../_shared/utils/response.ts";
+import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
-import { productAddSchema, type productAdd } from "../types/Product.ts"; 
-
-// Schema Zod
-const categories = ["electronics", "jewelery", "mens clothing", "womens clothing"] as const;
-
+import { productAddSchema } from "@shared/types/Product.ts";
+import { categoryEnum } from "@shared/types/Categories.ts";
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
-
     // CORS
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
-    const headers = corsResult;
 
     // Méthode HTTP
     if (req.method !== "PATCH") return errorResponse("Method not allowed", 405);
@@ -32,7 +27,7 @@ Deno.serve((req) =>
     // Validation body
     let body;
     try {
-      const json = await req.json();     
+      const json = await req.json();
       body = productAddSchema.parse(json);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -42,55 +37,61 @@ Deno.serve((req) =>
           const msgs = flattened[key];
           if (msgs && msgs.length > 0) {
             if (key === "category") {
-              errors[key] = `Invalid option: expected one of '${categories.join(" | ")}'`;
+              errors[key] = `Invalid option: expected one of '${
+                categoryEnum.options.join(" | ")
+              }'`;
             } else {
               errors[key] = msgs[0]!;
             }
           }
         }
-        return errorResponse(errors, 400);
+        return errorResponse(JSON.stringify(errors), 400);
       }
-      return errorResponse("Erreur de validation inconnue", 400);  
-    } 
+      return errorResponse("Erreur de validation inconnue", 400);
+    }
 
     // Vérification que le produit existe
     const { data: productData, error: productError } = await supabaseClient
       .from("products")
       .select()
-      .eq("id", body.id)
-      // .single();
+      .eq("id", body.id);
+    // .single();
 
     if (productError) return errorResponse(productError.message, 400);
-    if (productData.length === 0) return errorResponse("Produit introuvable", 404);
+    if (productData.length === 0) {
+      return errorResponse("Produit introuvable", 404);
+    }
 
     // Isoler les data modifiables
-    const {id, stock, ...updatableData} = body     
+    const { id, stock, ...updatableData } = body;
 
     // Modification du produit
-    const { data : updateProductData , error : updateProductError } = await supabaseClient
-      .from("products")
-      .update(updatableData)
-      .eq("id", body.id)
-      .select();
+    const { data: updateProductData, error: updateProductError } =
+      await supabaseClient
+        .from("products")
+        .update(updatableData)
+        .eq("id", body.id)
+        .select();
 
-    if (updateProductError) return jsonResponse({ updateProductError }, 400);
+    if (updateProductError) {
+      return jsonResponse({ updateProductError }, 400);
+    }
     // return jsonResponse({ message: "Produit modifié avec succès", updateProductData });
 
     // Modification des stock
-    const { data : stockData, error:stockError } = await supabaseClient
+    const { data: stockData, error: stockError } = await supabaseClient
       .from("product_stock")
-      .update({quantity: body.stock})
+      .update({ quantity: body.stock })
       .eq("product_id", body.id)
-      .select();      
+      .select();
 
     if (stockError) return jsonResponse({ stockError }, 400);
     // return jsonResponse({ message: "Stock modifié avec succès", stockData });
 
-    const {quantity, ...rest} = stockData[0]
+    const { quantity, ...rest } = stockData[0];
 
-    const data = {...updateProductData[0], stock:quantity}
+    const data = { ...updateProductData[0], stock: quantity };
 
     return jsonResponse({ message: "Produit modifié avec succès", data });
-
   })
 );

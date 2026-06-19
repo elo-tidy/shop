@@ -25,7 +25,7 @@ importers:
         version: 2.0.17(vue@3.5.22(typescript@5.8.3))
       '@vee-validate/zod':
         specifier: ^4.15.1
-        version: 4.15.1(vue@3.5.22(typescript@5.8.3))(zod@4.3.6)
+        version: 4.15.1(vue@3.5.22(typescript@5.8.3))(zod@3.23.8)
       '@vueuse/core':
         specifier: ^13.9.0
         version: 13.9.0(vue@3.5.22(typescript@5.8.3))
@@ -75,8 +75,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -4919,8 +4919,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
 snapshots:
 
@@ -6461,11 +6461,11 @@ snapshots:
       unhead: 2.0.17
       vue: 3.5.22(typescript@5.8.3)
 
-  '@vee-validate/zod@4.15.1(vue@3.5.22(typescript@5.8.3))(zod@4.3.6)':
+  '@vee-validate/zod@4.15.1(vue@3.5.22(typescript@5.8.3))(zod@3.23.8)':
     dependencies:
       type-fest: 4.41.0
       vee-validate: 4.15.1(vue@3.5.22(typescript@5.8.3))
-      zod: 4.3.6
+      zod: 3.23.8
     transitivePeerDependencies:
       - vue
 
@@ -10290,4 +10290,4 @@ snapshots:
       readable-stream: 4.7.0
     optional: true
 
-  zod@4.3.6: {}
+  zod@3.23.8: {}

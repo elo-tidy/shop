@@ -1,22 +1,15 @@
-import { z } from "npm:zod";
-import Stripe from "npm:stripe@14.0.0";
+import Stripe from "stripe";
 import { handleCors } from "../_shared/utils/handleCors.ts";
-import { jsonResponse, errorResponse } from "../_shared/utils/response.ts";
+import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 
-const schema = z.object({
-  orderId: z.string(),
-  amount: z.number(),
-  currency: z.string(),
-  paymentIntentId: z.string().optional(),
-  metadata: z.record(z.string(), z.string()).optional(),
-});
+import { ResolvePaymentIntentInputSchema } from "@shared/types/stripe.ts";
 
 Deno.serve(async (req) => {
-  const cors = handleCors(req);
-  if (cors instanceof Response) return cors;
+  const corsResult = handleCors(req);
+  if (corsResult instanceof Response) return corsResult;
 
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: cors });
+    return jsonResponse(null, 204);
   }
 
   if (req.method !== "POST") {
@@ -25,8 +18,7 @@ Deno.serve(async (req) => {
 
   let body;
   try {
-    body = schema.parse(await req.json());
-    console.log("body", body);
+    body = ResolvePaymentIntentInputSchema.parse(await req.json());
   } catch (e) {
     return errorResponse("Invalid body", 400);
   }
@@ -36,69 +28,81 @@ Deno.serve(async (req) => {
     return errorResponse("Missing Stripe key", 500);
   }
 
-  const stripe = new Stripe(stripeKey);
+  const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-  const createPi = async() => {
+  const createPi = () => {
     return stripe.paymentIntents.create({
       amount: body.amount,
       currency: body.currency,
-      payment_method_types: ["card"]
-    });
-  }
-
-  const updatePi = async(piId:Stripe.PaymentIntent["id"], metadataOnly:string | null) => {
-
-    if (metadataOnly === "metadataOnly") {
-      return stripe.paymentIntents.update(piId, {
-        metadata: {
-          orderId: body.orderId,
-          cartId: body.cartId,
-          userId: body.userId,
-        },
-      });
-    }
-
-    return stripe.paymentIntents.update(piId, {
-      amount: body.amount,
-      currency: body.currency,
-      payment_method_types: ["card"],  
+      payment_method_types: ["card"],
       metadata: {
-        orderId: body.orderId,
-        cartId: body.cartId,
-        userId: body.userId,
+        orderId: body.metadata.orderId,
+        cartId: body.metadata.cartId,
+        userId: body.metadata.userId,
       },
     });
-  }
+  };
+
+  const updatePi = (
+    piId: Stripe.PaymentIntent["id"],
+    metadataOnly: string | null,
+  ) => {
+    if (metadataOnly === "metadataOnly") {
+      return stripe.paymentIntents.update(
+        piId,
+        {
+          metadata: {
+            orderId: body.metadata.orderId,
+            cartId: body.metadata.cartId,
+            userId: body.metadata.userId,
+          },
+        },
+      );
+    }
+
+    return stripe.paymentIntents.update(
+      piId,
+      {
+        amount: body.amount,
+        currency: body.currency,
+        payment_method_types: ["card"],
+        metadata: {
+          orderId: body.metadata.orderId,
+          cartId: body.metadata.cartId,
+          userId: body.metadata.userId,
+        },
+      },
+    );
+  };
 
   try {
-    let paymentIntent: Stripe.PaymentIntent | null = null
-    const paymentIntentId = body.paymentIntentId
+    let paymentIntent: Stripe.PaymentIntent | null = null;
+    const paymentIntentId = body.paymentIntentId;
 
     // Si pas de pi, on en crée un
     if (!paymentIntentId) {
-      paymentIntent = await createPi()
+      paymentIntent = await createPi();
     } else {
-
       // sinon on le récupère et on maj
-      let pi: Stripe.PaymentIntent | null = null
+      let pi: Stripe.PaymentIntent | null = null;
 
       try {
-        pi = await stripe.paymentIntents.retrieve(paymentIntentId)
-        console.log("PI:", pi)
+        pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+        console.log("PI:", pi);
       } catch (err) {
-        console.error("Invalid PaymentIntent ID:", paymentIntentId, err)
-        pi = null
+        console.error("Invalid PaymentIntent ID:", paymentIntentId, err);
+        pi = null;
       }
 
       // fallback si PI introuvable
       if (!pi) {
-        paymentIntent = await createPi()
+        paymentIntent = await createPi();
       } else if (pi.status === "succeeded") {
         // PI déjà payé → metadata only
-        paymentIntent = await updatePi(pi.id, "metadataOnly")
+        paymentIntent = await updatePi(pi.id, "metadataOnly");
       } else {
         // PI modifiable
-        paymentIntent = await updatePi(pi.id)
+        paymentIntent = await updatePi(pi.id, null);
       }
     }
 
@@ -108,10 +112,9 @@ Deno.serve(async (req) => {
         paymentIntentId: paymentIntent.id,
       },
       200,
-    )
-
+    );
   } catch (err) {
-    console.error("Stripe error:", err)
-    return errorResponse("Stripe failure", 500)
+    console.error("Stripe error:", err);
+    return errorResponse("Stripe failure", 500);
   }
 });

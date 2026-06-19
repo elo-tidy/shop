@@ -1,71 +1,76 @@
-import { defineComponent, h, markRaw, computed } from 'vue'
+import { computed, defineComponent, h, markRaw } from "vue";
 // Types
-import type {cartProduct} from '@/types/Cart'
+import type { cartProduct } from "@shared/types/Cart";
 // Ui
-import { toast } from 'vue-sonner'
+import { toast } from "vue-sonner";
 // Stores
-import { useCartStore } from '@/store/CartStore'
+import { useCartStore } from "@/store/CartStore";
 
 export function useCartProcess() {
-  
-  const cartStore = useCartStore()
+  const cartStore = useCartStore();
 
   const wordingTotalNumberOfItem = computed(() => {
-    return cartStore.getCartTotalItems > 1 ? 'articles' : 'article'
-  })
+    return cartStore.getCartTotalItems > 1 ? "articles" : "article";
+  });
 
   // Notify user that item has been added to cart
   const customToast = defineComponent({
     setup() {
       return () =>
-        h('div', { class: 'grid' }, [
-          h('p', 'Le produit a été ajouté au panier.'),
+        h("div", { class: "grid" }, [
+          h("p", "Le produit a été ajouté au panier."),
           h(
-            'p',
+            "p",
             `Vous avez ${cartStore.getCartTotalItems} ${wordingTotalNumberOfItem.value} dans votre panier.`,
           ),
-          h('div', {
+          h("div", {
             innerHTML:
               '<Button type="button" class="bg-primary text-background px-3 py-1 ">Voir le panier</Button>',
-            class: 'mt-2 justify-end grid',
+            class: "mt-2 justify-end grid",
             onClick: () => {
-              window.location.href = '/cart'
+              window.location.href = "/cart";
             },
           }),
-        ])
+        ]);
     },
-  })
+  });
 
   const addThisProductToCart = (product: cartProduct, quantity: number) => {
-    cartStore.addToCart(product, quantity)
-    cartStore.getCartTotalItems
-    toast(markRaw(customToast))
-  }
+    cartStore.addToCart(product, quantity);
+    cartStore.getCartTotalItems;
+    toast(markRaw(customToast));
+  };
 
   const deleteThisProductfromCart = async (productId: number) => {
-    cartStore.deleteFromCart(productId)
-  }
+    cartStore.deleteFromCart(productId);
+  };
 
   // Update item quantity
-  const updateItemQuantity = async (productId: number, addOrRemove: 'add' | 'remove') => {
-    if (limitUpdateQty(productId, addOrRemove)) return
-    cartStore.updateItemQuantity(productId, addOrRemove)
-  }
+  const updateItemQuantity = async (
+    productId: number,
+    addOrRemove: "add" | "remove",
+  ) => {
+    if (limitUpdateQty(productId, addOrRemove)) return;
+    cartStore.updateItemQuantity(productId, addOrRemove);
+  };
 
-  const limitUpdateQty = (productId:cartProduct['id'], addOrRemove?: 'add' | 'remove'): boolean => {
-    const product = cartStore.getCartProductsById(productId!)
-    if (!product) return false
-    if (product.quantity >= product.stock && addOrRemove === 'add') {
-      return true
+  const limitUpdateQty = (
+    productId: cartProduct["id"],
+    addOrRemove?: "add" | "remove",
+  ): boolean => {
+    const product = cartStore.getCartProductsById(productId!);
+    if (!product) return false;
+    if (product.quantity >= product.stock && addOrRemove === "add") {
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   return {
     addThisProductToCart,
     deleteThisProductfromCart,
     updateItemQuantity,
     limitUpdateQty,
-    wordingTotalNumberOfItem
-  }
+    wordingTotalNumberOfItem,
+  };
 }

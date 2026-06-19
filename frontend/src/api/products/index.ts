@@ -1,34 +1,37 @@
-import type {productForm, productDelete} from '@/types/Product'
-import { supabase } from '@/utils/supabase'
+import type { productDelete, productForm } from "@shared/types/Product";
+import { supabase } from "@/utils/supabase";
 
-export async function addProduct(product:productForm) {
+export async function addProduct(product: productForm) {
   const { data, error } = await supabase.functions.invoke("products-create", {
     body: product,
-    method: 'POST'
-  })
+    method: "POST",
+  });
   if (error) {
-    throw error
+    throw error;
   }
-  return data
+  return data;
 }
 
-export async function deleteProduct(product:productDelete) {
-  const { data, error } = await supabase.functions.invoke(`products-delete?id=${product.id}`, {
-    method: "DELETE",
-  })
+export async function deleteProduct(product: productDelete) {
+  const { data, error } = await supabase.functions.invoke(
+    `products-delete?id=${product.id}`,
+    {
+      method: "DELETE",
+    },
+  );
   if (error) {
-    throw error
+    throw error;
   }
-  return data 
+  return data;
 }
 
-export async function updateProduct(product:productForm) {
+export async function updateProduct(product: productForm) {
   const { data, error } = await supabase.functions.invoke("products-update", {
     body: product,
-    method: 'PATCH'
-  })
+    method: "PATCH",
+  });
   if (error) {
-    throw error
+    throw error;
   }
-  return data
+  return data;
 }

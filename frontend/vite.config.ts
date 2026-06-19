@@ -1,23 +1,24 @@
-import path from 'node:path'
-import tailwindcss from '@tailwindcss/vite'
-import vue from '@vitejs/plugin-vue'
-import { defineConfig } from 'vite'
+import path from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      "@": path.resolve(__dirname, "src"),
+      "@shared": path.resolve(__dirname, "../shared"),
     },
-    dedupe: ['zod'],
+    dedupe: ["zod"],
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
+      "/api": {
+        target: "http://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
     },
   },
-})
+});

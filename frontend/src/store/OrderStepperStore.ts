@@ -7,7 +7,7 @@ import type {
   DeliveryDetailsWrapper,
   DeliveryMode,
   Transporter,
-} from "@/types/ShippingMode";
+} from "@shared/types/ShippingMode";
 import { getCarrierDetails } from "@/services/CarrierService";
 
 export const usecheckoutStepper = defineStore(

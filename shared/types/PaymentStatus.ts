@@ -1,4 +1,4 @@
-import { z } from "https://esm.sh/zod@4.1.11";
+import { z } from "zod";
 
 export const paymentStatusEnumSchema = z.enum([
   "pending",

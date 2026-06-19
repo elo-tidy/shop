@@ -1,4 +1,4 @@
-import { z } from "npm:zod";
+import { z } from "zod";
 import { AuthMiddleware } from "../_shared/jwt/default.ts";
 import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
@@ -7,23 +7,25 @@ import {
   cartTypeBackEndSchema,
   type Order,
   productBackEndSchema,
-} from "../types/Cart.ts";
-import { type Database } from "../types/database.ts";
-import deliveryData from "../data/shipping-options.json" with {
+} from "@shared/types/Cart.ts";
+import { type Database } from "@shared/types/database.ts";
+import deliveryData from "@shared/data/shipping-options.json" with {
   type: "json",
 };
 
-import { estimatedDelivery } from "../utils/useDeliveryEstimation.ts";
+import { estimatedDelivery } from "@shared/composables/useDeliveryEstimation.ts";
 
-import { calculateProductsPrice, calculateTotalPrice } from "../utils/Cart.ts";
-import { numberWithTwoDecimals } from "../utils/maths.ts";
+import {
+  calculateProductsPrice,
+  calculateTotalPrice,
+} from "@shared/utils/Cart.ts";
+import { numberWithTwoDecimals } from "@shared/utils/maths.ts";
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
     // CORS
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
-    const headers = corsResult;
 
     // Méthode HTTP
     if (req.method !== "POST") return errorResponse("Method not allowed", 405);
@@ -179,7 +181,7 @@ Deno.serve((req) =>
       .select("id")
       .single();
 
-    if (errorOrder) return jsonResponse({ errorOrder }, 400);
+    if (errorOrder) return jsonResponse(errorOrder, 400);
 
     // Mapping result
     const order: Order = {
@@ -216,7 +218,6 @@ Deno.serve((req) =>
         })),
       },
     };
-    console.log("order", order);
-    return new Response(JSON.stringify(order), { status: 201, headers });
+    return jsonResponse(JSON.stringify(order), 201);
   })
 );

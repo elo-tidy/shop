@@ -14,7 +14,8 @@
     "target": "esnext",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@shared/*": ["../shared/*"]
     }
   },
   "module": "ESNext",

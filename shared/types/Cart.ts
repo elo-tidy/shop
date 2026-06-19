@@ -1,4 +1,3 @@
-// import { z } from "https://esm.sh/zod@4.1.11";
 import { z } from "zod";
 import { categoryEnum } from "../types/Categories.ts";
 import { productCatalogSchema } from "../types/Product.ts";
@@ -11,7 +10,7 @@ const cartProductSchema = z.object({
   title: z.string(),
   price: z.number(),
   quantity: z.number(),
-  description: z.string(),
+  description: z.string().nullable,
   image: z.string(),
   category: categoryEnum,
   // stock: z.number().min(0),

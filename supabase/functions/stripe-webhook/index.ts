@@ -1,59 +1,62 @@
-
-import Stripe from "npm:stripe@14.0.0";
+import Stripe from "stripe";
 import { handleCors } from "../_shared/utils/handleCors.ts";
-import { jsonResponse, errorResponse } from "../_shared/utils/response.ts";
+import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { getSupabaseClient } from "../_shared/utils/supabase.ts";
 
 Deno.serve(async (req) => {
-	const cors = handleCors(req);
-	if (cors instanceof Response) return cors;
+  const cors = handleCors(req);
+  if (cors instanceof Response) return cors;
 
-	// Only POST for webhooks
-	if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
-	if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  // Only POST for webhooks
+  if (req.method === "OPTIONS") {
+    return jsonResponse(null, 204);
+  }
+  if (req.method !== "POST") return errorResponse("Method not allowed", 405);
 
-	const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-	const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-	if (!webhookSecret || !stripeKey) {
-		console.error("Missing Stripe env vars");
-		return errorResponse("Missing Stripe configuration", 500);
-	}
+  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+  if (!webhookSecret || !stripeKey) {
+    console.error("Missing Stripe env vars");
+    return errorResponse("Missing Stripe configuration", 500);
+  }
 
-	const stripe = new Stripe(stripeKey);
+  const stripe = new Stripe(stripeKey, {
+    apiVersion: "2023-10-16",
+  });
 
-	// Get raw body
-	const buf = await req.arrayBuffer();
-	const payload = new TextDecoder().decode(buf);
-	const sig = req.headers.get("stripe-signature") ?? "";
+  // Get raw body
+  const buf = await req.arrayBuffer();
+  const payload = new TextDecoder().decode(buf);
+  const sig = req.headers.get("stripe-signature") ?? "";
 
   // Check stripe signature
-	let event: any;
-	try {
-		event = await stripe.webhooks.constructEventAsync(payload, sig, webhookSecret);
-	} catch (err) {
-		console.error("Webhook signature verification failed:", err);
-		return errorResponse("Webhook signature verification failed", 400);
-	}	
+  let event: Stripe.Event;
+  try {
+    event = await stripe.webhooks.constructEventAsync(
+      payload,
+      sig,
+      webhookSecret,
+    );
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err);
+    return errorResponse("Webhook signature verification failed", 400);
+  }
 
-  const supabase = getSupabaseClient();  
+  const supabase = getSupabaseClient();
 
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-
   const paymentIntentId = paymentIntent.id;
-  const stripeEventId = event.id;    
+  const stripeEventId = event.id;
   const orderId = paymentIntent.metadata.orderId;
-
-  console.log("orderId", orderId);
-  console.log("event", event);
 
   if (!orderId) {
     console.error("Missing orderId in metadata");
-    return new Response("ok", { status: 200, headers: cors });
+    return jsonResponse(JSON.stringify({ received: true }), 200);
   }
 
   // bdd pending order data
-  const updateBddOrder = async(paymentStatus:  "failed") => {
+  const updateBddOrder = async (paymentStatus: "failed") => {
     const { data, error } = await supabase
       .from("orders")
       .update({
@@ -66,59 +69,54 @@ Deno.serve(async (req) => {
       .select()
       .maybeSingle();
 
-      if (error) {
-        console.error("DB error:", error);
-        return errorResponse("DB error", 500);
-      }
+    if (error) {
+      console.error("DB error:", error);
+      return errorResponse("DB error", 500);
+    }
 
-      if (!data) {
-        console.warn("[WEBHOOK NO-OP] already processed or not found", {
-          stripeEventId,
-          paymentIntentId,
-          orderId,
-        });
+    if (!data) {
+      console.warn("[WEBHOOK NO-OP] already processed or not found", {
+        stripeEventId,
+        paymentIntentId,
+        orderId,
+      });
 
-        return new Response(
-          JSON.stringify({ received: true, noop: true }),
-          { status: 200, headers: cors }
+      return jsonResponse(JSON.stringify({ received: true, noop: true }), 200);
+    }
+    return data;
+  };
+
+  try {
+    // Handle common events - update order payment status when appropriate
+    switch (event.type) {
+      case "payment_intent.succeeded": {
+        const { data: data, error } = await supabase.rpc(
+          "process_paid_order",
+          {
+            p_order_id: orderId,
+            p_payment_intent_id: paymentIntentId,
+            p_stripe_event_id: stripeEventId,
+          },
         );
-      }
-    console.log("data", data);
-    return data
-  }
-
-	try {
-		
-		// Handle common events - update order payment status when appropriate
-		switch (event.type) {
-			case "payment_intent.succeeded": {  
-        const { data, error } = await supabase.rpc("process_paid_order",{
-          p_order_id: orderId,
-          p_payment_intent_id: paymentIntentId,
-          p_stripe_event_id: stripeEventId,
-        });
 
         if (error) {
           console.error("PROCESS ORDER ERROR:", error);
           return errorResponse("Failed processing order", 500);
         }
 
-        console.log("RPC RESULT:", data);
+        break;
+      }
+      case "payment_intent.payment_failed": {
+        await updateBddOrder("failed");
+        break;
+      }
+      default:
+        console.log("Unhandled event:", event.type);
+    }
 
-				break;
-			}
-			case "payment_intent.payment_failed": {
-        await updateBddOrder("failed")				
-				break;
-			}
-			default:
-				console.log("Unhandled event:", event.type);
-		}    
-
-		return new Response(JSON.stringify({ received: true }), { status: 200, headers: cors });
-	} catch (err) {
-		console.error("Error handling webhook event:", err);
-		return errorResponse("Internal error", 500);
-	}
+    return jsonResponse(JSON.stringify({ received: true }), 200);
+  } catch (err) {
+    console.error("Error handling webhook event:", err);
+    return errorResponse("Internal error", 500);
+  }
 });
-

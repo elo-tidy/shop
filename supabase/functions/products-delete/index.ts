@@ -1,20 +1,23 @@
-import { z } from "npm:zod";
+import { z } from "zod";
 import { AuthMiddleware } from "../_shared/jwt/default.ts";
 import { handleCors } from "../_shared/utils/handleCors.ts";
-import { jsonResponse, errorResponse } from "../_shared/utils/response.ts";
+import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
-import {productDeleteSchema, type productDelete} from '../types/Product.ts'
+import {
+  type productDelete,
+  productDeleteSchema,
+} from "@shared/types/Product.ts";
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
-
     // CORS
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
-    const headers = corsResult;
 
     // Méthode HTTP
-    if (req.method !== "DELETE") return errorResponse("Method not allowed", 405);
+    if (req.method !== "DELETE") {
+      return errorResponse("Method not allowed", 405);
+    }
 
     // Vérification admin + Supabase client
     let supabaseClient;
@@ -24,23 +27,27 @@ Deno.serve((req) =>
     } catch {
       return errorResponse("Unauthorized", 403);
     }
-    
+
     // Validation body
     const url = new URL(req.url);
     const productId = Number(url.searchParams.get("id"));
-    if (!productId) return errorResponse("L'id du produit est obligatoire", 400);
-    
-    let validatedId: productDelete['id'];
+    if (!productId) {
+      return errorResponse("L'id du produit est obligatoire", 400);
+    }
+
+    let validatedId: productDelete["id"];
     try {
-      validatedId = productDeleteSchema.parse({ id: productId }).id;        
+      validatedId = productDeleteSchema.parse({ id: productId }).id;
     } catch (err) {
       if (err instanceof z.ZodError) {
         // Erreur Zod
-        const messages = err.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+        const messages = err.errors.map((e) =>
+          `${e.path.join(".")}: ${e.message}`
+        );
         return errorResponse(messages.join(" | "), 400);
       }
       return errorResponse("Invalid JSON body", 400);
-    } 
+    }
 
     // On vérifie si le produit existe
     const { data: productData, error: productError } = await supabaseClient
@@ -49,7 +56,9 @@ Deno.serve((req) =>
       .eq("id", validatedId);
 
     if (productError) return errorResponse(productError.message, 400);
-    if (!productData || productData.length === 0) return errorResponse("Produit introuvable", 404);
+    if (!productData || productData.length === 0) {
+      return errorResponse("Produit introuvable", 404);
+    }
 
     // Présence de cascade
     const { data: cascadeData, error: cascadeError } = await supabaseClient
@@ -57,7 +66,9 @@ Deno.serve((req) =>
       .select()
       .eq("product_id", validatedId);
 
-    if (cascadeError) return errorResponse(cascadeError.message, 400);
+    if (cascadeError) {
+      return errorResponse(cascadeError.message, 400);
+    }
 
     // Si cascade, on arhive
     if (cascadeData && cascadeData.length > 0) {
@@ -68,7 +79,10 @@ Deno.serve((req) =>
         .select();
 
       if (archivedError) return errorResponse(archivedError.message, 400);
-      return jsonResponse({ message: "Produit archivé car utilisé dans un panier", data: archivedData });
+      return jsonResponse({
+        message: "Produit archivé car utilisé dans un panier",
+        data: archivedData,
+      });
     }
 
     // On supprime les stocks avant le produit
@@ -77,8 +91,8 @@ Deno.serve((req) =>
       .delete()
       .eq("product_id", validatedId)
       .select();
-    
-    if (stockError) return errorResponse(stockError.message, 400);      
+
+    if (stockError) return errorResponse(stockError.message, 400);
 
     // si aucune cascade, on supprime le produit
     const { data: deletedData, error: deletedError } = await supabaseClient
@@ -88,9 +102,9 @@ Deno.serve((req) =>
       .select()
       .single();
 
-    if (deletedError) return errorResponse(deletedError.message, 400);     
+    if (deletedError) return errorResponse(deletedError.message, 400);
 
-    const data = {...deletedData, stock : stockData[0].quantity}
+    const data = { ...deletedData, stock: stockData[0].quantity };
 
     return jsonResponse({ message: "Produit supprimé avec succès", data });
   })

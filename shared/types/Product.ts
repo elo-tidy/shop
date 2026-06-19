@@ -1,4 +1,3 @@
-// import { z } from "https://esm.sh/zod@4.1.11";
 import { z } from "zod";
 import { categoryEnum } from "../types/Categories.ts";
 
@@ -7,10 +6,10 @@ export const productCatalogSchema = z.object({
   id: z.number().min(0, "L'id doit être positif"),
   title: z.string(),
   price: z.number()
+    .min(0, "Le prix doit être positif")
     .refine((val: number) => val > 0, {
       message: "Le prix est obligatoire",
-    })
-    .min(0, "Le prix doit être positif"),
+    }),
   description: z.string().nullable().optional(),
   image: z.string().nullable().optional(),
   category: z.union([
@@ -24,7 +23,7 @@ export type productCatalog = z.infer<typeof productCatalogSchema>;
 export const productFormSchema = z.object({
   id: z.number().optional(),
   title: z.string().min(1, "Titre obligatoire"),
-  price: z.number().min(0),
+  price: z.coerce.number(),
   description: z.string().nullable().optional(),
   image: z.string().nullable().optional(),
   category: categoryEnum.optional(),
@@ -38,10 +37,10 @@ export const productAddSchema = z.object({
   id: z.number().optional(),
   title: z.string().min(1, "Le titre est obligatoire"),
   price: z.number()
+    .min(0, "Le prix doit être positif")
     .refine((val: number) => val > 0, {
       message: "Le prix est obligatoire",
-    })
-    .min(0, "Le prix doit être positif"),
+    }),
   description: z.string().min(1, "La description est obligatoire"),
   image: z.string()
     .min(1, "L'url de l'image est obligatoire")

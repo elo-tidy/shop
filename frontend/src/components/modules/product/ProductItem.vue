@@ -2,8 +2,8 @@
 import { computed, toRef } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 // Type
-import type { productCatalog } from '@/types/Product'
-import type { cartProduct, CartType } from '@/types/Cart'
+import type { productCatalog } from '@shared/types/Product'
+import type { cartProduct, CartType } from '@shared/types/Cart'
 // Ui
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 // Components
@@ -11,7 +11,7 @@ import ProductItemFooterDefault from '@/components/modules/cart/CartItemAddButto
 import CartItemFooter from '@/components/modules/cart/CartItemDeleteUpdateButton.vue'
 import CartItemFooterCheck from '@/components/modules/cart/CartItemFooterCheck.vue'
 import ProductTitle from '@/components/modules/product/ProductTitle.vue'
-import CartItemFooterAdmin from '@/components/modules/cart/CartItemFooterAdmin.vue'
+import ProductItemFooterAdmin from '@/components/modules/product/ProductItemFooterAdmin.vue'
 // Composables
 import { useProductModel } from '@/composables/useProductModel'
 // global
@@ -58,7 +58,7 @@ const compLayout = computed(() =>
 
 // Product content details
 function isProduct(p: any): p is productCatalog {
-  return 'stock' in p
+  return 'stock' in p && 'archived' in p
 }
 const productRef = computed(() => (isProduct(props.product) ? props.product : null))
 const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
@@ -115,7 +115,7 @@ const productFooter = computed(() => {
     case 'check':
       return CartItemFooterCheck
     case 'admin':
-      return CartItemFooterAdmin
+      return ProductItemFooterAdmin
     default:
       return ProductItemFooterDefault
   }
@@ -145,7 +145,7 @@ const productFooter = computed(() => {
     <div class="stock-archived grid">
       <p v-if="displayStock" class="stock">{{ stockWording }}</p>
       <p
-        v-if="props.showItemId !== false && layout === 'admin' && product.archived === true"
+        v-if="props.showItemId !== false && layout === 'admin' && modelProduct?.archived === true"
         class="archived text-xs border px-2 py-1"
       >
         <span class="sr-only">Produit</span> archivé

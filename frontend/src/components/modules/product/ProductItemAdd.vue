@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 // Types
-import { productFormSchema, type productCatalog, type productForm } from '@/types/Product'
+import { productFormSchema, type productCatalog, type productForm } from '@shared/types/Product'
 // UI
 import {
   Field,
@@ -34,7 +34,7 @@ import ProductCard from '@/components/modules/product/ProductItem.vue'
 import { addProduct, updateProduct } from '@/api/products'
 // Store
 import { useProductStore } from '@/store/ProductStore'
-import type { cartProduct } from '@/types/Cart'
+import type { cartProduct } from '@shared/types/Cart'
 
 // Props
 const props = defineProps<{
@@ -73,6 +73,7 @@ const { handleSubmit, resetForm } = useForm<productForm>({
     image: productToEdit?.image ?? '',
     category: productToEdit?.category ?? undefined,
     archived: productToEdit?.archived ?? false,
+    // archived: productToEdit?.archived ? 'true' : 'false',
     stock: productToEdit?.stock ?? 0,
   },
 })
@@ -82,14 +83,14 @@ const onSubmit = handleSubmit(async (data) => {
       // update product
       const req = await updateProduct({ id: productToEdit.id, ...data })
       // const req = await updateProduct(productToEdit)
-      dataReq.value = req
+      dataReq.value = req.data
       productStore.updateProductInStore(req.data)
       toast(`Produit "${req.data.title}" modifié avec succès`)
     } else {
       // add product
       const req = await addProduct(data)
       dataReq.value = req
-      productStore.addProductToStore(dataReq.value.data)
+      productStore.addProductToStore(req)
       toast('Produit ajouté au catalogue avec succès')
       resetForm()
     }
@@ -261,6 +262,7 @@ const onSubmit = handleSubmit(async (data) => {
                       :model-value="field.value"
                       @update:model-value="field.onChange"
                       class="grid grid-cols-[auto_auto] justify-start"
+                      :default-value="archivedDefaultValue"
                     >
                       <FieldLabel>
                         <Field orientation="horizontal" :data-invalid="!!errors.length">
@@ -269,7 +271,7 @@ const onSubmit = handleSubmit(async (data) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-true"
-                            value="true"
+                            :value="true"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
@@ -282,7 +284,7 @@ const onSubmit = handleSubmit(async (data) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-false"
-                            value="false"
+                            :value="false"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
@@ -312,7 +314,7 @@ const onSubmit = handleSubmit(async (data) => {
     </div>
     <div v-if="dataReq">
       <h2 class="mb-5 text-[23px]">Visuel du produit précédemment {{ labels.previewTitle }} :</h2>
-      <ProductCard :product="dataReq.data" display="card" :displayFooter="false" :hn="3" />
+      <ProductCard :product="dataReq" display="card" :displayFooter="false" :hn="3" />
     </div>
   </div>
 </template>

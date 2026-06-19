@@ -15,9 +15,12 @@ export async function fetchAllProductCategories() {
 }*/
 
 import { supabase } from "@/utils/supabase";
-import { type productCatalog, productCatalogSchema } from "@/types/Product";
-import type { CartType } from "@/types/Cart";
-import type { Database } from "../../../shared/types/database";
+import {
+  type productCatalog,
+  productCatalogSchema,
+} from "@shared/types/Product";
+import type { CartType } from "@shared/types/Cart";
+import type { Database } from "@shared/types/database";
 
 export async function fetchAllProducts(): Promise<productCatalog[]> {
   const { data, error } = await supabase

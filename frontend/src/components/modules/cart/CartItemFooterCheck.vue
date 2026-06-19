@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, effect } from 'vue'
 // Types
-import type { cartProduct } from '@/types/Cart'
-import type { productCatalog } from '@/types/Product'
+import type { cartProduct } from '@shared/types/Cart'
+import type { productCatalog } from '@shared/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
 // Stores

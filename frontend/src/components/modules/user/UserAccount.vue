@@ -12,7 +12,7 @@ import {
   getUserProfile,
   updateProfileService,
   signOutService,
-} from '../../../../../shared/services/SupabaseServices'
+} from '@shared/services/SupabaseServices'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
 

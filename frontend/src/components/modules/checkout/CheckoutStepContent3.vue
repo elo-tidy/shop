@@ -2,10 +2,10 @@
 import { onMounted, computed, ref, onBeforeMount } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 // Types
-import type { Order } from '@/types/Cart'
+import type { Order } from '@shared/types/Cart'
 // Composables
 import { useOrderProcess } from '@/composables/useOrderProcess'
-import { convertISOtoDateFR } from '../../../../../shared/composables/useDeliveryEstimation'
+import { convertISOtoDateFR } from '@shared/composables/useDeliveryEstimation'
 // Store
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'

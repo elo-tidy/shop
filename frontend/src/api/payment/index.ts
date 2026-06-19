@@ -1,7 +1,7 @@
 import type {
   ResolvePaymentIntentInput,
   ResolvePaymentIntentResponse,
-} from "@/types/stripe";
+} from "@shared/types/stripe";
 import { supabase } from "@/utils/supabase";
 
 export async function resolvePaymentIntent(
