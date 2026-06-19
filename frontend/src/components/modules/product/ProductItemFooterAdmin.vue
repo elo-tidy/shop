@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 // types
-import type { productForm, productDelete } from '@/types/Product'
+import type { productForm, productDelete } from '@shared/types/Product'
 // Ui
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
