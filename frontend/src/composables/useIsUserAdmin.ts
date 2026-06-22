@@ -1,29 +1,42 @@
 import { ref, watch } from "vue";
 import { useSupabaseSession } from "../composables/useSupabaseSession";
 import { isAdmin } from "@shared/services/SupabaseServices";
+import { supabase } from "@/utils/supabase";
 
 const currentSessionIsAdmin = ref(false);
 const isLoaded = ref(false);
+let initPromise: Promise<boolean> | null = null;
 let initialized = false;
 
 export function useIsUserAdmin() {
   const { session } = useSupabaseSession();
 
-  const checkAdmin = async () => {
-    if (session.value?.user) {
-      try {
-        currentSessionIsAdmin.value = await isAdmin();
-      } catch (err) {
-        console.error("Erreur vérification admin", err);
-        currentSessionIsAdmin.value = false;
-      }
-    } else {
+  const checkAdmin = async (): Promise<boolean> => {
+    const { data } = await supabase.auth.getUser();
+
+    if (!data.user) {
       currentSessionIsAdmin.value = false;
+      return false;
     }
-    isLoaded.value = true;
+
+    try {
+      const req = await isAdmin();
+      currentSessionIsAdmin.value = req;
+      return req;
+    } catch {
+      currentSessionIsAdmin.value = false;
+      return false;
+    }
   };
 
-  if (!initialized) {
+  const init = () => {
+    if (!initPromise) {
+      initPromise = checkAdmin();
+    }
+    return initPromise;
+  };
+
+  /*if (!initialized) {
     watch(
       session,
       async (newSession, oldSession) => {
@@ -35,7 +48,7 @@ export function useIsUserAdmin() {
       { immediate: true },
     );
     initialized = true;
-  }
+  }*/
 
-  return { currentSessionIsAdmin, isLoaded, checkAdmin };
+  return { currentSessionIsAdmin, isLoaded, checkAdmin, init };
 }

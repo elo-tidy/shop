@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+
+// views
 import ProductList from "@/views/ShopView.vue";
 import Product from "@/views/ProductView.vue";
 import Cart from "@/views/CartView.vue";
@@ -6,7 +8,13 @@ import Auth from "@/views/AuthView.vue";
 import Checkout from "@/views/CheckoutView.vue";
 import AdminDashboard from "@/views/admin/AdminDashboardView.vue";
 import AdminAddProducts from "@/views/admin/AdminProductAddView.vue";
+import NotFound from "@/views/NotFound.vue";
+import ForbiddenView from "@/views/ForbiddenView.vue";
 
+// composables
+import { useIsUserAdmin } from "@/composables/useIsUserAdmin";
+
+// Router
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -44,7 +52,7 @@ const router = createRouter({
     {
       path: "/404",
       name: "404",
-      component: Product,
+      component: NotFound,
       meta: { title: "Page introuvable", breadcrumb: "Page introuvable" },
     },
     {
@@ -57,6 +65,7 @@ const router = createRouter({
           meta: {
             title: "Gestion des produits",
             breadcrumb: "Gestion des produits",
+            requiresAdmin: true,
           },
         },
         {
@@ -66,6 +75,7 @@ const router = createRouter({
           meta: {
             title: "Ajouter un produit au catalogue",
             breadcrumb: "Ajouter un produit au catalogue",
+            requiresAdmin: true,
           },
         },
         {
@@ -75,12 +85,19 @@ const router = createRouter({
           meta: {
             title: "Modifier la fiche produit",
             breadcrumb: "Modification de la fiche produit",
+            requiresAdmin: true,
           },
           props: (route) => ({
             id: Number(route.params.id),
           }),
         },
       ],
+    },
+    {
+      path: "/forbidden",
+      name: "forbidden",
+      component: ForbiddenView,
+      meta: { title: "Accès interdit", breadcrumb: "Accès interdit" },
     },
     // {
     //   path: '/catalogue/categorie/:slug',
@@ -89,6 +106,18 @@ const router = createRouter({
     //   meta: { title: 'Page catégorie', breadcrumb: 'Catégorie' },
     // },
   ],
+});
+
+// Redirect if not admin
+router.beforeEach(async (to) => {
+  const { currentSessionIsAdmin, init } = useIsUserAdmin();
+  await init();
+
+  if (to.meta.requiresAdmin && !currentSessionIsAdmin.value) {
+    return {
+      name: "forbidden",
+    };
+  }
 });
 
 export default router;

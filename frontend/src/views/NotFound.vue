@@ -1,3 +1,3 @@
 <template>
-  <h1>Page introuvable</h1>
+  <h1 class="mb-10 text-[30px]">Page introuvable</h1>
 </template>

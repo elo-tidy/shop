@@ -9,6 +9,8 @@ import { toast } from 'vue-sonner'
 import { deleteProduct } from '@/api/products'
 // Store
 import { useProductStore } from '@/store/ProductStore'
+// Composables
+import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 
 // Data
 const props = defineProps<{
@@ -31,9 +33,11 @@ const handleDeleteClick = (productId: number) => {
   payload_api.value = { id: productId }
   deleteThisProduct(payload_api.value)
 }
+
+const { currentSessionIsAdmin } = useIsUserAdmin()
 </script>
 <template>
-  <div class="footer-admin grid grid-flow-col gap-4">
+  <div v-if="currentSessionIsAdmin" class="footer-admin grid grid-flow-col gap-4">
     <RouterLink
       v-if="product.id"
       class="patch btn-icon bg-primary"

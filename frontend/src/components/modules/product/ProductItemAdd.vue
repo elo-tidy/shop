@@ -30,6 +30,8 @@ import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 // Components
 import ProductCard from '@/components/modules/product/ProductItem.vue'
+// Composables
+import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 // Api
 import { addProduct, updateProduct } from '@/api/products'
 // Store
@@ -45,7 +47,7 @@ const props = defineProps<{
 const addProductForm = ref()
 const storedProduct = useProductStore()
 const productToEdit = props.id ? storedProduct.getProductById(props.id) : null
-// const currentSessionIsAdmin = useIsUserAdmin()
+const currentSessionIsAdmin = useIsUserAdmin()
 const dataReq = ref()
 const productStore = useProductStore()
 const archivedDefaultValue = productToEdit?.archived ? 'archived-true' : 'archived-false'
@@ -99,8 +101,8 @@ const onSubmit = handleSubmit(async (data) => {
   }
 })
 </script>
-<template v-if="currentSessionIsAdmin">
-  <div class="grid gap-10 grid-cols-2">
+<template>
+  <div v-if="currentSessionIsAdmin" class="grid gap-10 grid-cols-2">
     <div>
       <div class="flex max-w-xl justify-between gap-x-4">
         <h1 class="mb-5 text-[23px]">{{ labels.pageTitle }}</h1>
