@@ -99,12 +99,6 @@ const router = createRouter({
       component: ForbiddenView,
       meta: { title: "Accès interdit", breadcrumb: "Accès interdit" },
     },
-    // {
-    //   path: '/catalogue/categorie/:slug',
-    //   name: 'categorie',
-    //   component: CategoryList,
-    //   meta: { title: 'Page catégorie', breadcrumb: 'Catégorie' },
-    // },
   ],
 });
 

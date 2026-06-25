@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import { computed, effect } from 'vue'
+import { computed } from 'vue'
 // Types
 import type { cartProduct } from '@shared/types/Cart'
 import type { productCatalog } from '@shared/types/Product'
 // Ui
 import { CardFooter } from '@/components/ui/card'
-// Stores
-import { useCartStore } from '@/store/CartStore'
 
 // Props
 const props = defineProps<{

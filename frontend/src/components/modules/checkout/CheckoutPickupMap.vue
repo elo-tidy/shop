@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 //https://tomickigrzegorz.github.io/react-leaflet-examples/#/simple-map
-import { onMounted, ref, watch, computed, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 // Ui
 import Button from '@/components/ui/button/Button.vue'
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form'
@@ -9,7 +9,7 @@ import { toast } from 'vue-sonner'
 // Types
 import type { Pickup } from '@/types/pickup'
 // Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
+import { useOrderStore } from '@/store/OrderStore'
 // Services
 import { getMarkersData } from '@/services/PickupMap'
 // Leaflet
@@ -252,12 +252,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['isMapVisible'])
-const stepStore = usecheckoutStepper()
+const orderStore = useOrderStore()
 const displayMap = () => {
-  if (
-    stepStore.getLivraisonDetails?.deliveryModeId === 'pickup_point' &&
-    props.mapComponentIsLoaded
-  )
+  if (orderStore.deliveryDetails?.deliveryMode === 'pickup_point' && props.mapComponentIsLoaded)
     return true
   return false
 }

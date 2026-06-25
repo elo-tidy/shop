@@ -1,6 +1,7 @@
 import { computed, defineComponent, h, markRaw } from "vue";
 // Types
 import type { cartProduct } from "@shared/types/Cart";
+import type { productCatalog } from "@shared/types/Product";
 // Ui
 import { toast } from "vue-sonner";
 // Stores
@@ -45,7 +46,6 @@ export function useCartProcess() {
     cartStore.deleteFromCart(productId);
   };
 
-  // Update item quantity
   const updateItemQuantity = async (
     productId: number,
     addOrRemove: "add" | "remove",
@@ -54,12 +54,15 @@ export function useCartProcess() {
     cartStore.updateItemQuantity(productId, addOrRemove);
   };
 
+  function isCatalogProduct(p: any): p is productCatalog {
+    return "stock" in p;
+  }
   const limitUpdateQty = (
     productId: cartProduct["id"],
     addOrRemove?: "add" | "remove",
   ): boolean => {
     const product = cartStore.getCartProductsById(productId!);
-    if (!product) return false;
+    if (!product || !isCatalogProduct(product)) return false;
     if (product.quantity >= product.stock && addOrRemove === "add") {
       return true;
     }

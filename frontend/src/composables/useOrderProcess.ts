@@ -1,41 +1,30 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-
-import { useSupabaseSession } from "./useSupabaseSession";
-
+// Types
+import type { cartProduct, CartType, Order } from "@shared/types/Cart";
+import type { Transporter } from "@shared/types/ShippingMode";
+import type { ResolvePaymentIntentInput } from "@shared/types/stripe";
 // Stores
 import { useCartStore } from "@/store/CartStore";
 import { useOrderStore } from "@/store/OrderStore";
 import { usecheckoutStepper } from "@/store/OrderStepperStore";
 import { usePaymentStore } from "@/store/StripeStore";
-
-// Services
+// Api
 import { addOrder } from "@/api/order";
-
+import { resolvePaymentIntent } from "@/api/payment";
+// Services
 import {
   deleteOrderFromBdd,
   getOrderService,
 } from "@shared/services/SupabaseServices";
-
-import { resolvePaymentIntent } from "@/api/payment";
-
+// Utils
 import { stripePromise } from "@/utils/stripe";
-
-import type { cartProduct, CartType, Order } from "@shared/types/Cart";
-import type { Transporter } from "@shared/types/ShippingMode";
-import type { productCatalog } from "@shared/types/Product";
-import type { ResolvePaymentIntentInput } from "@shared/types/stripe";
-
-/* -------------------------------------------------- */
-/* STATE                                              */
-/* -------------------------------------------------- */
 
 export function useOrderProcess() {
   const route = useRoute();
 
   const cartStore = useCartStore();
   const orderStore = useOrderStore();
-  const stepStore = usecheckoutStepper();
   const paymentStore = usePaymentStore();
 
   // States
@@ -63,16 +52,12 @@ export function useOrderProcess() {
     carrierId: Transporter["id"],
     paymentIntentId: string,
   ): Promise<Order> {
-    console.log("Creating order...", cart, carrierId, paymentIntentId);
     const order = await addOrder({
       products: cart.products,
       payment_ID: paymentIntentId,
       delivery_carrier: carrierId,
     });
     if (!order) throw new Error("Order creation failed");
-
-    console.log("Order created:", order);
-
     orderStore.setOrder(order);
 
     return order;
@@ -126,7 +111,6 @@ export function useOrderProcess() {
         userId: order.user_id ?? "",
       },
     };
-
     orderStore.setOrder(order);
 
     return await resolvePaymentIntent(payload);

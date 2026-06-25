@@ -11,7 +11,7 @@ Deno.serve((req) =>
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
 
-    // Méthode HTTP
+    // HTTP Method
     if (req.method !== "POST") return errorResponse("Method not allowed", 405);
 
     // Vérification admin + Supabase client
@@ -23,7 +23,7 @@ Deno.serve((req) =>
       return errorResponse("Unauthorized", 403);
     }
 
-    // Validation body
+    // Body check
     let body: productAdd;
     try {
       const json = await req.json();
@@ -41,7 +41,7 @@ Deno.serve((req) =>
 
     const { stock, ...rest } = body;
 
-    // Insertion du produit
+    // Product insertion
     const { data: newProductData, error: newroductError } = await supabaseClient
       .from("products")
       .insert(rest)
@@ -50,8 +50,7 @@ Deno.serve((req) =>
 
     if (newroductError) return jsonResponse(newroductError, 400);
 
-    // Insertion du stock
-    console.log("product_id", newProductData.id);
+    // Stock insertion
     const { data: stockData, error: stockError } = await supabaseClient
       .from("product_stock")
       .insert({
@@ -63,7 +62,7 @@ Deno.serve((req) =>
 
     const data = { ...newProductData, stock: stock };
 
-    // Réponse
+    // response
     return jsonResponse(data, 201);
   })
 );

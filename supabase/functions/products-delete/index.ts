@@ -14,12 +14,12 @@ Deno.serve((req) =>
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
 
-    // Méthode HTTP
+    // HTTP Method
     if (req.method !== "DELETE") {
       return errorResponse("Method not allowed", 405);
     }
 
-    // Vérification admin + Supabase client
+    // Check if admin user - get supabase client
     let supabaseClient;
     try {
       const result = await requireAdmin(req);
@@ -28,7 +28,7 @@ Deno.serve((req) =>
       return errorResponse("Unauthorized", 403);
     }
 
-    // Validation body
+    // Body check
     const url = new URL(req.url);
     const productId = Number(url.searchParams.get("id"));
     if (!productId) {
@@ -49,7 +49,7 @@ Deno.serve((req) =>
       return errorResponse("Invalid JSON body", 400);
     }
 
-    // On vérifie si le produit existe
+    // Check if product exist
     const { data: productData, error: productError } = await supabaseClient
       .from("products")
       .select()
@@ -60,7 +60,7 @@ Deno.serve((req) =>
       return errorResponse("Produit introuvable", 404);
     }
 
-    // Présence de cascade
+    // Product cascade
     const { data: cascadeData, error: cascadeError } = await supabaseClient
       .from("carts_products")
       .select()
@@ -70,7 +70,7 @@ Deno.serve((req) =>
       return errorResponse(cascadeError.message, 400);
     }
 
-    // Si cascade, on arhive
+    // If cascade, archive
     if (cascadeData && cascadeData.length > 0) {
       const { data: archivedData, error: archivedError } = await supabaseClient
         .from("products")
@@ -85,7 +85,7 @@ Deno.serve((req) =>
       });
     }
 
-    // On supprime les stocks avant le produit
+    // Delete stock
     const { data: stockData, error: stockError } = await supabaseClient
       .from("product_stock")
       .delete()
@@ -94,7 +94,7 @@ Deno.serve((req) =>
 
     if (stockError) return errorResponse(stockError.message, 400);
 
-    // si aucune cascade, on supprime le produit
+    // If no cascade, delete product
     const { data: deletedData, error: deletedError } = await supabaseClient
       .from("products")
       .delete()

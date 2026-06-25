@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 // Types
 import type { productCatalog } from "@shared/types/Product";
 // Services
-import { fetchAllProducts } from "../services/ShopService";
+import { fetchAllProducts } from "@/services/ShopService";
 
 export const useProductStore = defineStore(
   "product",
@@ -60,7 +60,6 @@ export const useProductStore = defineStore(
     }
     function addProductToStore(product: productCatalog) {
       products.value.push(product);
-      // products.value = [...products.value, product]
     }
     function removeProductFromStore(id: number) {
       const index = products.value.findIndex((p) => p.id === id);

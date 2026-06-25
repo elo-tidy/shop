@@ -1,31 +1,23 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
+// ui
 import {
   Breadcrumb,
-  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-
+// composables
 import { useBreadcrumbs } from '@/composables/breadcrumbs'
-import { RouterLink } from 'vue-router'
-
-import { useRoute } from 'vue-router'
-
+// Schema Org
 import { defineBreadcrumb, useSchemaOrg } from '@unhead/schema-org/vue'
-const { breadcrumbs } = useBreadcrumbs()
 
 const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
 
+const { breadcrumbs } = useBreadcrumbs()
 const breadcrumbsSchema = computed(() =>
   breadcrumbs.value.map((crumb, index) => {
     const item: Record<string, any> = {
@@ -39,14 +31,11 @@ const breadcrumbsSchema = computed(() =>
     return item
   }),
 )
-
 useSchemaOrg([
   defineBreadcrumb({
     itemListElement: breadcrumbsSchema,
   }),
 ])
-
-const route = useRoute()
 </script>
 
 <template>

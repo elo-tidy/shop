@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, toRef } from 'vue'
+import { computed } from 'vue'
 // Types
 import type { cartProduct } from '@shared/types/Cart'
 import type { productCatalog } from '@shared/types/Product'

@@ -1,6 +1,7 @@
-import { ref, watch } from "vue";
-import { useSupabaseSession } from "../composables/useSupabaseSession";
+import { ref } from "vue";
+// Services
 import { isAdmin } from "@shared/services/SupabaseServices";
+// Utils
 import { supabase } from "@/utils/supabase";
 
 const currentSessionIsAdmin = ref(false);
@@ -9,8 +10,6 @@ let initPromise: Promise<boolean> | null = null;
 let initialized = false;
 
 export function useIsUserAdmin() {
-  const { session } = useSupabaseSession();
-
   const checkAdmin = async (): Promise<boolean> => {
     const { data } = await supabase.auth.getUser();
 

@@ -1,4 +1,3 @@
-// import { z } from "https://esm.sh/zod@4.1.11";
 import { z } from "zod";
 
 // Transporter
@@ -8,8 +7,8 @@ const transporterSchema = z.object({
   price: z.number().min(0, "Le prix doit être positif"),
   currency: z.string().min(1, "Devise requise"),
   estimated_delivery_time: z.string().min(1, "Délai requis"),
-})
-export type Transporter = z.infer<typeof transporterSchema>
+});
+export type Transporter = z.infer<typeof transporterSchema>;
 
 // Delivery Mode
 const deliveryModeSchema = z.object({
@@ -17,24 +16,26 @@ const deliveryModeSchema = z.object({
   name: z.string().min(1, "Mode de livraison requis"),
   description: z.string().min(1, "Description du mode de livraison requise"),
   transporters: z.array(transporterSchema),
-})
-export type DeliveryMode = z.infer<typeof deliveryModeSchema>
+});
+export type DeliveryMode = z.infer<typeof deliveryModeSchema>;
 
 // Shipping mode
 const shippingModeSchema = z.object({
   delivery_modes: z.array(deliveryModeSchema),
-})
-export type ShippingMode = z.infer<typeof shippingModeSchema>
+});
+export type ShippingMode = z.infer<typeof shippingModeSchema>;
 
 // Delivery detail
 const deliveryDetailsWrapperSchema = shippingModeSchema.extend({
   transporter: transporterSchema,
-})
-export type DeliveryDetailsWrapper = z.infer<typeof deliveryDetailsWrapperSchema>
+});
+export type DeliveryDetailsWrapper = z.infer<
+  typeof deliveryDetailsWrapperSchema
+>;
 
 const deliveryDetailsSchema = z.object({
   transporter: transporterSchema,
   deliveryMode: z.string().min(1, "Mode de livraison requis"),
   deliveryModeId: z.string().min(1, "ID du mode de livraison requis"),
-})
-export type DeliveryDetails = z.infer<typeof deliveryDetailsSchema>
+});
+export type DeliveryDetails = z.infer<typeof deliveryDetailsSchema>;

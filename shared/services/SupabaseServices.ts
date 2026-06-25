@@ -1,14 +1,10 @@
 // Types
-import type { CartType, Order, OrderDb } from "@shared/types/Cart";
-import type { productCatalog } from "@shared/types/Product";
-import type { Database } from "../types/database.ts";
-
+import type { Order, OrderDb } from "@shared/types/Cart";
+import type { Database } from "@shared/types/database.ts";
+import type { Category } from "@shared/types/Categories.ts";
 // Utils
 import { supabase } from "@/utils/supabase";
-import {
-	formatPriceWithTwoDecimals,
-	numberWithTwoDecimals,
-} from "@/utils/maths";
+import { numberWithTwoDecimals } from "@shared/utils/maths";
 
 export async function sendMagicLink(email: string): Promise<void> {
 	const { error } = await supabase.auth.signInWithOtp({ email });
@@ -62,13 +58,6 @@ export async function signOutService(): Promise<void> {
 	if (error) throw error;
 }
 
-export async function inserOrderService(
-	product_list: CartType,
-	carrierId: string,
-	paymentIntentId: string,
-) {
-}
-
 export const order_select_sql = `
   id,
   user_id,
@@ -110,11 +99,10 @@ const mapOrderData = (
 	data: OrderDb | null,
 ): Order | null => {
 	if (!data) return null;
-
 	return {
 		id: data.id,
 		user_id: data.user_id,
-		cart_id: data.cart_id,
+		cart_id: data.cart_id ?? "",
 		created_at: data.created_at,
 		updated_at: data.updated_at,
 		total_price: Number(numberWithTwoDecimals(data.total_price)),
@@ -135,7 +123,7 @@ const mapOrderData = (
 				price: p.price,
 				description: p.description ?? "",
 				image: p.image ?? "",
-				category: p.category ?? "",
+				category: p.category as Category,
 				quantity: p.quantity,
 				stock: p.products?.stock?.quantity ?? 0,
 			})),
@@ -147,10 +135,6 @@ export async function updatePaymentOrderService(
 	orderId: Order["id"],
 	paymentId: Order["payment_ID"],
 ): Promise<Order | null> {
-	// retourne la commande mise à jour
-	console.log("orderId", orderId);
-	console.log("paymentId", paymentId);
-
 	const orderData = await getOrderService(undefined, orderId);
 	if (!orderData) return null;
 
@@ -205,8 +189,6 @@ export async function updatePaymentOrderService(
 		return null;
 	}
 
-	type OrderDb = typeof data;
-
 	const mappedData = mapOrderData(data);
 	if (!mappedData) return null;
 
@@ -223,9 +205,6 @@ export async function deleteOrderFromBdd(
 		console.error("Commande introuvable pour l'ID :", OrderID);
 		return false;
 	}
-
-	console.log("Suppression de la commande ID :", orderData.id);
-	console.log("Suppression cart_id :", orderData.cart_id);
 
 	if (!orderData.cart_id) {
 		console.error("Panier introuvable pour orderID  :", OrderID);
@@ -256,7 +235,7 @@ export async function deleteOrderFromBdd(
 			.from("orders")
 			.delete()
 			.eq("id", orderData.id)
-			.select(); // récupère la commande supprimée
+			.select();
 
 		if (errorOrder) {
 			console.error("Erreur de suppression de la commande :", errorOrder);
@@ -271,14 +250,12 @@ export async function deleteOrderFromBdd(
 		.from("carts")
 		.delete()
 		.eq("id", orderData.cart_id)
-		.select(); // récupère la commande supprimée
+		.select();
 
 	if (errorCart) {
 		console.error("Erreur de suppression du panier en bdd :", errorCart);
 		return false;
 	}
-
-	console.log("Commande supprimée :", data);
 
 	return true;
 }
@@ -327,5 +304,5 @@ export async function getOrderService(
 	const mappedData = mapOrderData(data);
 	if (!mappedData) return null;
 
-	return mappedData as Order;
+	return mappedData;
 }

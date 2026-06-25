@@ -1,15 +1,11 @@
-export function estimatedDelivery(createdAt: Date , delivery_time: string): string |null {
-
+export function estimatedDelivery(
+	createdAt: Date,
+	delivery_time: string,
+): string | null {
 	if (!createdAt || delivery_time == null) {
-		return null
+		return null;
 	}
 
-	const options: Intl.DateTimeFormatOptions = {
-		weekday: "long",
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	};
 	// Current date
 	const baseDate: Date = new Date(createdAt);
 
@@ -18,10 +14,9 @@ export function estimatedDelivery(createdAt: Date , delivery_time: string): stri
 	const deliveryDaysInfo: string | undefined = delivery_time;
 	const extractDeliveryDays: number[] =
 		deliveryDaysInfo?.match(/\d+/g)?.map((n) => parseInt(n, 10)) || [];
-	const deliveryMaxDays: number | null =
-		extractDeliveryDays.length > 0
-			? Math.max(...extractDeliveryDays)
-			: null;
+	const deliveryMaxDays: number | null = extractDeliveryDays.length > 0
+		? Math.max(...extractDeliveryDays)
+		: null;
 	const deliveryDay: number = deliveryMaxDays ?? 0 + processing;
 
 	const newDate: Date = new Date(baseDate);

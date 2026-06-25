@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 // Types
 import type { stepType } from '@/types/Stepper'
 // Ui
@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import Stepper from '@/components/modules/checkout/CheckoutStepper.vue'
 import Step from '@/components/modules/checkout/CheckoutStep.vue'
 import CheckoutSummary from '@/components/modules/checkout/CheckoutSummary.vue'
-import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useOrderStore } from '@/store/OrderStore'
@@ -16,7 +15,6 @@ import { useCartStore } from '@/store/CartStore'
 /**
  * Data : Step navigation
  */
-// const { effectiveOrder, loadCarrierInfo, carrierInfo } = useOrderProcess()
 const orderStore = useOrderStore()
 const cartStore = useCartStore()
 const productInCart = computed(() => cartStore.cart)
@@ -33,9 +31,6 @@ const nextStep = (stepNumber: number): void => {
 const prevtStep = (): void => {
   stepStore.decrementStep()
 }
-onMounted(async () => {
-  // await loadCarrierInfo()
-})
 </script>
 <template>
   <div id="checkout" class="grid gap-10 grid-cols-2" v-if="productInCart">

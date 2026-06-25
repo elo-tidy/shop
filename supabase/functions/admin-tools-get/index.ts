@@ -3,9 +3,6 @@ import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { AuthMiddleware } from "../_shared/jwt/default.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
-import { getSupabaseClient } from "../_shared/utils/supabase.ts";
-
-const userIdSchema = z.string();
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
@@ -13,12 +10,12 @@ Deno.serve((req) =>
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
 
-    // Méthode HTTP
+    // HTTP Method
     if (req.method !== "GET") {
       return errorResponse("Method not allowed", 405);
     }
 
-    // Vérification admin + Supabase client
+    // Check if admin user - get supabase client
     let supabaseClient;
     try {
       const result = await requireAdmin(req);

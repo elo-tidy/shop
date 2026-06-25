@@ -1,25 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 // Ui
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  type SidebarProps,
-  SidebarRail,
-} from '@/components/ui/sidebar'
+import { Sidebar, SidebarContent, SidebarHeader } from '@/components/ui/sidebar'
 // Components
 import CartButton from '@/components/modules/cart/CartSectionLink.vue'
 import userInfo from '@/components/modules/user/UserDisplay.vue'
 import dashboard from '@/components/modules/admin/AdminDashboard.vue'
 // Composables
-import { useSupabaseSession } from '@/composables/useSupabaseSession'
 import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 
 // Data

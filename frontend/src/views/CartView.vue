@@ -4,7 +4,6 @@ import { computed } from 'vue'
 import CartItem from '@/components/modules/cart/CartItem.vue'
 // Store
 import { useCartStore } from '@/store/CartStore'
-import type { cartProduct } from '@shared/types/Cart'
 const cartStore = useCartStore()
 const products = computed(() => cartStore.cart.products)
 </script>

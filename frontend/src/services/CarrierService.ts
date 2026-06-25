@@ -1,11 +1,13 @@
-import { fetchShippingOptions } from "@/services/ShippingOptions";
+// Types
 import type {
     DeliveryMode,
     ShippingMode,
     Transporter,
 } from "@shared/types/ShippingMode";
-import { useOrderStore } from "@/store/OrderStore";
+// Composables
 import { estimatedDelivery } from "@shared/composables/useDeliveryEstimation";
+// Services
+import { fetchShippingOptions } from "@/services/ShippingOptions";
 
 export async function getCarrierDetails(
     carrierId:

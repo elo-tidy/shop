@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
-
 import { ResolvePaymentIntentInputSchema } from "@shared/types/stripe.ts";
 
 Deno.serve(async (req) => {
@@ -79,29 +78,28 @@ Deno.serve(async (req) => {
     let paymentIntent: Stripe.PaymentIntent | null = null;
     const paymentIntentId = body.paymentIntentId;
 
-    // Si pas de pi, on en crée un
+    // if no pi, create
     if (!paymentIntentId) {
       paymentIntent = await createPi();
     } else {
-      // sinon on le récupère et on maj
+      // if existing pi, retrieve
       let pi: Stripe.PaymentIntent | null = null;
 
       try {
         pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-        console.log("PI:", pi);
       } catch (err) {
         console.error("Invalid PaymentIntent ID:", paymentIntentId, err);
         pi = null;
       }
 
-      // fallback si PI introuvable
+      // fallback if PI not found
       if (!pi) {
         paymentIntent = await createPi();
       } else if (pi.status === "succeeded") {
-        // PI déjà payé → metadata only
+        // already paid, metadata only
         paymentIntent = await updatePi(pi.id, "metadataOnly");
       } else {
-        // PI modifiable
+        // update PI
         paymentIntent = await updatePi(pi.id, null);
       }
     }

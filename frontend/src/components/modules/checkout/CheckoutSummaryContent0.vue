@@ -3,5 +3,5 @@ import CartItem from '@/components/modules/cart/CartItem.vue'
 </script>
 
 <template>
-  <CartItem layout="check" hn="4" />
+  <CartItem layout="check" :hn="4" />
 </template>

@@ -59,7 +59,6 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
     :linear="false"
     aria-label="Étapes de la commande"
   >
-    <!-- :totalSteps="stepStore.getStepsNumber" -->
     <StepperItem
       v-for="(stepItem, index) in steps"
       :key="stepItem.step"

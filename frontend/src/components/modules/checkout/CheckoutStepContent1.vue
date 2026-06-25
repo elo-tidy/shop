@@ -1,18 +1,17 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
 // Types
-import type { ShippingMode, Transporter } from '@shared/types/ShippingMode'
+import type { ShippingMode } from '@shared/types/ShippingMode'
 // Ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 // Components
-// import CheckoutPickupMap from './CheckoutPickupMap.vue'
+// import CheckoutPickupMap from '@/components/modules/checkout/CheckoutPickupMap.vue'
 // Utils
-import { numberWithTwoDecimals } from '@/utils/maths'
+import { numberWithTwoDecimals } from '@shared/utils/maths'
 // Services
 import { fetchShippingOptions } from '@/services/ShippingOptions'
 // Stores
-import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useOrderStore } from '@/store/OrderStore'
 
 // Ref
@@ -20,7 +19,6 @@ const shippingOptions = ref<ShippingMode | null>(null)
 const activeTab = ref<string>('home_delivery')
 
 // Transporter details
-const stepStore = usecheckoutStepper()
 const orderStore = useOrderStore()
 const currentCarrier = computed(() => orderStore.deliveryDetails?.transporter.id)
 const selectCarrier = async (transporterId: string): Promise<void> => {

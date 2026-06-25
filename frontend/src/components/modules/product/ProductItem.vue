@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, toRef } from 'vue'
+import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 // Type
 import type { productCatalog } from '@shared/types/Product'
@@ -14,8 +14,6 @@ import ProductTitle from '@/components/modules/product/ProductTitle.vue'
 import ProductItemFooterAdmin from '@/components/modules/product/ProductItemFooterAdmin.vue'
 // Composables
 import { useProductModel } from '@/composables/useProductModel'
-// global
-const route = useRoute()
 
 // Props
 const props = withDefaults(
@@ -42,26 +40,12 @@ const props = withDefaults(
 /**
  * Data : layout
  */
+
 // Class
 const gridClass = props.display !== 'grid' ? '' : ' py-4'
 const compLayout = computed(() =>
   props.display === 'grid' || props.display === undefined ? 'grid-tpl' : 'card-tpl',
 )
-
-// Layout
-// const layout = computed(() => {
-//   return props.layout ? props.layout : 'detail bg-transparent border-0'
-// })
-
-/*const hn: 1 | 4 | undefined =
-  layout.value === 'detail' ? 1 : layout.value === 'admin' ? 4 : undefined*/
-
-// Product content details
-function isProduct(p: any): p is productCatalog {
-  return 'stock' in p && 'archived' in p
-}
-const productRef = computed(() => (isProduct(props.product) ? props.product : null))
-const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
 
 // Component setup
 const productTitleWrapper = computed(() => {
@@ -72,7 +56,39 @@ const productTitleWrapperProps = computed(() => {
     ? { to: `/product/${modelProduct.value.id}` }
     : null
 })
+const productFooter = computed(() => {
+  switch (props.layout) {
+    case 'cart':
+      return CartItemFooter
+    case 'check':
+      return CartItemFooterCheck
+    case 'admin':
+      return ProductItemFooterAdmin
+    default:
+      return ProductItemFooterDefault
+  }
+})
+
+// Product content details
+function isProduct(p: any): p is productCatalog {
+  return 'stock' in p && 'archived' in p
+}
+const productRef = computed(() => (isProduct(props.product) ? props.product : null))
+const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
+const route = useRoute()
 const displayStock = computed(() => (route.query.redirect_status === 'succeeded' ? false : true))
+const productContent = computed(() => {
+  return props.layout === 'detail' && modelProduct.value
+    ? {
+        productDescription: modelProduct.value.description,
+        productTitle: modelProduct.value.title,
+      }
+    : {
+        productDescription: modelProduct.value?.shortDesc,
+        productTitle: modelProduct.value?.shortTitle,
+      }
+})
+
 // Wording
 const stockWording = computed(() => {
   if (props.layout === 'detail' || props.layout === 'liste') {
@@ -92,32 +108,6 @@ const stockClassAlert = computed((): string | undefined => {
       return 'stock-null'
     }
     return 'stock-alert'
-  }
-})
-
-const productContent = computed(() => {
-  return props.layout === 'detail' && modelProduct.value
-    ? {
-        productDescription: modelProduct.value.description,
-        productTitle: modelProduct.value.title,
-      }
-    : {
-        productDescription: modelProduct.value?.shortDesc,
-        productTitle: modelProduct.value?.shortTitle,
-      }
-})
-
-// Product
-const productFooter = computed(() => {
-  switch (props.layout) {
-    case 'cart':
-      return CartItemFooter
-    case 'check':
-      return CartItemFooterCheck
-    case 'admin':
-      return ProductItemFooterAdmin
-    default:
-      return ProductItemFooterDefault
   }
 })
 </script>

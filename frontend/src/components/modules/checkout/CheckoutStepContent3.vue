@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref, onBeforeMount } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 // Types
 import type { Order } from '@shared/types/Cart'
@@ -13,7 +13,7 @@ import { usePaymentStore } from '@/store/StripeStore'
 import { useOrderStore } from '@/store/OrderStore'
 
 // Data Order details
-const { loadLastOrder, verifyStripePayment, confirmPaidOrder } = useOrderProcess()
+const { verifyStripePayment, confirmPaidOrder } = useOrderProcess()
 
 // Data delivery
 const orderStore = useOrderStore()
@@ -61,7 +61,7 @@ onMounted(async () => {
       // Clear cart and reload with paid order products
       cartStore.clearCartStore()
       const paidProducts = computed(() => paidOrder.value?.cart.products ?? [])
-      paidProducts.value.forEach((product: Order['carts']['products'][number]) => {
+      paidProducts.value.forEach((product: Order['cart']['products'][number]) => {
         cartStore.addToCart(product, product.quantity)
       })
 

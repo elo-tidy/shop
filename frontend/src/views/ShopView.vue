@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+// components
 import ProductList from '@/components/modules/product/ProductList.vue'
 import CategoryList from '@/components/modules/category/CategoryList.vue'
-// composables
+// store
 import { useProductStore } from '@/store/ProductStore'
 const productStore = useProductStore()
 productStore.setAdminDisplay(false)

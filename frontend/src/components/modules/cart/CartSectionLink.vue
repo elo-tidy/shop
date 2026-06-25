@@ -8,9 +8,9 @@ import { useOrderStore } from '@/store/OrderStore'
 import { useCartProcess } from '@/composables/useCartProcess'
 
 const cart = useCartStore()
-const orderStore = useOrderStore()
 const { wordingTotalNumberOfItem } = useCartProcess()
 
+const orderStore = useOrderStore()
 const displayTotalNumberOfItem = (): boolean => {
   if (cart.getCartTotalItems > 0 && !orderStore.isPaid) return true
   return false

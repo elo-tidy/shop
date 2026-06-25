@@ -16,11 +16,11 @@ const props = defineProps<{
   data: SummaryContent
   index: number
 }>()
+
+// Data
 const title = computed(() => props.data.title)
 const id = computed(() => props.index)
 const currentContent = computed(() => props.data.component)
-
-// Delivery estimated date
 const orderStore = useOrderStore()
 const deliveryDate = computed(() => orderStore.deliveryDetails?.deliveryDate)
 const isPaid = computed(() => orderStore.isPaid)

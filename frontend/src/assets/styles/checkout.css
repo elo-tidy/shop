@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "@/assets/styles/main.css";
 #checkout {
   #stepper {
     button {

@@ -23,7 +23,6 @@ const orderStore = useOrderStore()
 const { payment_intent, loadLastOrder, createOrder, resolveOrderPayment, syncCartWithOrder } =
   useOrderProcess()
 const stripeStore = usePaymentStore()
-const { initWithExistingPi } = stripeStore
 
 const pI = ref<string | null>(null)
 

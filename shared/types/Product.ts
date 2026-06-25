@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { categoryEnum } from "../types/Categories.ts";
+import { categoryEnum } from "@shared/types/Categories.ts";
 
 // Frontend
 export const productCatalogSchema = z.object({
@@ -28,7 +28,8 @@ export const productFormSchema = z.object({
   image: z.string().nullable().optional(),
   category: categoryEnum.optional(),
   stock: z.number().min(0),
-  archived: z.boolean().optional(),
+  archived: z.enum(["true", "false"]),
+  // archived: z.string().optional(),
 });
 export type productForm = z.infer<typeof productFormSchema>;
 
@@ -52,7 +53,7 @@ export const productAddSchema = z.object({
   ]).refine((val: unknown) => val !== undefined, {
     message: "La catégorie est obligatoire",
   }),
-  archived: z.boolean().optional(),
+  archived: z.enum(["true", "false"]),
   stock: z.number().min(0),
   // product_stock:  z.object({
   //   quantity: z.number().min(0, "La quantité doit être renseignée")

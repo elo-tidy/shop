@@ -1,18 +1,10 @@
 import { defineStore } from "pinia";
-import { computed, reactive, ref, toRefs } from "vue";
+import { computed, reactive } from "vue";
 // Types
 import type { productCatalog } from "@shared/types/Product";
 import type { cartProduct, CartType } from "@shared/types/Cart";
 //  Models
 import { Cart } from "@/models/Cart";
-// Stores
-import { usecheckoutStepper } from "./OrderStepperStore";
-// Utils
-import {
-  formatPriceWithTwoDecimals,
-  numberWithTwoDecimals,
-  priceFromEurosToCents,
-} from "@/utils/maths";
 
 export const useCartStore = defineStore(
   "cart",
@@ -28,7 +20,6 @@ export const useCartStore = defineStore(
     // Getters
     const getCartTotalItems = computed(() => cart.totalNumberOfItem);
     const getCartTotalPrice = computed(() => cart.totalPrice);
-    // const getCartTotalPriceInCents = computed(() => priceFromEurosToCents(cart.totalPrice))
     const getCartProducts = computed(() => cart.products);
     const getItemQuantity = (productId: cartProduct["id"]) =>
       cart.getItemQuantity(productId);
@@ -59,7 +50,6 @@ export const useCartStore = defineStore(
       cart,
       getCartTotalItems,
       getCartTotalPrice,
-      // getCartTotalPriceInCents,
       getCartProducts,
       addToCart,
       deleteFromCart,

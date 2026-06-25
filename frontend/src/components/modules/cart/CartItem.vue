@@ -2,20 +2,18 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { productCatalog } from '@shared/types/Product'
-import type { cartProduct, Order } from '@shared/types/Cart'
+import type { cartProduct } from '@shared/types/Cart'
 // Components
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
-import { useOrderProcess } from '@/composables/useOrderProcess'
 import { useCartProcess } from '@/composables/useCartProcess'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
 import { useOrderStore } from '@/store/OrderStore'
 // Utils
-import { numberWithTwoDecimals } from '@/utils/maths'
+import { numberWithTwoDecimals } from '@shared/utils/maths'
 
 // Props
 const props = withDefaults(

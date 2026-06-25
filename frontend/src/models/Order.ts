@@ -1,8 +1,6 @@
 import type { Order } from "@shared/types/Cart";
 import type { DeliveryMode, Transporter } from "@shared/types/ShippingMode";
-
-import { priceFromEurosToCents } from "@/utils/maths";
-import { estimatedDelivery } from "@shared/composables/useDeliveryEstimation";
+import { priceFromEurosToCents } from "@shared/utils/maths";
 
 export class OrderModel {
   constructor(
@@ -38,21 +36,6 @@ export class OrderModel {
       this.order.stripe_event_id !== "";
   }
 
-  // get deliveryDetails() {
-  //   return this.delivery
-  // }
-
-  // get deliveryDate() {
-  //   if (!this.transporter?.estimated_delivery_time) {
-  //     return null
-  //   }
-
-  //   return estimatedDelivery(
-  //     this.order.created_at,
-  //     this.transporter.estimated_delivery_time,
-  //   )
-  // }
-
   get stripePayload() {
     if (!this.order.delivery_carrier) {
       throw new Error("Missing delivery_carrier in order");
@@ -67,7 +50,7 @@ export class OrderModel {
     };
   }
 
-  setProducts(products: Order["carts"]["products"]) {
+  setProducts(products: Order["cart"]["products"]) {
     this.order.cart.products = products;
   }
 }

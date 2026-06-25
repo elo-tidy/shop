@@ -12,10 +12,10 @@ Deno.serve((req) =>
     const corsResult = handleCors(req);
     if (corsResult instanceof Response) return corsResult;
 
-    // Méthode HTTP
+    // HTTP Method
     if (req.method !== "PATCH") return errorResponse("Method not allowed", 405);
 
-    // Vérification admin + Supabase client
+    // admin check + supabase client
     let supabaseClient;
     try {
       const result = await requireAdmin(req);
@@ -24,7 +24,7 @@ Deno.serve((req) =>
       return errorResponse("Unauthorized", 403);
     }
 
-    // Validation body
+    // Body check
     let body;
     try {
       const json = await req.json();
@@ -50,7 +50,7 @@ Deno.serve((req) =>
       return errorResponse("Erreur de validation inconnue", 400);
     }
 
-    // Vérification que le produit existe
+    // check if product exist
     const { data: productData, error: productError } = await supabaseClient
       .from("products")
       .select()
@@ -62,10 +62,10 @@ Deno.serve((req) =>
       return errorResponse("Produit introuvable", 404);
     }
 
-    // Isoler les data modifiables
+    // isolate modifiable data
     const { id, stock, ...updatableData } = body;
 
-    // Modification du produit
+    // Product update
     const { data: updateProductData, error: updateProductError } =
       await supabaseClient
         .from("products")
@@ -78,7 +78,7 @@ Deno.serve((req) =>
     }
     // return jsonResponse({ message: "Produit modifié avec succès", updateProductData });
 
-    // Modification des stock
+    // Stock update
     const { data: stockData, error: stockError } = await supabaseClient
       .from("product_stock")
       .update({ quantity: body.stock })
@@ -86,7 +86,6 @@ Deno.serve((req) =>
       .select();
 
     if (stockError) return jsonResponse({ stockError }, 400);
-    // return jsonResponse({ message: "Stock modifié avec succès", stockData });
 
     const { quantity, ...rest } = stockData[0];
 

@@ -2,20 +2,12 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import type { stepType } from "@/types/Stepper";
-import type {
-  DeliveryDetails,
-  DeliveryDetailsWrapper,
-  DeliveryMode,
-  Transporter,
-} from "@shared/types/ShippingMode";
-import { getCarrierDetails } from "@/services/CarrierService";
 
 export const usecheckoutStepper = defineStore(
   "checkoutStepper",
   () => {
     // state
     const step = ref(0);
-    // const livraisonDetails = ref<{deliveryMode: DeliveryMode['name'], transporter:Transporter} | null>(null)
     const steps = ref<stepType[]>([
       {
         id: "informations_client",
@@ -49,7 +41,6 @@ export const usecheckoutStepper = defineStore(
 
     // Getters
     const getSteps = computed(() => steps.value);
-    // const getLivraisonDetails = computed(() => livraisonDetails.value)
 
     // Actions
     function validStep(stepNumber: number): void {
@@ -65,12 +56,7 @@ export const usecheckoutStepper = defineStore(
     function decrementStep(): void {
       step.value--;
     }
-    // async function setLivraisonDetails(transporterId: Transporter["id"]) {
-    //   livraisonDetails.value = await getCarrierDetails(transporterId)
-    // }
-    // function clearLivraisonDetails() {
-    //   livraisonDetails.value = null
-    // }
+
     function resetStepper(): void {
       step.value = 0;
       // clearLivraisonDetails()
@@ -80,15 +66,11 @@ export const usecheckoutStepper = defineStore(
     return {
       step,
       steps,
-      // livraisonDetails,
       getSteps,
-      // getLivraisonDetails,
       validStep,
       changeStep,
       incrementStep,
       decrementStep,
-      // setLivraisonDetails,
-      // clearLivraisonDetails,
       resetStepper,
     };
   },

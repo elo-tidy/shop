@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
-import ProductItem from '@/components/modules/product/ProductItem.vue'
-
-import { useProductStore } from '@/store/ProductStore'
+// Types
 import type { productCatalog } from '@shared/types/Product'
+// Components
+import ProductItem from '@/components/modules/product/ProductItem.vue'
+// Store
+import { useProductStore } from '@/store/ProductStore'
 
 const route = useRoute()
 const router = useRouter()

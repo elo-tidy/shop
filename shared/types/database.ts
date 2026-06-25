@@ -119,7 +119,7 @@ export type Database = {
       }
       orders: {
         Row: {
-          cart_id: string | null
+          cart_id: string
           created_at: string
           delivery_carrier: string
           delivery_date: string
@@ -136,7 +136,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          cart_id?: string | null
+          cart_id: string
           created_at?: string
           delivery_carrier: string
           delivery_date: string
@@ -153,7 +153,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          cart_id?: string | null
+          cart_id?: string
           created_at?: string
           delivery_carrier?: string
           delivery_date?: string

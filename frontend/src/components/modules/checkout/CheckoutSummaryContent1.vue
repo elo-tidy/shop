@@ -2,26 +2,20 @@
 import { computed } from 'vue'
 // Ui
 import { Button } from '@/components/ui/button'
-// Composables
-import { useOrderProcess } from '@/composables/useOrderProcess'
 // Stores
 import { useOrderStore } from '@/store/OrderStore'
 // Utils
-import { numberWithTwoDecimals } from '@/utils/maths'
+import { numberWithTwoDecimals } from '@shared/utils/maths'
 
 // Props
 const props = defineProps<{
   GoToStep: (stepNumber: number) => void
 }>()
 
-// Data
 const orderStore = useOrderStore()
-// const { carrierInfo, isConfirmed, deliveryPrice } = useOrderProcess()
 
 // Step edition
 const isEditable = computed(() => !orderStore.isPaid)
-
-// Delivery date
 </script>
 <template>
   <div class="grid grid-cols-2 gap-2">

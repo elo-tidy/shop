@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
+// Components
+import ProductCard from '@/components/modules/product/ProductItem.vue'
+// Store
 import { useProductStore } from '@/store/ProductStore'
-import ProductCard from './ProductItem.vue'
 
+// Data store
 const productStore = useProductStore()
 const nbProduct = computed(() => productStore.filteredProducts.length)
 const wording = computed(() => (nbProduct.value > 1 ? 'articles' : 'article'))
@@ -41,7 +44,6 @@ const compLayout = computed(() =>
   </p>
   <div v-if="productStore.isLoading">Chargement des produits...</div>
 
-  <!-- <div v-else :class="['grid', gridClass, layoutClass]"> -->
   <div v-else :class="['grid', gridClass]">
     <ProductCard
       v-for="product in productStore.filteredProducts"

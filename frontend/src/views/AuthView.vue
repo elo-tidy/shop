@@ -2,8 +2,8 @@
 // Components
 import Account from '@/components/modules/user/userAccount.vue'
 import Auth from '@/components/modules/user/UserAuth.vue'
-import { useSupabaseSession } from '@/composables/useSupabaseSession'
 // Composables
+import { useSupabaseSession } from '@/composables/useSupabaseSession'
 const { session } = useSupabaseSession()
 </script>
 

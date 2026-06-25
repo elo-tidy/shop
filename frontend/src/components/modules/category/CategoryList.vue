@@ -1,21 +1,24 @@
 <script lang="ts" setup>
-import { ref, onMounted, watchEffect } from 'vue'
-
+import { ref, onMounted } from 'vue'
+// Ui
 import { Button } from '@/components/ui/button'
-
+// Store
 import { useProductStore } from '@/store/ProductStore'
+// Services
 import { fetchAllProductCategories } from '@/services/ShopService'
 
+// Products data
+
 const categories = ref<string[] | null>(null)
-const storeProducts = useProductStore()
 const activeCategory = ref<null | string>(null)
 
+const storeProducts = useProductStore()
 const filterByCategory = (categorieName: string) => {
   storeProducts.updateCurrentCategory(categorieName)
   activeCategory.value = categorieName
 }
 
-const displayAllProduct = (categorieName: string) => {
+const displayAllProduct = () => {
   storeProducts.updateCurrentCategory(null)
   activeCategory.value = null
 }
@@ -41,7 +44,7 @@ onMounted(async () => {
       <Button
         class="border-1 border-dashed"
         :variant="activeCategory === null ? 'default' : 'outline'"
-        @click="displayAllProduct('all')"
+        @click="displayAllProduct()"
         :aria-current="activeCategory === null ? 'true' : 'false'"
         >Afficher tous les produits</Button
       >

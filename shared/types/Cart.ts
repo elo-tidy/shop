@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { categoryEnum } from "../types/Categories.ts";
-import { productCatalogSchema } from "../types/Product.ts";
-import { paymentStatusEnumSchema } from "../types/PaymentStatus.ts";
+import { categoryEnum } from "@shared/types/Categories.ts";
+import { paymentStatusEnumSchema } from "@shared/types/PaymentStatus.ts";
 
 // Frontend
 
@@ -10,7 +9,7 @@ const cartProductSchema = z.object({
   title: z.string(),
   price: z.number(),
   quantity: z.number(),
-  description: z.string().nullable,
+  description: z.string().nullable(),
   image: z.string(),
   category: categoryEnum,
   // stock: z.number().min(0),
