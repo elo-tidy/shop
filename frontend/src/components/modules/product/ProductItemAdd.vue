@@ -47,7 +47,8 @@ const props = defineProps<{
 const storedProduct = useProductStore()
 const productToEdit = props.id ? storedProduct.getProductById(props.id) : null
 const currentSessionIsAdmin = useIsUserAdmin()
-const dataReq = ref()
+// const dataReq = ref()
+const dataReq = ref<productCatalog | null>(null)
 const productStore = useProductStore()
 const archivedDefaultValue = productToEdit?.archived ? 'true' : 'false'
 
@@ -69,15 +70,15 @@ const { handleSubmit, resetForm } = useForm<productForm>({
   validationSchema: toTypedSchema(productFormSchema),
   initialValues: {
     title: productToEdit?.title ?? '',
-    price: productToEdit?.price ?? 0,
+    price: productToEdit?.price,
     description: productToEdit?.description ?? '',
     image: productToEdit?.image ?? '',
-    category: productToEdit?.category ?? undefined,
-    archived: productToEdit?.archived ? 'true' : 'false',
-    stock: productToEdit?.stock ?? 0,
+    category: productToEdit?.category,
+    archived: productToEdit?.archived ? true : false,
+    stock: productToEdit?.stock,
   },
 })
-const onSubmit = handleSubmit(async (data) => {
+const onSubmit = handleSubmit(async (data: productForm) => {
   try {
     if (productToEdit) {
       // update product
@@ -88,8 +89,8 @@ const onSubmit = handleSubmit(async (data) => {
     } else {
       // add product
       const req = await addProduct(data)
-      dataReq.value = req
-      productStore.addProductToStore(req)
+      dataReq.value = req.data
+      productStore.addProductToStore(req.data)
       toast('Produit ajouté au catalogue avec succès')
       resetForm()
     }
@@ -111,7 +112,7 @@ const onSubmit = handleSubmit(async (data) => {
           </Button>
         </p>
       </div>
-      <div class="grid gap-y-10 max-w-[550px]">
+      <div class="grid gap-y-10 max-w-137.5">
         <Card class="px-6">
           <form ref="addProductForm" id="add-product" @submit="onSubmit">
             <FieldSet>
@@ -175,7 +176,6 @@ const onSubmit = handleSubmit(async (data) => {
                       class="inputField"
                       type="number"
                       step="0.01"
-                      min="0"
                       :aria-invalid="!!errors.length"
                     />
                     <FieldError
@@ -241,7 +241,6 @@ const onSubmit = handleSubmit(async (data) => {
                       class="inputField"
                       type="number"
                       step="1"
-                      min="0"
                       :aria-invalid="!!errors.length"
                     />
                     <FieldError

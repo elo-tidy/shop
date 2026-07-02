@@ -14,35 +14,39 @@ export const useCartStore = defineStore(
       new Cart({
         id: "",
         products: [],
-      } as CartType),
+      }),
     );
 
     // Getters
     const getCartTotalItems = computed(() => cart.totalNumberOfItem);
     const getCartTotalPrice = computed(() => cart.totalPrice);
     const getCartProducts = computed(() => cart.products);
-    const getItemQuantity = (productId: cartProduct["id"]) =>
-      cart.getItemQuantity(productId);
-    const getItemArchivedStatus = (productId: cartProduct["id"]) =>
-      cart.getItemArchivedStatus(productId);
+    const getItemQuantity = (
+      productId: cartProduct["id"],
+    ): number => cart.getItemQuantity(productId);
 
     // Actions
-    function addToCart(product: cartProduct, itemQuantity: number) {
+    function addToCart(
+      product: cartProduct,
+      itemQuantity: cartProduct["quantity"],
+    ): void {
       cart.addItemToCart(product, itemQuantity);
     }
-    function deleteFromCart(productId: number) {
+    function deleteFromCart(productId: cartProduct["id"]): void {
       cart.deleteItemFromCart(productId);
     }
     function updateItemQuantity(
-      productId: number,
+      productId: cartProduct["id"],
       addOrRemove: "add" | "remove",
-    ) {
+    ): void {
       cart.updateItemQuantity(productId, addOrRemove);
     }
-    function clearCartStore() {
+    function clearCartStore(): void {
       cart.clearCart();
     }
-    const getCartProductsById = (productId: productCatalog["id"]) => {
+    const getCartProductsById = (
+      productId: productCatalog["id"],
+    ): cartProduct | undefined => {
       return cart.getProduct(productId);
     };
 
@@ -56,7 +60,6 @@ export const useCartStore = defineStore(
       updateItemQuantity,
       clearCartStore,
       getItemQuantity,
-      getItemArchivedStatus,
       getCartProductsById,
     };
   },

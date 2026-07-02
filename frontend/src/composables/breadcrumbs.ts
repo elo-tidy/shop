@@ -36,7 +36,7 @@ export function useBreadcrumbs() {
           let product = productStore.getProductById(id);
 
           if (!product) {
-            productStore.loadProducts();
+            await productStore.loadProducts();
             product = productStore.getProductById(id);
           }
 
@@ -54,7 +54,9 @@ export function useBreadcrumbs() {
               "https://fakestoreapi.com/products/categories",
             );
             const data: string[] = await response.json();
-            const categories = data.map((item) => new Category(item));
+            const categories: Category[] = data.map((item) =>
+              new Category(item)
+            );
             const found = categories.find((c) => c.slug === slug);
 
             return {

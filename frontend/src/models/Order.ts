@@ -1,4 +1,4 @@
-import type { Order } from "@shared/types/Cart";
+import type { Order } from "@shared/types/Order";
 import type { DeliveryMode, Transporter } from "@shared/types/ShippingMode";
 import { priceFromEurosToCents } from "@shared/utils/maths";
 
@@ -15,15 +15,15 @@ export class OrderModel {
     return this.order;
   }
 
-  get totalPrice(): number {
+  get totalPrice(): Order["total_price"] {
     return this.order.total_price;
   }
 
-  get productsPrice(): number {
+  get productsPrice(): Order["products_price"] {
     return this.order.products_price;
   }
 
-  get deliveryPrice(): number {
+  get deliveryPrice(): Order["delivery_price"] {
     return this.order.delivery_price;
   }
 
@@ -50,7 +50,7 @@ export class OrderModel {
     };
   }
 
-  setProducts(products: Order["cart"]["products"]) {
+  setProducts(products: Order["cart"]["products"]): void {
     this.order.cart.products = products;
   }
 }

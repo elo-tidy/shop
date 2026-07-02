@@ -18,7 +18,7 @@ import { numberWithTwoDecimals } from '@shared/utils/maths'
 // Props
 const props = withDefaults(
   defineProps<{
-    products?: cartProduct[]
+    // products?: cartProduct[]
     hn?: 1 | 2 | 3 | 4
     layout?: 'cart' | 'check' | 'admin'
     productOnly?: true
@@ -39,7 +39,7 @@ const cartStore = useCartStore()
 const orderStore = useOrderStore()
 
 // Layout
-const displayProductOnly = computed(() => !!props.productOnly)
+const displayProductOnly = computed(() => props.productOnly)
 
 const deliveryPrice = computed(() =>
   !orderStore.isPaid
@@ -91,10 +91,10 @@ const cta = computed(() => {
         <span class="text-right tabular-nums font-mono"> {{ productsPrice }} € </span>
       </p>
 
-      <template v-if="stepStore && layout === 'check'">
+      <template v-if="layout === 'check'">
         <p class="total grid grid-cols-[1fr_80px] place-items-end border-b p-2">
           <span>Frais de livraison :</span>
-          <span class="text-right tabular-nums font-mono"> {{ deliveryPrice ?? '--' }} €</span>
+          <span class="text-right tabular-nums font-mono"> {{ deliveryPrice }} €</span>
         </p>
         <p class="total text-primary grid grid-cols-[1fr_80px] place-items-end border-b p-2">
           <span>Total :</span>

@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 // Types
-import type { CartType, Order } from "@shared/types/Cart";
+import type { cartProduct } from "@shared/types/Cart";
+import type { Order } from "@shared/types/Order";
 import type { DeliveryMode, Transporter } from "@shared/types/ShippingMode";
 import type { productCatalog } from "@shared/types/Product";
 // Models
@@ -25,12 +26,12 @@ export const useOrderStore = defineStore(
     const deliveryDetails = ref<
       {
         deliveryMode: DeliveryMode["name"];
-        deliveryDate: String | null;
+        deliveryDate: string | null;
         transporter: Transporter;
       } | null
     >(null);
 
-    const orderModel = computed(() => {
+    const orderModel = computed((): OrderModel | null => {
       if (!orderData.value) return null;
       return new OrderModel(orderData.value);
     });
@@ -51,21 +52,26 @@ export const useOrderStore = defineStore(
     );
 
     // Actions
-    function setOrder(data: Order) {
+    function setOrder(data: Order): void {
       // orderModel.value = new OrderModel(data)
       orderData.value = data;
     }
-    const isCatalogProduct = (p: any): p is productCatalog => {
-      return "stock" in p;
+    const isCatalogProduct = (p: unknown): p is productCatalog => {
+      return typeof p === "object" && p !== null && "id" in p && "price" in p;
     };
-    function initOrder(userId: string, paymentIntentId: string | null = null) {
+    function initOrder(
+      userId: string,
+      paymentIntentId: string | null = null,
+    ): void {
       const cartStore = useCartStore();
 
       const cart = cartStore.cart;
       const deliveryPrice = deliveryDetails.value?.transporter?.price ?? 0;
       const delivery_carrier_id = deliveryDetails.value?.transporter?.id ?? "";
 
-      const carts_products = cart.products.map((p) => ({
+      const carts_products = cart.products.map((
+        p: cartProduct,
+      ) => ({
         id: p.id,
         title: p.title,
         price: p.price,
@@ -77,7 +83,7 @@ export const useOrderStore = defineStore(
       }));
 
       const productsPrice = cart.products.reduce(
-        (total, p) => total + p.price * (p.quantity ?? 1),
+        (total: number, p: cartProduct) => total + p.price * (p.quantity ?? 1),
         0,
       );
 
@@ -110,23 +116,25 @@ export const useOrderStore = defineStore(
       };
       setOrder(orderDraft);
     }
-    function resetOrderDraft() {
+    function resetOrderDraft(): void {
       orderData.value = null;
     }
-    function clearOrder() {
+    function clearOrder(): void {
       resetOrderDraft();
       clearLivraisonDetails();
     }
-    function reloadOrderProducts(products: CartType["products"]) {
+    function reloadOrderProducts(products: cartProduct[]): void {
       //   orderModel.value?.setProducts(products)
       if (!orderData.value) return;
       orderData.value.cart.products = [...products];
     }
 
-    async function setLivraisonDetails(transporterId: Transporter["id"]) {
+    async function setLivraisonDetails(
+      transporterId: Transporter["id"],
+    ): Promise<void> {
       deliveryDetails.value = await getCarrierDetails(transporterId);
     }
-    function clearLivraisonDetails() {
+    function clearLivraisonDetails(): void {
       deliveryDetails.value = null;
     }
 

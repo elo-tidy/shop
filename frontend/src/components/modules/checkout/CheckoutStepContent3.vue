@@ -2,7 +2,7 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 // Types
-import type { Order } from '@shared/types/Cart'
+import type { Order } from '@shared/types/Order'
 // Composables
 import { useOrderProcess } from '@/composables/useOrderProcess'
 import { convertISOtoDateFR } from '@shared/composables/useDeliveryEstimation'

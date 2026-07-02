@@ -44,6 +44,13 @@ Deno.serve(async (req) => {
 
   const supabase = getSupabaseClient();
 
+  if (
+    event.type !== "payment_intent.succeeded" &&
+    event.type !== "payment_intent.payment_failed"
+  ) {
+    return jsonResponse({ received: true }, 200);
+  }
+
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
   const paymentIntentId = paymentIntent.id;
@@ -52,7 +59,7 @@ Deno.serve(async (req) => {
 
   if (!orderId) {
     console.error("Missing orderId in metadata");
-    return jsonResponse(JSON.stringify({ received: true }), 200);
+    return jsonResponse({ received: true }, 200);
   }
 
   // bdd pending order data
@@ -81,7 +88,7 @@ Deno.serve(async (req) => {
         orderId,
       });
 
-      return jsonResponse(JSON.stringify({ received: true, noop: true }), 200);
+      return jsonResponse({ received: true, noop: true }, 200);
     }
     return data;
   };
@@ -90,7 +97,7 @@ Deno.serve(async (req) => {
     // Handle common events - update order payment status when appropriate
     switch (event.type) {
       case "payment_intent.succeeded": {
-        const { data: data, error } = await supabase.rpc(
+        const { error } = await supabase.rpc(
           "process_paid_order",
           {
             p_order_id: orderId,
@@ -114,7 +121,7 @@ Deno.serve(async (req) => {
         console.log("Unhandled event:", event.type);
     }
 
-    return jsonResponse(JSON.stringify({ received: true }), 200);
+    return jsonResponse({ received: true }, 200);
   } catch (err) {
     console.error("Error handling webhook event:", err);
     return errorResponse("Internal error", 500);

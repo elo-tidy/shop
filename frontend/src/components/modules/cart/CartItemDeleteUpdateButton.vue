@@ -8,7 +8,6 @@ import { CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 // Composables
 import { useCartProcess } from '@/composables/useCartProcess'
-import { useProductModel } from '@/composables/useProductModel'
 
 // Props
 const props = defineProps<{

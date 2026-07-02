@@ -7,35 +7,35 @@ export class Product {
     this.data = data;
   }
 
-  get id(): number {
+  get id(): productCatalog["id"] {
     return this.data.id;
   }
 
-  get title(): string {
+  get title(): productCatalog["title"] {
     return this.data.title;
   }
 
-  get price(): number {
+  get price(): productCatalog["price"] {
     return this.data.price;
   }
 
-  get description(): string {
+  get description(): productCatalog["description"] {
     return this.data.description ?? "";
   }
 
-  get image(): string {
+  get image(): productCatalog["image"] {
     return this.data.image ?? "";
   }
 
-  get category(): string {
-    return this.data.category ?? "";
+  get category(): productCatalog["category"] {
+    return this.data.category;
   }
 
-  get stock(): number {
+  get stock(): productCatalog["stock"] {
     return this.data.stock;
   }
 
-  get archived(): boolean {
+  get archived(): productCatalog["archived"] {
     return this.data.archived ?? false;
   }
 
@@ -43,11 +43,12 @@ export class Product {
     return `${this.price.toFixed(2)} €`;
   }
 
-  get shortTitle(): string {
+  get shortTitle(): productCatalog["title"] {
     return this.title.length > 40 ? this.title.slice(0, 37) + "…" : this.title;
   }
 
-  get shortDesc(): string {
+  get shortDesc(): productCatalog["description"] {
+    if (!this.description) return "";
     return this.description.length > 100
       ? this.description.slice(0, 97) + "…"
       : this.description;

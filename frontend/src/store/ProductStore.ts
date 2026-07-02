@@ -39,7 +39,7 @@ export const useProductStore = defineStore(
     });
 
     // Actions
-    async function loadProducts() {
+    async function loadProducts(): Promise<void> {
       if (products.value.length > 0) return;
 
       isLoading.value = true;
@@ -55,24 +55,24 @@ export const useProductStore = defineStore(
         isLoading.value = false;
       }
     }
-    function updateCurrentCategory(category: string | null) {
+    function updateCurrentCategory(category: string | null): void {
       currentCategory.value = category;
     }
-    function addProductToStore(product: productCatalog) {
+    function addProductToStore(product: productCatalog): void {
       products.value.push(product);
     }
-    function removeProductFromStore(id: number) {
+    function removeProductFromStore(id: number): void {
       const index = products.value.findIndex((p) => p.id === id);
       if (index !== -1) {
         products.value.splice(index, 1);
       }
     }
-    function updateProductInStore(product: productCatalog) {
+    function updateProductInStore(product: productCatalog): void {
       products.value = products.value.map((p) =>
         p.id === product.id ? product : p
       );
     }
-    function setAdminDisplay(isAdmin: boolean) {
+    function setAdminDisplay(isAdmin: boolean): void {
       adminDisplay.value = isAdmin;
     }
 

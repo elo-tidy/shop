@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
+import type { Database } from "../../../../shared/types/database.ts";
 
 export function getSupabaseClient() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -8,5 +9,5 @@ export function getSupabaseClient() {
     throw new Error("Missing Supabase env vars");
   }
 
-  return createClient(supabaseUrl, serviceRoleKey);
+  return createClient<Database>(supabaseUrl, serviceRoleKey);
 }

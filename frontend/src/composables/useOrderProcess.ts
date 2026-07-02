@@ -1,13 +1,17 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 // Types
-import type { cartProduct, CartType, Order } from "@shared/types/Cart";
+import type { cartProduct, CartType } from "@shared/types/Cart";
+import type { Order } from "@shared/types/Order";
 import type { Transporter } from "@shared/types/ShippingMode";
-import type { ResolvePaymentIntentInput } from "@shared/types/stripe";
+import type {
+  ResolvePaymentIntentInput,
+  ResolvePaymentIntentResponse,
+} from "@shared/types/stripe";
+import type { PaymentIntentResult } from "@stripe/stripe-js";
 // Stores
 import { useCartStore } from "@/store/CartStore";
 import { useOrderStore } from "@/store/OrderStore";
-import { usecheckoutStepper } from "@/store/OrderStepperStore";
 import { usePaymentStore } from "@/store/StripeStore";
 // Api
 import { addOrder } from "@/api/order";
@@ -62,7 +66,7 @@ export function useOrderProcess() {
 
     return order;
   }
-  async function deleteOrder(orderId: Order["id"]) {
+  async function deleteOrder(orderId: Order["id"]): Promise<boolean> {
     try {
       return await deleteOrderFromBdd(orderId);
     } catch (err) {
@@ -71,7 +75,7 @@ export function useOrderProcess() {
       return false;
     }
   }
-  async function resetOrder(order?: Order | null) {
+  async function resetOrder(order?: Order | null): Promise<boolean> {
     const last = order ?? await loadLastOrder();
     if (!last) return false;
     const paymentStore = usePaymentStore();
@@ -84,7 +88,7 @@ export function useOrderProcess() {
     }
 
     const current = orderStore.orderModel;
-    if (!current) return false;
+    if (!current?.data.id) return false;
     const deleted = await deleteOrder(current.data.id);
 
     if (!deleted) {
@@ -96,12 +100,12 @@ export function useOrderProcess() {
   }
 
   // Stripe payment
-  async function resolveOrderPayment() {
+  async function resolveOrderPayment(): Promise<ResolvePaymentIntentResponse> {
     const order = orderStore.orderModel?.data;
     const amount = orderStore.totalPriceInCents;
     if (!order) throw new Error("Order missing");
 
-    const payload: ResolvePaymentIntentInput = {
+    const payload = {
       paymentIntentId: order.payment_ID ?? "",
       amount: amount,
       currency: "eur",
@@ -115,14 +119,16 @@ export function useOrderProcess() {
 
     return await resolvePaymentIntent(payload);
   }
-  async function verifyStripePayment(clientSecret: string) {
+  async function verifyStripePayment(
+    clientSecret: string,
+  ): Promise<PaymentIntentResult | null> {
     const stripe = await stripePromise;
     if (!stripe) return null;
     return await stripe.retrievePaymentIntent(clientSecret);
   }
-  async function confirmPaidOrder() {
+  async function confirmPaidOrder(): Promise<Order | null> {
     const data = await loadLastOrder("paid");
-    if (!data) return;
+    if (!data) throw new Error("Order not found");
     orderStore.setOrder(data);
     return data;
   }
@@ -139,7 +145,7 @@ export function useOrderProcess() {
       })),
     };
   }
-  async function syncCartWithOrder() {
+  async function syncCartWithOrder(): Promise<void> {
     // Get transporter
     const transporterId = orderStore.deliveryDetails?.transporter?.id;
     if (!transporterId) {
@@ -156,16 +162,27 @@ export function useOrderProcess() {
 
     const mappedBdd = mapOrder(bddOrder);
     const mappedLocal = mapOrder(localOrder);
+
     const isIdentical =
-      JSON.stringify(mappedLocal) === JSON.stringify(mappedBdd);
+      mappedLocal.delivery_carrier === mappedBdd.delivery_carrier &&
+      mappedLocal.products.length === mappedBdd.products.length &&
+      mappedLocal.products.every((p, i) =>
+        p.id === mappedBdd.products[i].id &&
+        p.quantity === mappedBdd.products[i].quantity
+      );
+
     if (isIdentical) return;
 
     // If bdd and local order are different, re-create order
     await resetOrder(bddOrder);
+    const paymentIntentId = paymentStore.paymentIntentId;
+    if (!paymentIntentId) {
+      throw new Error("Missing payment intent");
+    }
     await createOrder(
       cartStore.cart,
       transporterId,
-      paymentStore.paymentIntentId!,
+      paymentIntentId,
     );
   }
 

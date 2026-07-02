@@ -7,7 +7,9 @@ import { supabase } from "@/utils/supabase";
 export async function resolvePaymentIntent(
   payload: ResolvePaymentIntentInput,
 ): Promise<ResolvePaymentIntentResponse> {
-  const { data, error } = await supabase.functions.invoke(
+  const { data, error } = await supabase.functions.invoke<
+    ResolvePaymentIntentResponse
+  >(
     "payment-resolve",
     {
       body: payload,
@@ -17,5 +19,8 @@ export async function resolvePaymentIntent(
     console.error("resolvePaymentIntent error:", error);
     throw new Error("Failed to resolve PaymentIntent");
   }
-  return data as ResolvePaymentIntentResponse;
+  if (!data) {
+    throw new Error("No data returned");
+  }
+  return data;
 }

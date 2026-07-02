@@ -23,37 +23,47 @@ export type productCatalog = z.infer<typeof productCatalogSchema>;
 export const productFormSchema = z.object({
   id: z.number().optional(),
   title: z.string().min(1, "Titre obligatoire"),
-  price: z.coerce.number(),
+  price: z.coerce.number().positive(),
   description: z.string().nullable().optional(),
   image: z.string().nullable().optional(),
   category: categoryEnum.optional(),
   stock: z.number().min(0),
-  archived: z.enum(["true", "false"]),
+  // archived: z.enum(["true", "false"]),
+  archived: z.boolean().nullable(),
   // archived: z.string().optional(),
 });
 export type productForm = z.infer<typeof productFormSchema>;
 
 // Backend
 export const productAddSchema = z.object({
-  id: z.number().optional(),
+  // id: z.number().optional(),
   title: z.string().min(1, "Le titre est obligatoire"),
   price: z.number()
     .min(0, "Le prix doit être positif")
     .refine((val: number) => val > 0, {
       message: "Le prix est obligatoire",
     }),
-  description: z.string().min(1, "La description est obligatoire"),
+  description: z.string().nullable(),
   image: z.string()
-    .min(1, "L'url de l'image est obligatoire")
-    .pipe(z.string().url("L'url est invalide")),
+    // .min(1, "L'url de l'image est obligatoire")
+    // .pipe(z.string().url("L'url est invalide"))
+    .url("L'url est invalide")
+    .nullable(),
   // category: z.string().min(1, "La catégorie est obligatoire"),
-  category: z.union([
+  /*category: z.union([
     z.enum(["electronics", "jewelery", "mens clothing", "womens clothing"]),
     z.undefined(),
   ]).refine((val: unknown) => val !== undefined, {
     message: "La catégorie est obligatoire",
-  }),
-  archived: z.enum(["true", "false"]),
+  }),*/
+  category: z.enum([
+    "electronics",
+    "jewelery",
+    "mens clothing",
+    "womens clothing",
+  ]),
+
+  archived: z.boolean().nullable(),
   stock: z.number().min(0),
   // product_stock:  z.object({
   //   quantity: z.number().min(0, "La quantité doit être renseignée")
@@ -66,3 +76,12 @@ export const productDeleteSchema = z.object({
   id: z.number().min(1, "L'id du produit est obligatoire"),
 });
 export type productDelete = z.infer<typeof productDeleteSchema>;
+
+// Api
+export type productCreateApi = productForm;
+
+export type productUpdateApi = productForm & {
+  id: number;
+};
+
+export type productApiResponse = productCatalog;

@@ -3,10 +3,7 @@ import { AuthMiddleware } from "../_shared/jwt/default.ts";
 import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
-import {
-  type productDelete,
-  productDeleteSchema,
-} from "@shared/types/Product.ts";
+import { productDeleteSchema } from "@shared/types/Product.ts";
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
@@ -35,7 +32,7 @@ Deno.serve((req) =>
       return errorResponse("L'id du produit est obligatoire", 400);
     }
 
-    let validatedId: productDelete["id"];
+    let validatedId: number;
     try {
       validatedId = productDeleteSchema.parse({ id: productId }).id;
     } catch (err) {
@@ -52,18 +49,19 @@ Deno.serve((req) =>
     // Check if product exist
     const { data: productData, error: productError } = await supabaseClient
       .from("products")
-      .select()
-      .eq("id", validatedId);
+      .select("id")
+      .eq("id", validatedId)
+      .maybeSingle();
 
     if (productError) return errorResponse(productError.message, 400);
-    if (!productData || productData.length === 0) {
+    if (!productData) {
       return errorResponse("Produit introuvable", 404);
     }
 
     // Product cascade
     const { data: cascadeData, error: cascadeError } = await supabaseClient
       .from("carts_products")
-      .select()
+      .select("product_id")
       .eq("product_id", validatedId);
 
     if (cascadeError) {
@@ -71,12 +69,13 @@ Deno.serve((req) =>
     }
 
     // If cascade, archive
-    if (cascadeData && cascadeData.length > 0) {
+    if (cascadeData.length > 0) {
       const { data: archivedData, error: archivedError } = await supabaseClient
         .from("products")
         .update({ archived: true })
         .eq("id", validatedId)
-        .select();
+        .select()
+        .single();
 
       if (archivedError) return errorResponse(archivedError.message, 400);
       return jsonResponse({
@@ -90,7 +89,8 @@ Deno.serve((req) =>
       .from("product_stock")
       .delete()
       .eq("product_id", validatedId)
-      .select();
+      .select()
+      .single();
 
     if (stockError) return errorResponse(stockError.message, 400);
 
@@ -104,7 +104,7 @@ Deno.serve((req) =>
 
     if (deletedError) return errorResponse(deletedError.message, 400);
 
-    const data = { ...deletedData, stock: stockData[0].quantity };
+    const data = { ...deletedData, stock: stockData.quantity ?? 0 };
 
     return jsonResponse({ message: "Produit supprimé avec succès", data });
   })

@@ -9,15 +9,15 @@ export const usePaymentStore = defineStore(
     const stripeLoaded = ref<boolean>(true);
 
     // Actions
-    function resetPayment() {
+    function resetPayment(): void {
       paymentIntentId.value = null;
       setStripeLoaded(true);
     }
-    function initWithExistingPi(pi: string) {
+    function initWithExistingPi(pi: string): void {
       paymentIntentId.value = pi;
       setStripeLoaded(false);
     }
-    function setStripeLoaded(arg: boolean) {
+    function setStripeLoaded(arg: boolean): void {
       stripeLoaded.value = arg;
     }
 

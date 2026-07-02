@@ -4,6 +4,11 @@ import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
 import { type productAdd, productAddSchema } from "@shared/types/Product.ts";
+import type { Database, Tables } from "@shared/types/database";
+
+type ProductCreateResponse = Tables<"products"> & {
+  stock: number;
+};
 
 Deno.serve((req) =>
   AuthMiddleware(req, async (req) => {
@@ -45,10 +50,12 @@ Deno.serve((req) =>
     const { data: newProductData, error: newroductError } = await supabaseClient
       .from("products")
       .insert(rest)
-      .select()
-      .single();
+      .single<Tables<"products">>();
 
     if (newroductError) return jsonResponse(newroductError, 400);
+    if (!newProductData) {
+      return errorResponse("Produit introuvable", 404);
+    }
 
     // Stock insertion
     const { data: stockData, error: stockError } = await supabaseClient
@@ -60,9 +67,11 @@ Deno.serve((req) =>
 
     if (stockError) return jsonResponse(stockError, 400);
 
-    const data = { ...newProductData, stock: stock };
+    const response: ProductCreateResponse = {
+      ...newProductData,
+      stock,
+    };
 
-    // response
-    return jsonResponse(data, 201);
+    return jsonResponse(response, 201);
   })
 );

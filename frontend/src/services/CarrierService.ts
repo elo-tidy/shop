@@ -15,14 +15,14 @@ export async function getCarrierDetails(
 ): Promise<
     {
         deliveryMode: DeliveryMode["name"];
-        deliveryDate: String | null;
+        deliveryDate: string | null;
         transporter: Transporter;
     }
 > {
-    const carriers: ShippingMode = await fetchShippingOptions();
+    const carriers = await fetchShippingOptions();
     for (const deliveryMode of carriers.delivery_modes) {
         const found = deliveryMode.transporters.find(
-            (carrier) => carrier.id === carrierId,
+            (carrier: Transporter) => carrier.id === carrierId,
         );
         if (found) {
             const deliveryDate = estimatedDelivery(

@@ -44,7 +44,7 @@ const isStepVisible = (i: number, steps: stepType[]): boolean => {
 <template>
   <div class="sticky -top-10 border bg-background h-[calc(100dvh-48px)]">
     <h2 class="text-[23px] px-10 pt-5">Récapitulatif de ma commande</h2>
-    <div class="px-10 mb-5 max-h-[calc(100dvh-48px-74.5px-calc(var(--spacing)*5)))] overflow-auto">
+    <div class="px-10 mb-5 max-h-[calc(100dvh-48px-74.5px-(--spacing(5)))] overflow-auto">
       <template v-for="(sumContent, index) in contents" :key="index">
         <template v-if="isStepVisible(Number(index), stepStore.getSteps)">
           <checkoutSummaryContent

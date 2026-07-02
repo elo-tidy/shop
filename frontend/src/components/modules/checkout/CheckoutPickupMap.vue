@@ -272,11 +272,7 @@ watch(
 </script>
 <template>
   <div class="mt-10 grid grid-cols-[auto_auto_1fr] gap-2 items-center" v-if="displayMap()">
-    <Button
-      type="button"
-      v-if="map instanceof L.Map"
-      @click="geolocalisateMe(map)"
-      class="max-w-[120px]"
+    <Button type="button" v-if="map instanceof L.Map" @click="geolocalisateMe(map)" class="max-w-30"
       >Me géolocaliser</Button
     >
     <p class="text-center px-4">Ou</p>
@@ -312,7 +308,7 @@ watch(
   /> -->
     <p class="mb-3 col-span-3">Choisissez un point dans la carte</p>
     <div :class="['map-container relative col-span-3 isolate', { isLoading: loading }]">
-      <div id="map" class="h-[500px] w-[500px] z-0"></div>
+      <div id="map" class="h-125 w-125 z-0"></div>
       <div
         v-if="loading"
         class="loader absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-1"

@@ -5,7 +5,7 @@ export async function requireUser(req: Request) {
   const token = req.headers.get("Authorization") || undefined;
   const user = await getUserFromToken(token);
 
-  if (!user) { throw new Error("Unauthorized"); }
+  if (!user) throw new Error("Unauthorized");
   const supabaseClient = getSupabaseClient();
 
   return { user, supabaseClient };

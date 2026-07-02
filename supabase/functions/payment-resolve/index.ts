@@ -1,7 +1,11 @@
 import Stripe from "stripe";
 import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
-import { ResolvePaymentIntentInputSchema } from "@shared/types/stripe.ts";
+import {
+  type ResolvePaymentIntentInput,
+  ResolvePaymentIntentInputSchema,
+  ResolvePaymentIntentResponseSchema,
+} from "@shared/types/stripe.ts";
 
 Deno.serve(async (req) => {
   const corsResult = handleCors(req);
@@ -15,7 +19,7 @@ Deno.serve(async (req) => {
     return errorResponse("Method not allowed", 405);
   }
 
-  let body;
+  let body: ResolvePaymentIntentInput;
   try {
     body = ResolvePaymentIntentInputSchema.parse(await req.json());
   } catch (e) {
@@ -104,13 +108,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    return jsonResponse(
-      {
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id,
-      },
-      200,
-    );
+    if (!paymentIntent || !paymentIntent.client_secret) {
+      return errorResponse("Invalid payment intent", 500);
+    }
+
+    const data = ResolvePaymentIntentResponseSchema.parse({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+    });
+
+    return jsonResponse(data, 200);
   } catch (err) {
     console.error("Stripe error:", err);
     return errorResponse("Stripe failure", 500);

@@ -14,12 +14,19 @@ export async function fetchAllProducts(): Promise<productCatalog[]> {
   if (error) {
     throw new Error("Erreur lors du chargement des produits");
   }
+  if (!data) {
+    throw new Error("No data returned");
+  }
   // extract stock within item
-  const mappedData = data.map((item) => ({
-    ...item,
-    stock: item.product_stock?.quantity ?? 0,
-  })).map(({ product_stock, ...rest }) => rest);
+  const mappedData = data.map((item) => {
+    const stock = item.product_stock?.quantity ?? 0;
+    const { product_stock, ...rest } = item;
 
+    return {
+      ...rest,
+      stock,
+    };
+  });
   return mappedData;
 }
 
@@ -30,5 +37,5 @@ export async function fetchAllProductCategories(): Promise<
   if (error) {
     throw new Error("Erreur lors du chargement des catégories");
   }
-  return (data ?? []) as Database["public"]["Enums"]["categories"][];
+  return data as Database["public"]["Enums"]["categories"][];
 }

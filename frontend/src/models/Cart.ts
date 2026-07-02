@@ -1,4 +1,5 @@
 import type { cartProduct, CartType } from "@shared/types/Cart";
+import type { productCatalog } from "@shared/types/Product";
 export class Cart {
   constructor(private cart: CartType) {}
 
@@ -6,11 +7,11 @@ export class Cart {
     return this.cart;
   }
 
-  get id() {
+  get id(): CartType["id"] {
     return this.cart.id;
   }
 
-  get products() {
+  get products(): cartProduct[] {
     return this.cart.products;
   }
 
@@ -27,28 +28,24 @@ export class Cart {
     return this.cart.products.reduce(
       (totalPrice: number, product: cartProduct) => {
         return Math.round(
-          (totalPrice + (product.quantity ?? 0) * product.price) * 100,
+          (totalPrice + product.quantity * product.price) * 100,
         ) / 100;
       },
       0,
     );
   }
 
-  getProduct(productId: number) {
-    return this.cart.products.find((p) => p.id === productId);
+  getProduct(productId: number): cartProduct | undefined {
+    return this.cart.products.find((p: cartProduct) => p.id === productId);
   }
 
   getItemQuantity(productId: number): cartProduct["quantity"] {
     const product = this.getProduct(productId);
-    return product?.quantity ?? 0;
+    if (!product) throw new Error("Product not found");
+    return product.quantity;
   }
 
-  getItemArchivedStatus(productId: number): cartProduct["archived"] {
-    const product = this.getProduct(productId);
-    return product?.archived ?? false;
-  }
-
-  addItemToCart(product: cartProduct, itemQuantity: number) {
+  addItemToCart(product: cartProduct, itemQuantity: number): void {
     if (itemQuantity <= 0) return;
     const existingProduct = this.getProduct(product.id);
 
@@ -59,29 +56,34 @@ export class Cart {
     existingProduct.quantity += itemQuantity;
   }
 
-  deleteItemFromCart(productId: cartProduct["id"]) {
-    const index = this.cart.products.findIndex((p) => p.id === productId);
+  deleteItemFromCart(productId: cartProduct["id"]): void {
+    const index = this.cart.products.findIndex((p: cartProduct) =>
+      p.id === productId
+    );
     if (index !== -1) this.cart.products.splice(index, 1);
   }
 
-  updateItemQuantity(productId: number, addOrRemove: "add" | "remove") {
+  updateItemQuantity(
+    productId: cartProduct["id"],
+    addOrRemove: "add" | "remove",
+  ): void {
     addOrRemove === "add"
       ? this.increaseQuantity(productId)
       : this.decreaseQuantity(productId);
   }
 
-  increaseQuantity(productId: number) {
+  increaseQuantity(productId: cartProduct["id"]): void {
     const product = this.getProduct(productId);
     if (!product) return;
-    product.quantity = (product.quantity ?? 0) + 1;
+    product.quantity = product.quantity + 1;
   }
 
-  decreaseQuantity(productId: number) {
+  decreaseQuantity(productId: cartProduct["id"]): void {
     const product = this.getProduct(productId);
     if (!product) return;
-    product.quantity = Math.max((product.quantity ?? 0) - 1, 0);
+    product.quantity = Math.max(product.quantity - 1, 0);
   }
-  clearCart() {
+  clearCart(): void {
     this.cart.products.splice(0);
   }
 }

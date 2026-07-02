@@ -123,7 +123,7 @@ const stockClassAlert = computed((): string | undefined => {
         </component>
       </ProductTitle>
       <div class="flex flex-row-reverse items-center">
-        <CardDescription class="price text-primary max-w-[100px]">
+        <CardDescription class="price text-primary max-w-25">
           {{ formattedPrice }}
         </CardDescription>
       </div>

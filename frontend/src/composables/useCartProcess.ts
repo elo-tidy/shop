@@ -10,8 +10,9 @@ import { useCartStore } from "@/store/CartStore";
 export function useCartProcess() {
   const cartStore = useCartStore();
 
+  const totalItems = computed(() => cartStore.getCartTotalItems);
   const wordingTotalNumberOfItem = computed(() => {
-    return cartStore.getCartTotalItems > 1 ? "articles" : "article";
+    return totalItems.value > 1 ? "articles" : "article";
   });
 
   // Notify user that item has been added to cart
@@ -22,7 +23,7 @@ export function useCartProcess() {
           h("p", "Le produit a été ajouté au panier."),
           h(
             "p",
-            `Vous avez ${cartStore.getCartTotalItems} ${wordingTotalNumberOfItem.value} dans votre panier.`,
+            `Vous avez ${totalItems.value} ${wordingTotalNumberOfItem.value} dans votre panier.`,
           ),
           h("div", {
             innerHTML:
@@ -42,11 +43,11 @@ export function useCartProcess() {
     toast(markRaw(customToast));
   };
 
-  const deleteThisProductfromCart = async (productId: number) => {
+  const deleteThisProductfromCart = (productId: number) => {
     cartStore.deleteFromCart(productId);
   };
 
-  const updateItemQuantity = async (
+  const updateItemQuantity = (
     productId: number,
     addOrRemove: "add" | "remove",
   ) => {
@@ -54,14 +55,15 @@ export function useCartProcess() {
     cartStore.updateItemQuantity(productId, addOrRemove);
   };
 
-  function isCatalogProduct(p: any): p is productCatalog {
-    return "stock" in p;
+  function isCatalogProduct(p: unknown): p is productCatalog {
+    return typeof p === "object" && p !== null && "stock" in p;
   }
+
   const limitUpdateQty = (
     productId: cartProduct["id"],
     addOrRemove?: "add" | "remove",
   ): boolean => {
-    const product = cartStore.getCartProductsById(productId!);
+    const product = cartStore.getCartProductsById(productId);
     if (!product || !isCatalogProduct(product)) return false;
     if (product.quantity >= product.stock && addOrRemove === "add") {
       return true;

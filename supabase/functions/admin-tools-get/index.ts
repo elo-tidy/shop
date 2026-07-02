@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { AuthMiddleware } from "../_shared/jwt/default.ts";

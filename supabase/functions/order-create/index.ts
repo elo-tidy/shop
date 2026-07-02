@@ -4,10 +4,11 @@ import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireUser } from "../_shared/utils/requireUser.ts";
 import {
+  type CartBackEndType,
   cartTypeBackEndSchema,
-  type Order,
   productBackEndSchema,
 } from "@shared/types/Cart.ts";
+import { orderSchema } from "@shared/types/Order.ts";
 import { type Database } from "@shared/types/database.ts";
 import deliveryData from "@shared/data/shipping-options.json" with {
   type: "json",
@@ -42,7 +43,7 @@ Deno.serve((req) =>
     }
 
     // body check
-    let body;
+    let body: CartBackEndType;
     try {
       const json = await req.json();
       body = cartTypeBackEndSchema.parse(json);
@@ -60,12 +61,15 @@ Deno.serve((req) =>
 
     // Check if products exist and are not archived
     const productIds = body.products.map((p) => p.id);
-    const { data: productsData } = await supaClient
+    const { data: productsData, error: prodError } = await supaClient
       .from("products")
       .select(`id, price, archived, title, image, category, description`)
       .eq("archived", false)
       .in("id", productIds);
 
+    if (prodError) {
+      return errorResponse(prodError.message, 400);
+    }
     if (!productsData || productsData.length !== productIds.length) {
       return errorResponse("Certains produits sont invalides", 400);
     }
@@ -76,33 +80,52 @@ Deno.serve((req) =>
       .find((t) => t.id === body.delivery_carrier);
 
     if (!transporter) {
-      throw new Error(`Transporteur introuvable: ${body.delivery_carrier}`);
+      return errorResponse(
+        `Transporteur introuvable: ${body.delivery_carrier}`,
+        400,
+      );
     }
 
     // Check if payment intent exist
     if (!payment_ID) {
-      throw new Error(`Identification du paiement introuvable`);
+      return errorResponse(`Identification du paiement introuvable`, 400);
     }
 
     // Check if stock exist
-    const { data: stocks } = await supaClient
+    const { data: stocks, error: stockError } = await supaClient
       .from("product_stock")
       .select("product_id, quantity")
       .in("product_id", productIds);
 
+    if (stockError) {
+      return errorResponse(stockError.message, 400);
+    }
     if (!stocks || stocks.length !== productIds.length) {
       return errorResponse("Stock introuvable pour certains produits", 400);
     }
 
     // normalize cart
+    for (const item of body.products) {
+      const product = productsData.find((p) => p.id === item.id);
+      const stock = stocks.find((s) => s.product_id === item.id);
+
+      if (!product) {
+        return errorResponse(`Produit introuvable : ${item.id}`, 400);
+      }
+
+      if (!stock) {
+        return errorResponse(`Stock introuvable : ${item.id}`, 400);
+      }
+
+      if (stock.quantity !== null && stock.quantity < item.quantity) {
+        return errorResponse(
+          `Stock insuffisant pour le produit ${item.id}`,
+          400,
+        );
+      }
+    }
     const cartProductsFromBody = body.products.map((item) => {
       const product = productsData.find((p) => p.id === item.id)!;
-      const stock = stocks.find((s) => s.product_id === item.id)!;
-
-      // check stock
-      if (stock.quantity < item.quantity) {
-        throw new Error(`Stock insuffisant pour le produit ${item.id}`);
-      }
 
       return productBackEndSchema.parse({
         id: product.id,
@@ -116,6 +139,7 @@ Deno.serve((req) =>
     });
 
     // Prices calculation
+
     const productsPrice = calculateProductsPrice(cartProductsFromBody);
     const totalPrice = calculateTotalPrice(cartProductsFromBody, {
       delivery_price: transporter.price,
@@ -127,11 +151,11 @@ Deno.serve((req) =>
       transporter.estimated_delivery_time,
     );
     if (!isoDateStr) {
-      throw new Error("Date estimée de livraison introuvable");
+      return errorResponse("Date estimée de livraison introuvable", 400);
     }
     const deliveryDate = new Date(isoDateStr);
     if (isNaN(deliveryDate.getTime())) {
-      throw new Error("Date de livraison invalide");
+      return errorResponse("Date de livraison invalide", 400);
     }
     const isoStringDateOnly = deliveryDate.toISOString().split("T")[0];
 
@@ -144,7 +168,7 @@ Deno.serve((req) =>
       .select("id")
       .single();
 
-    if (cartError) throw cartError;
+    if (cartError) return errorResponse(cartError.message, 400);
 
     // Products insertion
     const cartProducts = cartProductsFromBody.map((p) => {
@@ -158,10 +182,10 @@ Deno.serve((req) =>
 
     const { data: productData, error: productsError } = await supaClient
       .from("carts_products")
-      .insert(cartProducts)
-      .select();
+      .insert(cartProducts);
+    // .select();
 
-    if (productsError) throw productsError;
+    if (productsError) return errorResponse(productsError.message, 400);
 
     // Order insertion
     const { data, error: errorOrder } = await supaClient
@@ -177,7 +201,7 @@ Deno.serve((req) =>
           total_price: totalPrice,
           user_id: userId,
           payment_ID: payment_ID,
-        } as Database["public"]["Tables"]["orders"]["Insert"],
+        },
       )
       .select("id")
       .single();
@@ -185,7 +209,7 @@ Deno.serve((req) =>
     if (errorOrder) return jsonResponse(errorOrder, 400);
 
     // Mapping result
-    const order: Order = {
+    const order = orderSchema.parse({
       id: data.id,
       user_id: userId,
       cart_id: cart.id,
@@ -218,7 +242,7 @@ Deno.serve((req) =>
           category: item.category,
         })),
       },
-    };
-    return jsonResponse(JSON.stringify(order), 201);
+    });
+    return jsonResponse(order, 201);
   })
 );
