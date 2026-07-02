@@ -29,6 +29,11 @@ export const orderSchema = z.object({
 });
 export type Order = z.infer<typeof orderSchema>;
 
+export const orderDeleteSchema = z.object({
+    id: z.string(),
+});
+export type orderDelete = z.infer<typeof orderDeleteSchema>;
+
 // Backend
 export const orderBackEndSchema = z.object({
     id: z.string(),
@@ -74,7 +79,8 @@ export const orderBackEndSchema = z.object({
                     .object({
                         stock: z.object({
                             quantity: z.number().nullable(),
-                        }),
+                        })
+                            .nullable(),
                     })
                     .optional(),
             }),

@@ -2,7 +2,7 @@ import { ref } from "vue";
 import { useRoute } from "vue-router";
 // Types
 import type { cartProduct, CartType } from "@shared/types/Cart";
-import type { Order } from "@shared/types/Order";
+import type { Order, orderDelete } from "@shared/types/Order";
 import type { Transporter } from "@shared/types/ShippingMode";
 import type {
   ResolvePaymentIntentInput,
@@ -17,12 +17,11 @@ import { usePaymentStore } from "@/store/StripeStore";
 import { addOrder } from "@/api/order";
 import { resolvePaymentIntent } from "@/api/payment";
 // Services
-import {
-  deleteOrderFromBdd,
-  getOrderService,
-} from "@shared/services/SupabaseServices";
+import { getOrderService } from "@shared/services/SupabaseServices";
 // Utils
 import { stripePromise } from "@/utils/stripe";
+// Api
+import { deleteOrderApi } from "@/api/order";
 
 export function useOrderProcess() {
   const route = useRoute();
@@ -66,13 +65,15 @@ export function useOrderProcess() {
 
     return order;
   }
-  async function deleteOrder(orderId: Order["id"]): Promise<boolean> {
+  async function deleteOrder(
+    orderId: orderDelete["id"],
+  ): Promise<{ message: string; data: { id: string } }> {
     try {
-      return await deleteOrderFromBdd(orderId);
+      return await deleteOrderApi({ id: orderId });
     } catch (err) {
       console.error(err);
       error.value = true;
-      return false;
+      throw err;
     }
   }
   async function resetOrder(order?: Order | null): Promise<boolean> {
@@ -89,7 +90,7 @@ export function useOrderProcess() {
 
     const current = orderStore.orderModel;
     if (!current?.data.id) return false;
-    const deleted = await deleteOrder(current.data.id);
+    const deleted = await deleteOrderApi({ id: current.data.id });
 
     if (!deleted) {
       throw new Error("Order deletion failed");

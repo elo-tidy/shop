@@ -1,5 +1,5 @@
 // Types
-import type { Order, OrderDb } from "@shared/types/Cart";
+import type { Order, OrderDb } from "@shared/types/Order";
 import type { Database } from "@shared/types/database.ts";
 import type { Category } from "@shared/types/Categories.ts";
 // Utils
@@ -18,39 +18,37 @@ export async function getUserProfile() {
 	if (error || !data) {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
-	return { data, error };
+	const userId = data?.session?.user.id;
+	if (!userId) {
+		throw new Error("Utilisateur non connecté ou session invalide");
+	}
+
+	const { data: profiles, error: profilesError } = await supabase
+		.from("profiles")
+		.select("*")
+		.eq("id", userId)
+		.single();
+
+	if (profilesError || !profiles) throw new Error("Profil introuvable");
+
+	return { profiles, profilesError };
 }
 
 export async function isAdmin(): Promise<boolean> {
-	const { data: sessionData, error: sessionError } = await getUserProfile();
+	const { profiles: sessionData, profilesError: sessionError } =
+		await getUserProfile();
 	if (sessionError || !sessionData) {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
-	const userId = sessionData?.session?.user.id!;
 
 	const { data, error } = await supabase
 		.from("profiles")
 		.select("role")
-		.eq("id", userId)
+		.eq("id", sessionData.id)
 		.single();
 	if (error) throw error;
 
 	return data.role === "admin" ? true : false;
-}
-
-export async function updateProfileService(
-	userId: string,
-	userName: string,
-): Promise<void> {
-	const updates: Database["public"]["Tables"]["profiles"]["Update"] = {
-		username: userName,
-		updated_at: new Date().toISOString(),
-	};
-	const { error } = await supabase
-		.from("profiles")
-		.update(updates)
-		.eq("id", userId);
-	if (error) throw error;
 }
 
 export async function signOutService(): Promise<void> {
@@ -195,71 +193,6 @@ export async function updatePaymentOrderService(
 	return mappedData;
 }
 
-export async function deleteOrderFromBdd(
-	OrderID: Order["id"],
-): Promise<boolean> {
-	// Récupérer la commande
-	const orderData = await getOrderService(undefined, OrderID);
-
-	if (!orderData || !orderData.id) {
-		console.error("Commande introuvable pour l'ID :", OrderID);
-		return false;
-	}
-
-	if (!orderData.cart_id) {
-		console.error("Panier introuvable pour orderID  :", OrderID);
-		return false;
-	}
-
-	// Supprimer les produits liés au panier
-	if (orderData.cart_id) {
-		const { error: errorProducts } = await supabase
-			.from("carts_products")
-			.delete()
-			.eq("cart_id", orderData.cart_id);
-
-		if (errorProducts) {
-			console.error(
-				"Erreur de suppression des produits du panier :",
-				errorProducts,
-			);
-			return false;
-		}
-	} else {
-		console.warn("Pas de cart_id associé, aucun produit à supprimer");
-	}
-
-	// Supprimer la commande
-	if (orderData.id) {
-		const { error: errorOrder } = await supabase
-			.from("orders")
-			.delete()
-			.eq("id", orderData.id)
-			.select();
-
-		if (errorOrder) {
-			console.error("Erreur de suppression de la commande :", errorOrder);
-			return false;
-		}
-	} else {
-		console.warn("Pas de commande associée à cet id");
-	}
-
-	// Supprimer le panier
-	const { data, error: errorCart } = await supabase
-		.from("carts")
-		.delete()
-		.eq("id", orderData.cart_id)
-		.select();
-
-	if (errorCart) {
-		console.error("Erreur de suppression du panier en bdd :", errorCart);
-		return false;
-	}
-
-	return true;
-}
-
 export async function getOrderService(
 	payment_status?: "paid",
 	orderId?: Order["id"],
@@ -281,17 +214,18 @@ export async function getOrderService(
 	}
 
 	// Check user session
-	const { data: sessionData, error: sessionError } = await getUserProfile();
+	const { profiles: sessionData, profilesError: sessionError } =
+		await getUserProfile();
 	if (sessionError || !sessionData) {
 		throw new Error("Utilisateur non connecté ou session invalide");
 	}
-	const userId = sessionData?.session?.user.id!;
+	// const userId = sessionData?.session?.user.id!;
 
 	// select order and return order
 	const { data, error } = await supabase
 		.from("orders")
 		.select(order_select_sql)
-		.eq("user_id", userId)
+		.eq("user_id", sessionData.id)
 		.in(
 			"payment_status",
 			payment_status === "paid" ? ["paid"] : ["pending", "failed"],
