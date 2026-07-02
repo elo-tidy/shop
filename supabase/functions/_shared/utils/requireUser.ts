@@ -8,5 +8,16 @@ export async function requireUser(req: Request) {
   if (!user) throw new Error("Unauthorized");
   const supabaseClient = getSupabaseClient();
 
-  return { user, supabaseClient };
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .eq("active", true)
+    .single();
+
+  if (error || !data) {
+    throw new Error("User not found or inactive");
+  }
+
+  return { user: data, supabaseClient };
 }

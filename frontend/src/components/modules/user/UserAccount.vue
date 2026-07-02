@@ -8,13 +8,11 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
 // Services
-import {
-  getUserProfile,
-  updateProfileService,
-  signOutService,
-} from '@shared/services/SupabaseServices'
+import { getUserProfile, signOutService } from '@shared/services/SupabaseServices'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
+// Api
+import { updateUser } from '@/api/user'
 
 // Refs
 const loading = ref(true)
@@ -32,9 +30,9 @@ async function getProfile() {
   try {
     loading.value = true
     const { user } = session.value
-    const { data } = await getUserProfile(user.id)
-    if (data) {
-      username.value = data.username
+    const { profiles } = await getUserProfile(user.id)
+    if (profiles) {
+      username.value = profiles.username
     }
   } catch (error) {
     toast(error.message)
@@ -45,8 +43,7 @@ async function getProfile() {
 async function updateProfile() {
   try {
     loading.value = true
-    const { user } = session.value
-    await updateProfileService(user.id, username.value)
+    await updateUser({ username: username.value })
     toast('Mise à jour enregistrée')
   } catch (error) {
     toast(error.message)
@@ -67,7 +64,6 @@ async function signOut() {
   }
 }
 </script>
-
 <template>
   <div class="flex max-w-xl justify-between">
     <h1 class="mb-10 text-[30px]">Mon profil</h1>
@@ -80,7 +76,13 @@ async function signOut() {
         <FieldGroup>
           <Field>
             <FieldLabel for="username">Nom d'utilisateur</FieldLabel>
-            <Input id="username" class="inputField" type="text" v-model="username" />
+            <Input
+              id="username"
+              class="inputField"
+              type="text"
+              v-model="username"
+              :default-value="username"
+            />
           </Field>
           <Field>
             <FieldLabel for="email">Adresse mail</FieldLabel>
