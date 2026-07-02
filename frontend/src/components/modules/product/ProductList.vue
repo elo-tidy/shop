@@ -7,7 +7,10 @@ import { useProductStore } from '@/store/ProductStore'
 
 // Data store
 const productStore = useProductStore()
-const nbProduct = computed(() => productStore.filteredProducts.length)
+const productStoreDisplay = computed(() =>
+  props.layout === 'admin' ? productStore.products : productStore.filteredProducts,
+)
+const nbProduct = computed(() => productStoreDisplay.value.length)
 const wording = computed(() => (nbProduct.value > 1 ? 'articles' : 'article'))
 
 if (productStore.products.length === 0) {
@@ -46,7 +49,7 @@ const compLayout = computed(() =>
 
   <div v-else :class="['grid', gridClass]">
     <ProductCard
-      v-for="product in productStore.filteredProducts"
+      v-for="product in productStoreDisplay"
       :class="compLayout"
       :product
       :key="product.id"
