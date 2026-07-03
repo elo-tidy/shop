@@ -116,7 +116,12 @@ const stockClassAlert = computed((): string | undefined => {
     v-if="product"
     :class="['py-0 relative card gap-0', gridClass, compLayout, props.layout, stockClassAlert]"
   >
-    <CardHeader class="card-header grid-cols-[1fr_auto] gap-x-4">
+    <CardHeader
+      :class="[
+        'card-header grid-cols-[1fr_auto] ',
+        props.layout !== 'liste' ? 'gap-x-4' : 'gap-x-0',
+      ]"
+    >
       <ProductTitle :hn="props.hn">
         <component :is="productTitleWrapper" v-bind="productTitleWrapperProps">
           {{ productContent.productTitle }}
@@ -132,7 +137,13 @@ const stockClassAlert = computed((): string | undefined => {
     <div class="id" v-if="props.showItemId !== false && layout === 'admin'">
       <p><span class="sr-only">ID du produit : </span>{{ product.id }}</p>
     </div>
-    <div class="stock-archived grid">
+    <div
+      class="stock-archived grid"
+      v-if="
+        displayStock ||
+        (props.showItemId !== false && layout === 'admin' && modelProduct?.archived === true)
+      "
+    >
       <p v-if="displayStock" class="stock">{{ stockWording }}</p>
       <p
         v-if="props.showItemId !== false && layout === 'admin' && modelProduct?.archived === true"
@@ -149,7 +160,7 @@ const stockClassAlert = computed((): string | undefined => {
 
     <!-- v-if="layout !== 'detail' && layout !== 'admin'" -->
     <CardContent :class="['h-full card-content', displayFooter === false ? 'pb-4' : undefined]">
-      {{ productContent.productDescription }}
+      <p>{{ productContent.productDescription }}</p>
     </CardContent>
 
     <component
