@@ -32,7 +32,7 @@ onMounted(async () => {
     <li v-for="category in categories">
       <Button
         class="border border-dashed"
-        :variant="activeCategory === category ? 'default' : 'outline'"
+        :variant="storeProducts.currentCategory === category ? 'default' : 'outline'"
         @click="filterByCategory(`${category}`)"
         :aria-current="activeCategory === category ? 'true' : 'false'"
       >
@@ -43,7 +43,7 @@ onMounted(async () => {
     <li>
       <Button
         class="border border-dashed"
-        :variant="activeCategory === null ? 'default' : 'outline'"
+        :variant="storeProducts.currentCategory === null ? 'default' : 'outline'"
         @click="displayAllProduct()"
         :aria-current="activeCategory === null ? 'true' : 'false'"
         >Afficher tous les produits</Button
