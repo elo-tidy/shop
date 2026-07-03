@@ -89,8 +89,8 @@ const onSubmit = handleSubmit(async (data: productForm) => {
     } else {
       // add product
       const req = await addProduct(data)
-      dataReq.value = req.data
-      productStore.addProductToStore(req.data)
+      dataReq.value = req
+      productStore.addProductToStore(req)
       toast('Produit ajouté au catalogue avec succès')
       resetForm()
     }
@@ -267,7 +267,7 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-true"
-                            value="true"
+                            :value="true"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
@@ -280,7 +280,7 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-false"
-                            value="false"
+                            :value="false"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>

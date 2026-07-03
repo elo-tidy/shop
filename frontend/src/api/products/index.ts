@@ -6,15 +6,13 @@ import type {
   productForm,
   productUpdateApi,
 } from "@shared/types/Product";
+import { type productCatalog } from "@shared/types/Product";
 import { supabase } from "@/utils/supabase";
 
 export async function addProduct(
   product: productCreateApi,
-): Promise<{ message: string; data: productApiResponse }> {
-  const { data, error } = await supabase.functions.invoke<{
-    message: string;
-    data: productApiResponse;
-  }>(
+): Promise<productCatalog> {
+  const { data, error } = await supabase.functions.invoke<productCatalog>(
     "products-create",
     {
       body: product,

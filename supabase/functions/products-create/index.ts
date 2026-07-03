@@ -4,7 +4,7 @@ import { handleCors } from "../_shared/utils/handleCors.ts";
 import { errorResponse, jsonResponse } from "../_shared/utils/response.ts";
 import { requireAdmin } from "../_shared/utils/requireAdmin.ts";
 import { type productAdd, productAddSchema } from "@shared/types/Product.ts";
-import type { Database, Tables } from "@shared/types/database";
+import type { Database, Tables } from "@shared/types/database.ts";
 
 type ProductCreateResponse = Tables<"products"> & {
   stock: number;
@@ -50,7 +50,8 @@ Deno.serve((req) =>
     const { data: newProductData, error: newroductError } = await supabaseClient
       .from("products")
       .insert(rest)
-      .single<Tables<"products">>();
+      .select()
+      .single();
 
     if (newroductError) return jsonResponse(newroductError, 400);
     if (!newProductData) {
