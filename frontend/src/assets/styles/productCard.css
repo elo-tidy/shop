@@ -9,6 +9,13 @@
       @apply text-xs max-w-[120px]  border bg-black/50;
     }
   }
+
+  &.skeleton-card {
+    position: relative;
+    overflow: hidden;
+    background: hsl(var(--card));
+  }
+
   /********************/
   /*** catalog card ***/
   /********************/

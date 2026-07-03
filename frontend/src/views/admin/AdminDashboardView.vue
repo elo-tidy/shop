@@ -6,6 +6,7 @@ import Button from '@/components/ui/button/Button.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 // Components
 import ProductList from '@/components/modules/product/ProductList.vue'
+import AdminDashboardSkeleton from '@/components/modules/admin/AdminDashboardSkeleton.vue'
 // Store
 import { useProductStore } from '@/store/ProductStore'
 // Api
@@ -17,6 +18,7 @@ productStore.setAdminDisplay(true)
 
 // Server auth
 const grantedAccess = ref<boolean | null>(null)
+const loading = ref(true)
 const router = useRouter()
 onMounted(async () => {
   try {
@@ -27,11 +29,15 @@ onMounted(async () => {
     } else {
       throw error
     }
+  } finally {
+    loading.value = false
   }
 })
 </script>
 <template>
-  <div v-if="grantedAccess">
+  <AdminDashboardSkeleton v-if="loading" />
+
+  <div v-else>
     <h1 class="mb-10 text-[30px]">Espace administrateur</h1>
 
     <Tabs default-value="products">
