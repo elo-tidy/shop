@@ -71,7 +71,7 @@ const productFooter = computed(() => {
 
 // Product content details
 function isProduct(p: any): p is productCatalog {
-  return 'stock' in p && 'archived' in p
+  return !!p && typeof p === 'object' && 'stock' in p
 }
 const productRef = computed(() => (isProduct(props.product) ? props.product : null))
 const { product: modelProduct, formattedPrice, imageAlt } = useProductModel(productRef)
