@@ -25,10 +25,10 @@
 
     .card-header {
       a::before {
-        @apply absolute top-[0] left-[0] w-full h-full content-[''];
+        @apply absolute top-0 left-0 w-full h-full content-[''];
       }
       .price {
-        @apply absolute px-2 py-1 top-[0] right-[0] bg-transparent;
+        @apply absolute px-2 py-1 top-0 right-0 bg-transparent;
       }
     }
 
@@ -53,7 +53,7 @@
   /********************/
 
   &.grid-tpl {
-    @apply grid max-w-4xl p-5 grid-rows-[auto_auto_1fr_0] grid-cols-[repeat(8,_1fr)];
+    @apply grid max-w-4xl p-5 grid-rows-[auto_auto_1fr_0] grid-cols-[repeat(8,1fr)];
     .card-header {
       @apply row-start-1 row-end-2;
     }
@@ -145,7 +145,7 @@
       button {
         position-anchor: --nbQuantity;
         top: anchor(50%);
-        @apply absolute -translate-y-[50%];
+        @apply absolute translate-y-[-50%];
 
         &.remove-quantity {
           left: anchor(left);
@@ -161,7 +161,7 @@
       + .delete-item {
         @apply relative;
         &::before {
-          @apply absolute w-[1px] h-full top-0 content-[''] bg-(--color-border) -left-8;
+          @apply absolute w-px h-full top-0 content-[''] bg-(--color-border) -left-8;
         }
       }
     }
@@ -172,12 +172,12 @@
   /*********************/
   &.admin {
     .stock-txt {
-      @apply absolute top-[50%] right-0 translate-x-[calc(100%+2rem)] -translate-y-[50%] ml-2  pb-2 pt-10 bg-no-repeat bg-position-[50%_8px] text-(--primary) bg-size-[2rem_auto] font-bold;
+      @apply absolute top-[50%] right-0 translate-x-[calc(100%+2rem)] translate-y-[-50%] ml-2  pb-2 pt-10 bg-no-repeat bg-position-[50%_8px] text-(--primary) bg-size-[2rem_auto] font-bold;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --%3E%3Cpath fill='%23facc15' d='M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zm1.725-2h15.1L12 6zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15m0-2.5'/%3E%3C/svg%3E");
     }
     &.stock-alert,
     &.stock-null {
-      @apply border-1 border-(--primary);
+      @apply border border-(--primary);
       .stock {
         @apply bg-red-700;
       }
@@ -185,7 +185,7 @@
     &.stock-null {
       @apply bg-(--primary)/20;
     }
-    @apply pl-2 pr-3 grid-cols-[auto_repeat(6,_1fr)_120px_auto];
+    @apply pl-2 pr-3 grid-cols-[auto_repeat(6,1fr)_120px_auto];
     .id {
       @apply col-start-1 col-end-2 mr-4 row-start-1 row-end-4 place-content-center;
     }
