@@ -103,12 +103,11 @@ const stockWording = computed(() => {
   return `Stock : ${modelProduct.value?.stock}`
 })
 const stockClassAlert = computed((): string | undefined => {
-  if (props.layout === 'admin' && modelProduct.value?.stock && modelProduct.value?.stock <= 5) {
-    if (modelProduct.value?.stock === 0) {
-      return 'stock-null'
-    }
-    return 'stock-alert'
+  const stock = modelProduct.value?.stock
+  if (props.layout !== 'admin' || stock == null || stock > 5) {
+    return
   }
+  return stock === 0 ? 'stock-null' : 'stock-alert'
 })
 </script>
 <template>
