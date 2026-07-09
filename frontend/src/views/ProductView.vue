@@ -36,6 +36,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ProductItem v-if="product" :product="product" layout="detail" />
+  <ProductItem v-if="product" :product="product" layout="detail" :hn="1" />
   <p v-else>Produit introuvable...</p>
 </template>
