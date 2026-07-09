@@ -5,7 +5,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import type { productCatalog } from '@shared/types/Product'
 import type { cartProduct, CartType } from '@shared/types/Cart'
 // Ui
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
+import { CardSemantic, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 // Components
 import ProductItemFooterDefault from '@/components/modules/cart/CartItemAddButton.vue'
 import CartItemFooter from '@/components/modules/cart/CartItemDeleteUpdateButton.vue'
@@ -112,7 +112,7 @@ const stockClassAlert = computed((): string | undefined => {
 })
 </script>
 <template>
-  <Card
+  <CardSemantic
     v-if="product"
     :class="['py-0 relative card gap-0', gridClass, compLayout, props.layout, stockClassAlert]"
   >
@@ -170,7 +170,7 @@ const stockClassAlert = computed((): string | undefined => {
       :layout
       :product
     ></component>
-  </Card>
+  </CardSemantic>
 </template>
 <style lang="css">
 @import '@/assets/styles/productCard.css';
