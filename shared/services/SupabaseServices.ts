@@ -1,6 +1,6 @@
 // Types
 import type { Order, OrderDb } from "@shared/types/Order";
-import type { Database } from "@shared/types/database.ts";
+import type { Database } from "@shared/types/database";
 import type { Category } from "@shared/types/Categories.ts";
 // Utils
 import { supabase } from "@/utils/supabase";
