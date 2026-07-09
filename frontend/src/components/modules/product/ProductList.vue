@@ -13,10 +13,6 @@ const productStoreDisplay = computed(() =>
 const nbProduct = computed(() => productStoreDisplay.value.length)
 const wording = computed(() => (nbProduct.value > 1 ? 'articles' : 'article'))
 
-if (productStore.products.length === 0) {
-  productStore.loadProducts()
-}
-
 // Props
 const props = withDefaults(
   defineProps<{

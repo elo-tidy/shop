@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, onBeforeUnmount } from 'vue'
 import { RouterView } from 'vue-router'
 // UI
 import { SidebarProvider } from '@/components/ui/sidebar'
@@ -7,6 +8,21 @@ import 'vue-sonner/style.css'
 // Components
 import AppSidebar from '@/components/header/AppSidebar.vue'
 import Breadcrumbs from '@/components/header/Breadcrumbs.vue'
+// Store
+import { useProductStore } from '@/store/ProductStore'
+
+const productStore = useProductStore()
+
+onMounted(async () => {
+  if (productStore.products.length === 0) {
+    await productStore.loadProducts()
+  }
+  productStore.initRealtimeSync()
+})
+
+onBeforeUnmount(() => {
+  productStore.stopRealtimeSync()
+})
 </script>
 
 <template>
