@@ -154,6 +154,6 @@ export const useProductStore = defineStore(
     };
   },
   {
-    persist: true,
+    // persist: true,
   },
 );
