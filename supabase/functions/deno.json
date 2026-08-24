@@ -4,6 +4,6 @@
 		"zod": "npm:zod@3.23.8",
 		"@shared/": "../../../shared/",
 		"@supabase/server": "npm:@supabase/server@^1",
-		"stripe": "npm:stripe@14.0.0"
+		"stripe": "npm:stripe@22.3.2"
 	}
 }

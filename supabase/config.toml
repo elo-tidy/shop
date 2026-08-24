@@ -7,7 +7,7 @@ project_id = "shop"
 [api]
 enabled = true
 # Port to use for the API URL.
-port = 54321
+port = 55321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. `public` and `graphql_public` schemas are included by default.
 schemas = ["public", "graphql_public"]
@@ -26,7 +26,7 @@ enabled = false
 
 [db]
 # Port to use for the local database URL.
-port = 54322
+port = 55322
 # Port used by db diff command to initialize the shadow database.
 shadow_port = 54320
 # Maximum amount of time to wait for health check when starting the local database.
@@ -84,7 +84,7 @@ enabled = true
 [studio]
 enabled = true
 # Port to use for Supabase Studio.
-port = 54323
+port = 55323
 # External URL of the API server that frontend connects to.
 api_url = "http://127.0.0.1"
 # OpenAI API Key to use for Supabase AI in the Supabase Studio.
@@ -95,7 +95,7 @@ openai_api_key = "env(OPENAI_API_KEY)"
 [inbucket]
 enabled = true
 # Port to use for the email testing server web interface.
-port = 54324
+port = 55324
 # Uncomment to expose additional ports for testing user applications that send emails.
 # smtp_port = 54325
 # pop3_port = 54326
@@ -175,7 +175,7 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+email_sent = 200
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
@@ -366,7 +366,7 @@ deno_version = 2
 
 [analytics]
 enabled = true
-port = 54327
+port = 55327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"
 
@@ -384,7 +384,7 @@ s3_access_key = "env(S3_ACCESS_KEY)"
 s3_secret_key = "env(S3_SECRET_KEY)"
 [functions.products-create]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/products-create/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -439,7 +439,7 @@ entrypoint = "./functions/stripe-webhook/index.ts"
 
 [functions.admin-tools-get]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/admin-tools-get/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -450,7 +450,7 @@ entrypoint = "./functions/admin-tools-get/index.ts"
 
 [functions.user-update]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/user-update/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -461,7 +461,7 @@ entrypoint = "./functions/user-update/index.ts"
 
 [functions.order-delete]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/order-delete/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
