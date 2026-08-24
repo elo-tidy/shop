@@ -13,7 +13,7 @@ Deno.serve((req) =>
 
     // HTTP Method
     if (req.method !== "DELETE") {
-      return errorResponse("Method not allowed", 405);
+      return errorResponse("Method not allowed", corsResult, 405);
     }
 
     // Check if admin user - get supabase client
@@ -22,14 +22,14 @@ Deno.serve((req) =>
       const result = await requireAdmin(req);
       supabaseClient = result.supabaseClient;
     } catch {
-      return errorResponse("Unauthorized", 403);
+      return errorResponse("Unauthorized", corsResult, 403);
     }
 
     // Body check
     const url = new URL(req.url);
     const productId = Number(url.searchParams.get("id"));
     if (!productId) {
-      return errorResponse("L'id du produit est obligatoire", 400);
+      return errorResponse("L'id du produit est obligatoire", corsResult, 400);
     }
 
     let validatedId: number;
@@ -41,9 +41,9 @@ Deno.serve((req) =>
         const messages = err.errors.map((e) =>
           `${e.path.join(".")}: ${e.message}`
         );
-        return errorResponse(messages.join(" | "), 400);
+        return errorResponse(messages.join(" | "), corsResult, 400);
       }
-      return errorResponse("Invalid JSON body", 400);
+      return errorResponse("Invalid JSON body", corsResult, 400);
     }
 
     // Check if product exist
@@ -53,9 +53,11 @@ Deno.serve((req) =>
       .eq("id", validatedId)
       .maybeSingle();
 
-    if (productError) return errorResponse(productError.message, 400);
+    if (productError) {
+      return errorResponse(productError.message, corsResult, 400);
+    }
     if (!productData) {
-      return errorResponse("Produit introuvable", 404);
+      return errorResponse("Produit introuvable", corsResult, 404);
     }
 
     // Product cascade
@@ -65,7 +67,7 @@ Deno.serve((req) =>
       .eq("product_id", validatedId);
 
     if (cascadeError) {
-      return errorResponse(cascadeError.message, 400);
+      return errorResponse(cascadeError.message, corsResult, 400);
     }
 
     // If cascade, archive
@@ -77,11 +79,17 @@ Deno.serve((req) =>
         .select()
         .single();
 
-      if (archivedError) return errorResponse(archivedError.message, 400);
-      return jsonResponse({
-        message: "Produit archivé car utilisé dans un panier",
-        data: archivedData,
-      });
+      if (archivedError) {
+        return errorResponse(archivedError.message, corsResult, 400);
+      }
+      return jsonResponse(
+        {
+          message: "Produit archivé car utilisé dans un panier",
+          data: archivedData,
+        },
+        corsResult,
+        200,
+      );
     }
 
     // Delete stock
@@ -92,7 +100,9 @@ Deno.serve((req) =>
       .select()
       .single();
 
-    if (stockError) return errorResponse(stockError.message, 400);
+    if (stockError) {
+      return errorResponse(stockError.message, corsResult, 400);
+    }
 
     // If no cascade, delete product
     const { data: deletedData, error: deletedError } = await supabaseClient
@@ -102,10 +112,16 @@ Deno.serve((req) =>
       .select()
       .single();
 
-    if (deletedError) return errorResponse(deletedError.message, 400);
+    if (deletedError) {
+      return errorResponse(deletedError.message, corsResult, 400);
+    }
 
     const data = { ...deletedData, stock: stockData.quantity ?? 0 };
 
-    return jsonResponse({ message: "Produit supprimé avec succès", data });
+    return jsonResponse(
+      { message: "Produit supprimé avec succès", data },
+      corsResult,
+      200,
+    );
   })
 );

@@ -18,7 +18,9 @@ Deno.serve((req) =>
     if (corsResult instanceof Response) return corsResult;
 
     // HTTP Method
-    if (req.method !== "PATCH") return errorResponse("Method not allowed", 405);
+    if (req.method !== "PATCH") {
+      return errorResponse("Method not allowed", corsResult, 405);
+    }
 
     // admin check + supabase client
     let supabaseClient;
@@ -26,7 +28,7 @@ Deno.serve((req) =>
       const result = await requireAdmin(req);
       supabaseClient = result.supabaseClient;
     } catch {
-      return errorResponse("Unauthorized", 403);
+      return errorResponse("Unauthorized", corsResult, 403);
     }
 
     // Body check
@@ -50,13 +52,13 @@ Deno.serve((req) =>
             }
           }
         }
-        return errorResponse(JSON.stringify(errors), 400);
+        return errorResponse(JSON.stringify(errors), corsResult, 400);
       }
-      return errorResponse("Erreur de validation inconnue", 400);
+      return errorResponse("Erreur de validation inconnue", corsResult, 400);
     }
 
     if (!body.id) {
-      return errorResponse("L'id du produit est obligatoire", 400);
+      return errorResponse("L'id du produit est obligatoire", corsResult, 400);
     }
 
     // isolate modifiable data
@@ -70,9 +72,11 @@ Deno.serve((req) =>
       .maybeSingle();
     // .single();
 
-    if (productError) return errorResponse(productError.message, 400);
+    if (productError) {
+      return errorResponse(productError.message, corsResult, 400);
+    }
     if (!productData) {
-      return errorResponse("Produit introuvable", 404);
+      return errorResponse("Produit introuvable", corsResult, 404);
     }
 
     // Product update
@@ -85,7 +89,7 @@ Deno.serve((req) =>
         .single();
 
     if (updateProductError) {
-      return jsonResponse({ updateProductError }, 400);
+      return jsonResponse({ updateProductError }, corsResult, 400);
     }
     // return jsonResponse({ message: "Produit modifié avec succès", updateProductData });
 
@@ -97,7 +101,9 @@ Deno.serve((req) =>
       .select()
       .single();
 
-    if (stockError) return jsonResponse({ stockError }, 400);
+    if (stockError) {
+      return jsonResponse({ stockError }, corsResult, 400);
+    }
 
     const { quantity, ...rest } = stockData;
 
@@ -106,6 +112,10 @@ Deno.serve((req) =>
       stock: quantity ?? 0,
     };
 
-    return jsonResponse({ message: "Produit modifié avec succès", data });
+    return jsonResponse(
+      { message: "Produit modifié avec succès", data },
+      corsResult,
+      200,
+    );
   })
 );

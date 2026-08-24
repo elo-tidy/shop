@@ -12,7 +12,9 @@ Deno.serve((req) =>
     if (corsResult instanceof Response) return corsResult;
 
     // HTTP Method
-    if (req.method !== "PATCH") return errorResponse("Method not allowed", 405);
+    if (req.method !== "PATCH") {
+      return errorResponse("Method not allowed", corsResult, 405);
+    }
 
     // User check
     let userId;
@@ -22,7 +24,7 @@ Deno.serve((req) =>
       userId = result.user.id;
       supaClient = result.supabaseClient;
     } catch {
-      return errorResponse("Unauthorized", 403);
+      return errorResponse("Unauthorized", corsResult, 403);
     }
 
     // Body check
@@ -36,9 +38,9 @@ Deno.serve((req) =>
         const messages = err.errors.map((e) =>
           `${e.path.join(".")}: ${e.message}`
         );
-        return errorResponse(messages.join(" | "), 400);
+        return errorResponse(messages.join(" | "), corsResult, 400);
       }
-      return errorResponse("Invalid JSON body", 400);
+      return errorResponse("Invalid JSON body", corsResult, 400);
     }
 
     const { username } = body;
@@ -52,12 +54,16 @@ Deno.serve((req) =>
       .single();
 
     if (error) {
-      return jsonResponse({ error: error.message }, 400);
+      return jsonResponse({ error: error.message }, corsResult, 400);
     }
 
-    return jsonResponse({
-      message: "Nom d'utilisateur modifié avec succès",
-      data,
-    });
+    return jsonResponse(
+      {
+        message: "Nom d'utilisateur modifié avec succès",
+        data,
+      },
+      corsResult,
+      200,
+    );
   })
 );

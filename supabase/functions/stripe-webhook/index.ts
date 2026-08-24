@@ -9,20 +9,20 @@ Deno.serve(async (req) => {
 
   // Only POST for webhooks
   if (req.method === "OPTIONS") {
-    return jsonResponse(null, 204);
+    return jsonResponse(null, cors, 204);
   }
-  if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  if (req.method !== "POST") {
+    return errorResponse("Method not allowed", cors, 405);
+  }
 
   const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
   const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
   if (!webhookSecret || !stripeKey) {
     console.error("Missing Stripe env vars");
-    return errorResponse("Missing Stripe configuration", 500);
+    return errorResponse("Missing Stripe configuration", cors, 500);
   }
 
-  const stripe = new Stripe(stripeKey, {
-    apiVersion: "2023-10-16",
-  });
+  const stripe = new Stripe(stripeKey);
 
   // Get raw body
   const buf = await req.arrayBuffer();
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error("Webhook signature verification failed:", err);
-    return errorResponse("Webhook signature verification failed", 400);
+    return errorResponse("Webhook signature verification failed", cors, 400);
   }
 
   const supabase = getSupabaseClient();
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     event.type !== "payment_intent.succeeded" &&
     event.type !== "payment_intent.payment_failed"
   ) {
-    return jsonResponse({ received: true }, 200);
+    return jsonResponse({ received: true }, cors, 200);
   }
 
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
 
   if (!orderId) {
     console.error("Missing orderId in metadata");
-    return jsonResponse({ received: true }, 200);
+    return jsonResponse({ received: true }, cors, 200);
   }
 
   // bdd pending order data
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
     if (error) {
       console.error("DB error:", error);
-      return errorResponse("DB error", 500);
+      return errorResponse("DB error", cors, 500);
     }
 
     if (!data) {
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
         orderId,
       });
 
-      return jsonResponse({ received: true, noop: true }, 200);
+      return jsonResponse({ received: true, noop: true }, cors, 200);
     }
     return data;
   };
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
 
         if (error) {
           console.error("PROCESS ORDER ERROR:", error);
-          return errorResponse("Failed processing order", 500);
+          return errorResponse("Failed processing order", cors, 500);
         }
 
         break;
@@ -121,9 +121,9 @@ Deno.serve(async (req) => {
         console.log("Unhandled event:", event.type);
     }
 
-    return jsonResponse({ received: true }, 200);
+    return jsonResponse({ received: true }, cors, 200);
   } catch (err) {
     console.error("Error handling webhook event:", err);
-    return errorResponse("Internal error", 500);
+    return errorResponse("Internal error", cors, 500);
   }
 });

@@ -11,7 +11,7 @@ Deno.serve((req) =>
 
     // HTTP Method
     if (req.method !== "DELETE") {
-      return errorResponse("Method not allowed", 405);
+      return errorResponse("Method not allowed", corsResult, 405);
     }
 
     // User check
@@ -23,7 +23,7 @@ Deno.serve((req) =>
       userId = result.user.id;
       supabaseClient = result.supabaseClient;
     } catch {
-      return errorResponse("Unauthorized", 403);
+      return errorResponse("Unauthorized", corsResult, 403);
     }
 
     // Body check
@@ -31,7 +31,11 @@ Deno.serve((req) =>
     const orderId = url.searchParams.get("id");
 
     if (!orderId) {
-      return errorResponse("L'id de la commande est obligatoire", 400);
+      return errorResponse(
+        "L'id de la commande est obligatoire",
+        corsResult,
+        400,
+      );
     }
 
     // Check if order exist with that user
@@ -43,11 +47,11 @@ Deno.serve((req) =>
       .maybeSingle();
 
     if (orderError) {
-      return errorResponse(orderError.message, 400);
+      return errorResponse(orderError.message, corsResult, 400);
     }
 
     if (!orderData) {
-      return errorResponse("Commande introuvable", 404);
+      return errorResponse("Commande introuvable", corsResult, 404);
     }
 
     // Delete all products from current cart
@@ -57,7 +61,7 @@ Deno.serve((req) =>
       .eq("cart_id", orderData.cart_id);
 
     if (productsError) {
-      return errorResponse(productsError.message, 400);
+      return errorResponse(productsError.message, corsResult, 400);
     }
 
     // Delete order
@@ -67,7 +71,7 @@ Deno.serve((req) =>
       .eq("id", orderData.id);
 
     if (orderDeleteError) {
-      return errorResponse(orderDeleteError.message, 400);
+      return errorResponse(orderDeleteError.message, corsResult, 400);
     }
 
     // Delete cart
@@ -79,12 +83,16 @@ Deno.serve((req) =>
       .single();
 
     if (cartError) {
-      return errorResponse(cartError.message, 400);
+      return errorResponse(cartError.message, corsResult, 400);
     }
 
-    return jsonResponse({
-      message: "Commande supprimée avec succès",
-      data: cartData.id,
-    });
+    return jsonResponse(
+      {
+        message: "Commande supprimée avec succès",
+        data: cartData.id,
+      },
+      corsResult,
+      200,
+    );
   })
 );

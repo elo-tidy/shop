@@ -12,26 +12,26 @@ Deno.serve(async (req) => {
   if (corsResult instanceof Response) return corsResult;
 
   if (req.method === "OPTIONS") {
-    return jsonResponse(null, 204);
+    return jsonResponse(null, corsResult, 204);
   }
 
   if (req.method !== "POST") {
-    return errorResponse("Method not allowed", 405);
+    return errorResponse("Method not allowed", corsResult, 405);
   }
 
   let body: ResolvePaymentIntentInput;
   try {
     body = ResolvePaymentIntentInputSchema.parse(await req.json());
   } catch (e) {
-    return errorResponse("Invalid body", 400);
+    return errorResponse("Invalid body", corsResult, 400);
   }
 
   const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
   if (!stripeKey) {
-    return errorResponse("Missing Stripe key", 500);
+    return errorResponse("Missing Stripe key", corsResult, 500);
   }
 
-  const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+  const stripe = new Stripe(stripeKey);
 
   const createPi = () => {
     return stripe.paymentIntents.create({
@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
     }
 
     if (!paymentIntent || !paymentIntent.client_secret) {
-      return errorResponse("Invalid payment intent", 500);
+      return errorResponse("Invalid payment intent", corsResult, 500);
     }
 
     const data = ResolvePaymentIntentResponseSchema.parse({
@@ -117,9 +117,9 @@ Deno.serve(async (req) => {
       paymentIntentId: paymentIntent.id,
     });
 
-    return jsonResponse(data, 200);
+    return jsonResponse(data, corsResult, 200);
   } catch (err) {
     console.error("Stripe error:", err);
-    return errorResponse("Stripe failure", 500);
+    return errorResponse("Stripe failure", corsResult, 500);
   }
 });

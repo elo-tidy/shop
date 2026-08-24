@@ -11,7 +11,7 @@ Deno.serve((req) =>
 
     // HTTP Method
     if (req.method !== "GET") {
-      return errorResponse("Method not allowed", 405);
+      return errorResponse("Method not allowed", corsResult, 405);
     }
 
     // Check if admin user - get supabase client
@@ -20,9 +20,9 @@ Deno.serve((req) =>
       const result = await requireAdmin(req);
       supabaseClient = result.supabaseClient;
     } catch {
-      return errorResponse("Unauthorized", 403);
+      return errorResponse("Unauthorized", corsResult, 403);
     }
 
-    return jsonResponse(true, 200);
+    return jsonResponse(true, corsResult, 200);
   })
 );
