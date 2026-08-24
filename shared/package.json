@@ -1,5 +1,18 @@
 {
-	"dependencies": {
-		"zod": "^4.4.3"
+	"name": "@shop/shared",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./types/*": "./types/*.ts",
+		"./services/*": "./services/*.ts",
+		"./utils/*": "./utils/*.ts",
+		"./composables/*": "./composables/*.ts"
+	},
+	"peerDependencies": {
+		"zod": "^3.25.0"
+	},
+	"devDependencies": {
+		"zod": "^3.25.76"
 	}
 }
