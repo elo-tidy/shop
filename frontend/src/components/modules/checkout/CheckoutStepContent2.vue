@@ -25,9 +25,11 @@ const { payment_intent, loadLastOrder, createOrder, resolveOrderPayment, syncCar
 const stripeStore = usePaymentStore()
 
 const pI = ref<string | null>(null)
+const paymentError = ref<string | null>(null)
 
 // Submit pay form
 async function handleSubmit() {
+  paymentError.value = null
   // Confirm the PaymentIntent using the details collected by the Payment Element
   const stripeInstance = elementsComponent.value?.instance
   const elements = elementsComponent.value?.elements
@@ -46,7 +48,8 @@ async function handleSubmit() {
 
   // Stripe payment success
   if (stripeInstance) {
-    const returned_url = 'http://localhost:5173/checkout'
+    // const returned_url = 'http://localhost:5173/checkout'
+    const returned_url = `${window.location.origin}/checkout`
     const { error } = await stripeInstance.confirmPayment({
       elements,
       clientSecret: clientSecretRef.value,
@@ -63,6 +66,7 @@ async function handleSubmit() {
     })
 
     if (error) {
+      paymentError.value = error.message ?? 'Le paiement a échoué.'
       console.error('Stripe error:', error.message)
     } else {
       // Your customer is redirected to your `return_url`. For some payment
@@ -74,6 +78,7 @@ async function handleSubmit() {
 
 // Stripe elements
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+
 const elementsOptions = computed<StripeElementsOptionsMode>(() => ({
   // https://stripe.com/docs/js/elements_object/create#stripe_elements-options
 
@@ -97,6 +102,10 @@ const elementsOptions = computed<StripeElementsOptionsMode>(() => ({
 }))
 const paymentElementOptions = ref<StripePaymentElementOptions>({
   // https://docs.stripe.com/js/elements_object/create_payment_element#payment_element_create-options
+  layout: {
+    type: 'auto',
+    radios: 'if_multiple',
+  },
   fields: {
     billingDetails: {
       address: {
@@ -111,10 +120,11 @@ const clientSecretRef = ref<string | null>(null)
 const elementsComponent = ref()
 
 // Load Stripe if needed
-async function initStripe() {
-  await loadStripe(stripeKey)
-  stripeStore.setStripeLoaded(true)
-}
+// async function initStripe() {
+//   await loadStripe(stripeKey)
+//   stripeStore.setStripeLoaded(true)
+// }
+const session = useSupabaseSession()
 
 const route = useRoute()
 const stepStore = usecheckoutStepper()
@@ -133,7 +143,6 @@ onBeforeMount(async () => {
     let bddOrder = await loadLastOrder()
 
     // init local order
-    const session = useSupabaseSession()
     const userId = session.session.value?.user.id
     if (!userId) return
     if (!bddOrder || !orderStore.orderModel?.data) {
@@ -144,7 +153,8 @@ onBeforeMount(async () => {
     await syncCartWithOrder()
 
     // Stripe init and paymentIntent
-    await initStripe()
+    // await initStripe()
+    stripeStore.setStripeLoaded(true)
     const payment = await resolveOrderPayment()
     clientSecretRef.value = payment.clientSecret
     const paymentIntentId = payment.paymentIntentId
@@ -164,6 +174,13 @@ onBeforeMount(async () => {
 })
 </script>
 <template>
+  <p
+    v-if="paymentError"
+    role="alert"
+    class="mt-4 rounded-md border border-red-400 bg-red-400/10 p-3 text-sm text-red-400"
+  >
+    {{ paymentError }}
+  </p>
   <StripeElements
     v-if="stripeStore.stripeLoaded && clientSecretRef"
     :key="clientSecretRef"
