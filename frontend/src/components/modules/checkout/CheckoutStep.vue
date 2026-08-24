@@ -9,6 +9,7 @@ import CheckoutStepContent0 from '@/components/modules/checkout/CheckoutStepCont
 import CheckoutStepContent1 from '@/components/modules/checkout/CheckoutStepContent1.vue'
 import CheckoutStepContent2 from '@/components/modules/checkout/CheckoutStepContent2.vue'
 import CheckoutStepContent3 from '@/components/modules/checkout/CheckoutStepContent3.vue'
+import StripeTestAssitant from './CheckoutStripeTestAssistant.vue'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
 
@@ -44,6 +45,11 @@ const currentContent = computed(() => content[stepStore.step])
       <Card class="px-6">
         <slot :content="currentContent" />
       </Card>
+      <div v-if="stepStore.step === 2">
+        <Card class="px-6">
+          <StripeTestAssitant />
+        </Card>
+      </div>
     </div>
   </div>
 </template>

@@ -1,0 +1,40 @@
+{
+  "cards": [
+    {
+      "id": "success",
+      "label": "Paiement réussi",
+      "description": "Le paiement est accepté.",
+      "number": "4242 4242 4242 4242"
+    },
+    {
+      "id": "declined",
+      "label": "Carte refusée",
+      "description": "Le paiement est refusé.",
+      "number": "4000 0000 0000 0002"
+    },
+    {
+      "id": "authentication",
+      "label": "Authentification 3DS2 Secure",
+      "description": "Déclenche une authentification 3D Secure.",
+      "number": "4000 0027 6000 3184"
+    },
+    {
+      "id": "fraudulent",
+      "label": "Carte frauduleuse",
+      "description": "Simule une carte signalée comme frauduleuse.",
+      "number": "4100000000000019"
+    }
+  ],
+  "fields": {
+    "number": {
+      "label": "Numéro de carte"
+    },
+    "expiry": {
+      "label": "Date d'expiration"
+    },
+    "cvc": {
+      "label": "Code de sécurité",
+      "value": "123"
+    }
+  }
+}
