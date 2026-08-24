@@ -143,8 +143,7 @@ ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."process_paid_order"("p_order_id" "uuid", "p_payment_intent_id" "text", "p_stripe_event_id" "text") RETURNS json
     LANGUAGE "plpgsql"
     SET "search_path" TO 'public'
-    AS $$
-declare
+    AS $$declare
   order_row orders%rowtype;
   expected_products_count integer;
   updated_stock_count integer;
@@ -210,6 +209,7 @@ begin
     and ps.quantity >= x.total_quantity;
 
   GET DIAGNOSTICS updated_stock_count = ROW_COUNT;
+  raise notice 'STOCK ROWS UPDATED = %', updated_stock_count;
 
   -- safety stock
   if updated_stock_count != expected_products_count then
@@ -229,8 +229,7 @@ begin
     'processed', true
   );
 
-end;
-$$;
+end;$$;
 
 
 ALTER FUNCTION "public"."process_paid_order"("p_order_id" "uuid", "p_payment_intent_id" "text", "p_stripe_event_id" "text") OWNER TO "postgres";
@@ -271,9 +270,9 @@ CREATE TABLE IF NOT EXISTS "public"."carts_products" (
     "quantity" integer NOT NULL,
     "price" numeric NOT NULL,
     "created_at" timestamp without time zone DEFAULT "now"() NOT NULL,
-    "title" character varying,
-    "image" character varying,
-    "category" "public"."categories",
+    "title" character varying NOT NULL,
+    "image" character varying NOT NULL,
+    "category" "public"."categories" NOT NULL,
     "description" "text"
 );
 
@@ -283,7 +282,7 @@ ALTER TABLE "public"."carts_products" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."orders" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "cart_id" "uuid",
+    "cart_id" "uuid" NOT NULL,
     "user_id" "uuid" NOT NULL,
     "payment_ID" "text",
     "payment_method" "text" NOT NULL,
@@ -366,7 +365,7 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "username" "text",
     "role" "public"."user_role" DEFAULT 'user'::"public"."user_role" NOT NULL,
     "created_at" timestamp with time zone,
-    CONSTRAINT "username_length" CHECK (("char_length"("username") >= 3))
+    "active" boolean DEFAULT true NOT NULL
 );
 
 
@@ -468,12 +467,6 @@ ALTER TABLE ONLY "public"."profiles"
 
 
 
-CREATE POLICY "Enable insert for admin based on user_id" ON "public"."products" FOR INSERT TO "authenticated" WITH CHECK ((EXISTS ( SELECT 1
-   FROM "public"."profiles"
-  WHERE (("profiles"."id" = "auth"."uid"()) AND ("profiles"."role" = 'admin'::"public"."user_role")))));
-
-
-
 CREATE POLICY "Enable read access for all users" ON "public"."product_stock" FOR SELECT USING (true);
 
 
@@ -483,10 +476,6 @@ CREATE POLICY "Enable read access for all users" ON "public"."products" FOR SELE
 
 
 CREATE POLICY "Enable select for users based on user_id" ON "public"."orders" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
-
-
-
-CREATE POLICY "Enable users to update their own data only" ON "public"."profiles" FOR UPDATE TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "id"));
 
 
 
@@ -525,6 +514,18 @@ ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."product_stock";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."products";
+
 
 
 
@@ -811,6 +812,12 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_user();
 
 
 
@@ -838,9 +845,5 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 
 
 
-
-
-
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 
