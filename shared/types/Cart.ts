@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { categoryEnum } from "@shared/types/Categories.ts";
+import { categoryEnum } from "./Categories.ts";
 
 // Frontend
 

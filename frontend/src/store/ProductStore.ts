@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 // Types
-import type { productCatalog } from "@shared/types/Product";
+import type { productCatalog } from "@shop/shared/types/Product";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-import type { Database, Tables } from "@shared/types/database";
+import type { Database, Tables } from "@shop/shared/types/database";
 // Services
 import {
   fetchAllProducts,

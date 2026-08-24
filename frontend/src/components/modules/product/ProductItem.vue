@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 // Type
-import type { productCatalog } from '@shared/types/Product'
-import type { cartProduct, CartType } from '@shared/types/Cart'
+import type { productCatalog } from '@shop/shared/types/Product'
+import type { cartProduct, CartType } from '@shop/shared/types/Cart'
 // Ui
 import { CardSemantic, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 // Components

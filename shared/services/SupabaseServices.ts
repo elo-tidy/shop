@@ -1,10 +1,10 @@
 // Types
-import type { Order, OrderDb } from "@shared/types/Order";
-import type { Database } from "@shared/types/database";
-import type { Category } from "@shared/types/Categories.ts";
+import type { Order, OrderDb } from "@shop/shared/types/Order";
+import type { Database } from "@shop/shared/types/database";
+import type { Category } from "@shop/shared/types/Categories";
 // Utils
-import { supabase } from "@/utils/supabase";
-import { numberWithTwoDecimals } from "@shared/utils/maths";
+import { supabase } from "../../frontend/src/utils/supabase";
+import { numberWithTwoDecimals } from "@shop/shared/utils/maths";
 
 export async function sendMagicLink(email: string): Promise<void> {
 	const { error } = await supabase.auth.signInWithOtp({ email });

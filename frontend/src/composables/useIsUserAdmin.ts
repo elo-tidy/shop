@@ -1,6 +1,6 @@
 import { ref } from "vue";
 // Services
-import { isAdmin } from "@shared/services/SupabaseServices";
+import { isAdmin } from "@shop/shared/services/SupabaseServices";
 // Utils
 import { supabase } from "@/utils/supabase";
 

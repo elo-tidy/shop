@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 // Types
-import type { productCatalog } from '@shared/types/Product'
+import type { productCatalog } from '@shop/shared/types/Product'
 // Components
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Store

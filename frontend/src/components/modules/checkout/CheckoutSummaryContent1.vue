@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 // Stores
 import { useOrderStore } from '@/store/OrderStore'
 // Utils
-import { numberWithTwoDecimals } from '@shared/utils/maths'
+import { numberWithTwoDecimals } from '@shop/shared/utils/maths'
 
 // Props
 const props = defineProps<{

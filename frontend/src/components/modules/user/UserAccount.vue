@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'vue-sonner'
 // Services
-import { getUserProfile, signOutService } from '@shared/services/SupabaseServices'
+import { getUserProfile, signOutService } from '@shop/shared/services/SupabaseServices'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'
 // Api

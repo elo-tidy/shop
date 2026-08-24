@@ -1,10 +1,13 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 // Types
-import type { cartProduct } from "@shared/types/Cart";
-import type { Order } from "@shared/types/Order";
-import type { DeliveryMode, Transporter } from "@shared/types/ShippingMode";
-import type { productCatalog } from "@shared/types/Product";
+import type { cartProduct } from "@shop/shared/types/Cart";
+import type { Order } from "@shop/shared/types/Order";
+import type {
+  DeliveryMode,
+  Transporter,
+} from "@shop/shared/types/ShippingMode";
+import type { productCatalog } from "@shop/shared/types/Product";
 // Models
 import { OrderModel } from "@/models/Order";
 // Services
@@ -13,7 +16,7 @@ import { getCarrierDetails } from "@/services/CarrierService";
 import {
   numberWithTwoDecimals,
   priceFromEurosToCents,
-} from "@shared/utils/maths";
+} from "@shop/shared/utils/maths";
 // Stores
 import { useCartStore } from "@/store/CartStore";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { cartSchema } from "@shared/types/Cart.ts";
-import { paymentStatusEnumSchema } from "@shared/types/PaymentStatus.ts";
+import { cartSchema } from "./Cart.ts";
+import { paymentStatusEnumSchema } from "./PaymentStatus.ts";
 
 // Frontend
 export const orderSchema = z.object({

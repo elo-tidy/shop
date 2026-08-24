@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 // Types
-import type { cartProduct, CartType } from "@shared/types/Cart";
-import type { Order, orderDelete } from "@shared/types/Order";
-import type { Transporter } from "@shared/types/ShippingMode";
+import type { cartProduct, CartType } from "@shop/shared/types/Cart";
+import type { Order, orderDelete } from "@shop/shared/types/Order";
+import type { Transporter } from "@shop/shared/types/ShippingMode";
 import type {
   ResolvePaymentIntentInput,
   ResolvePaymentIntentResponse,
-} from "@shared/types/stripe";
+} from "@shop/shared/types/stripe";
 import type { PaymentIntentResult } from "@stripe/stripe-js";
 // Stores
 import { useCartStore } from "@/store/CartStore";
@@ -17,7 +17,7 @@ import { usePaymentStore } from "@/store/StripeStore";
 import { addOrder } from "@/api/order";
 import { resolvePaymentIntent } from "@/api/payment";
 // Services
-import { getOrderService } from "@shared/services/SupabaseServices";
+import { getOrderService } from "@shop/shared/services/SupabaseServices";
 // Utils
 import { stripePromise } from "@/utils/stripe";
 // Api

@@ -1,6 +1,6 @@
 // Types
-import type { Database } from "@shared/types/database";
-import type { productCatalog } from "@shared/types/Product";
+import type { Database } from "@shop/shared/types/database";
+import type { productCatalog } from "@shop/shared/types/Product";
 // utils
 import { supabase } from "@/utils/supabase";
 

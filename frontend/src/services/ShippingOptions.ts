@@ -1,4 +1,4 @@
-import type { ShippingMode } from "@shared/types/ShippingMode";
+import type { ShippingMode } from "@shop/shared/types/ShippingMode";
 const BASE_URL = "/data/shipping-options.json";
 
 export async function fetchShippingOptions(): Promise<ShippingMode> {

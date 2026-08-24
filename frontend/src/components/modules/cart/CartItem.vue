@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 // Types
-import type { cartProduct } from '@shared/types/Cart'
+import type { cartProduct } from '@shop/shared/types/Cart'
 // Components
 import ProductItem from '@/components/modules/product/ProductItem.vue'
 // Composables
@@ -13,7 +13,7 @@ import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
 import { useOrderStore } from '@/store/OrderStore'
 // Utils
-import { numberWithTwoDecimals } from '@shared/utils/maths'
+import { numberWithTwoDecimals } from '@shop/shared/utils/maths'
 
 // Props
 const props = withDefaults(

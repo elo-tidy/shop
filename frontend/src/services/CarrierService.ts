@@ -3,9 +3,9 @@ import type {
     DeliveryMode,
     ShippingMode,
     Transporter,
-} from "@shared/types/ShippingMode";
+} from "@shop/shared/types/ShippingMode";
 // Composables
-import { estimatedDelivery } from "@shared/composables/useDeliveryEstimation";
+import { estimatedDelivery } from "@shop/shared/composables/useDeliveryEstimation";
 // Services
 import { fetchShippingOptions } from "@/services/ShippingOptions";
 

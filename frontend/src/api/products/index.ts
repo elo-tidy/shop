@@ -5,8 +5,8 @@ import type {
   productDelete,
   productForm,
   productUpdateApi,
-} from "@shared/types/Product";
-import { type productCatalog } from "@shared/types/Product";
+} from "@shop/shared/types/Product";
+import { type productCatalog } from "@shop/shared/types/Product";
 import { supabase } from "@/utils/supabase";
 
 export async function addProduct(

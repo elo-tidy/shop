@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 // Types
-import { productFormSchema, type productCatalog, type productForm } from '@shared/types/Product'
+import {
+  productFormSchema,
+  type productCatalog,
+  type productForm,
+} from '@shop/shared/types/Product'
+
 // UI
 import {
   Field,
@@ -255,8 +260,8 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                     <FieldLegend>Produit archivé</FieldLegend>
 
                     <RadioGroup
-                      :model-value="field.value"
-                      @update:model-value="field.onChange"
+                      :model-value="field.value ? 'true' : 'false'"
+                      @update:model-value="(v) => field.onChange(v === 'true')"
                       class="grid grid-cols-[auto_auto] justify-start"
                       :default-value="archivedDefaultValue"
                     >
@@ -267,7 +272,7 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-true"
-                            :value="true"
+                            value="true"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>
@@ -280,7 +285,7 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                           </FieldContent>
                           <RadioGroupItem
                             id="archived-false"
-                            :value="false"
+                            value="false"
                             :aria-invalid="!!errors.length"
                           />
                         </Field>

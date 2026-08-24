@@ -1,6 +1,6 @@
 import { computed, type Ref } from "vue";
 // Types
-import type { productCatalog } from "@shared/types/Product";
+import type { productCatalog } from "@shop/shared/types/Product";
 // Models
 import { Product } from "@/models/Product";
 

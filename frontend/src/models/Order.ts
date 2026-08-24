@@ -1,6 +1,9 @@
-import type { Order } from "@shared/types/Order";
-import type { DeliveryMode, Transporter } from "@shared/types/ShippingMode";
-import { priceFromEurosToCents } from "@shared/utils/maths";
+import type { Order } from "@shop/shared/types/Order";
+import type {
+  DeliveryMode,
+  Transporter,
+} from "@shop/shared/types/ShippingMode";
+import { priceFromEurosToCents } from "@shop/shared/utils/maths";
 
 export class OrderModel {
   constructor(

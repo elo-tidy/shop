@@ -1,5 +1,5 @@
 // Types
-import type { productCatalog } from "@shared/types/Product";
+import type { productCatalog } from "@shop/shared/types/Product";
 export class Product {
   private data: productCatalog;
 

@@ -1,4 +1,4 @@
-import type { User } from "@shared/types/User";
+import type { User } from "@shop/shared/types/User";
 import { supabase } from "@/utils/supabase";
 
 export async function updateUser(user: { username: string }): Promise<User> {

@@ -1,5 +1,5 @@
-import type { CartBackEndType } from "@shared/types/Cart";
-import type { Order, orderDelete } from "@shared/types/Order";
+import type { CartBackEndType } from "@shop/shared/types/Cart";
+import type { Order, orderDelete } from "@shop/shared/types/Order";
 import { supabase } from "@/utils/supabase";
 
 export async function addOrder(order: CartBackEndType): Promise<Order> {

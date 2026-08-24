@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed, ref, onMounted } from 'vue'
 // Types
-import type { ShippingMode } from '@shared/types/ShippingMode'
+import type { ShippingMode } from '@shop/shared/types/ShippingMode'
 // Ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 // Components
 // import CheckoutPickupMap from '@/components/modules/checkout/CheckoutPickupMap.vue'
 // Utils
-import { numberWithTwoDecimals } from '@shared/utils/maths'
+import { numberWithTwoDecimals } from '@shop/shared/utils/maths'
 // Services
 import { fetchShippingOptions } from '@/services/ShippingOptions'
 // Stores
@@ -52,7 +52,7 @@ onMounted(async () => {
         :value="shippingOption.id"
       >
         <h3>
-          <Button class="w-full bg-transparent text-inherit hover:bg-transparent" type="Button">{{
+          <Button class="w-full bg-transparent text-inherit hover:bg-transparent" type="button">{{
             shippingOption.name
           }}</Button>
         </h3>

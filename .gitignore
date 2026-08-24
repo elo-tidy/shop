@@ -13,11 +13,13 @@ backend/node_modules/
 node_modules/
 
 # Environnement
-frontend/*.local
+frontend/.env.example.local
+frontend/.env.production
 frontend/.env
-backend/*.local
-backend/.env
+
 supabase/functions/.env
+supabase/functions/.env.local
+supabase/functions/.env.production
 
 # Dossiers de build
 frontend/dist/
@@ -42,3 +44,5 @@ coverage
 
 supabase/_backups/
 supabase/snippets/
+.vercel
+.env*.local
