@@ -1,24 +1,41 @@
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref } from "vue";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 
 const session = ref<Session | null>(null);
+const isLoaded = ref(false);
+
+let initialized = false;
+let unsubscribe: (() => void) | null = null;
+
+async function initSession() {
+  if (initialized) {
+    return;
+  }
+
+  initialized = true;
+
+  const {
+    data: { session: currentSession },
+  } = await supabase.auth.getSession();
+
+  session.value = currentSession;
+  isLoaded.value = true;
+
+  const { data } = supabase.auth.onAuthStateChange(
+    (_event, newSession) => {
+      session.value = newSession;
+    },
+  );
+
+  unsubscribe = data.subscription.unsubscribe;
+}
 
 export function useSupabaseSession() {
-  let unsubscribe: () => void;
-  onMounted(async () => {
-    const { data: sessionData } = await supabase.auth.getSession();
-    session.value = sessionData.session;
+  initSession();
 
-    const { data: stateData } = supabase.auth.onAuthStateChange(
-      (_, _session) => {
-        session.value = _session;
-      },
-    );
-    unsubscribe = stateData.subscription.unsubscribe;
-  });
-  onUnmounted(() => {
-    if (unsubscribe) unsubscribe();
-  });
-  return { session };
+  return {
+    session,
+    isLoaded,
+  };
 }

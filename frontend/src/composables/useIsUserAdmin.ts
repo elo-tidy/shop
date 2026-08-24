@@ -1,53 +1,71 @@
-import { ref } from "vue";
-// Services
+import { ref, watch } from "vue";
 import { isAdmin } from "@shop/shared/services/SupabaseServices";
-// Utils
-import { supabase } from "@/utils/supabase";
+import { useSupabaseSession } from "./useSupabaseSession";
 
 const currentSessionIsAdmin = ref(false);
 const isLoaded = ref(false);
-let initPromise: Promise<boolean> | null = null;
+
 let initialized = false;
+let initPromise: Promise<boolean> | null = null;
 
 export function useIsUserAdmin() {
-  const checkAdmin = async (): Promise<boolean> => {
-    const { data } = await supabase.auth.getUser();
+  const { session } = useSupabaseSession();
 
-    if (!data.user) {
+  const checkAdmin = async (): Promise<boolean> => {
+    if (!session.value?.user) {
       currentSessionIsAdmin.value = false;
+      isLoaded.value = true;
       return false;
     }
 
+    isLoaded.value = false;
+
     try {
-      const req = await isAdmin();
-      currentSessionIsAdmin.value = req;
-      return req;
+      const admin = await isAdmin();
+
+      currentSessionIsAdmin.value = admin;
+      return admin;
     } catch {
       currentSessionIsAdmin.value = false;
       return false;
+    } finally {
+      isLoaded.value = true;
     }
   };
 
   const init = () => {
     if (!initPromise) {
-      initPromise = checkAdmin();
+      initPromise = checkAdmin().finally(() => {
+        initPromise = null;
+      });
     }
+
     return initPromise;
   };
 
-  /*if (!initialized) {
+  if (!initialized) {
     watch(
-      session,
-      async (newSession, oldSession) => {
-        if (newSession?.user?.id !== oldSession?.user?.id) {
-          isLoaded.value = false;
-          await checkAdmin();
+      () => session.value?.user?.id ?? null,
+      async (userId, oldUserId) => {
+        if (userId === oldUserId) {
+          return;
         }
+
+        currentSessionIsAdmin.value = false;
+        isLoaded.value = false;
+
+        await checkAdmin();
       },
       { immediate: true },
     );
-    initialized = true;
-  }*/
 
-  return { currentSessionIsAdmin, isLoaded, checkAdmin, init };
+    initialized = true;
+  }
+
+  return {
+    currentSessionIsAdmin,
+    isLoaded,
+    checkAdmin,
+    init,
+  };
 }
