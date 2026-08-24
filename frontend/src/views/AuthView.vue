@@ -1,6 +1,6 @@
 <script setup>
 // Components
-import Account from '@/components/modules/user/userAccount.vue'
+import Account from '@/components/modules/user/UserAccount.vue'
 import Auth from '@/components/modules/user/UserAuth.vue'
 // Composables
 import { useSupabaseSession } from '@/composables/useSupabaseSession'

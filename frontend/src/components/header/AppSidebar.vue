@@ -42,7 +42,7 @@ const { currentSessionIsAdmin } = useIsUserAdmin()
             <li>
               <CartButton />
             </li>
-            <li class="mt-5 pt-2 border-t-1">
+            <li class="mt-5 pt-2 border-t">
               <RouterLink :to="{ name: 'catalogue' }">Catalogue produits</RouterLink>
             </li>
           </ul>
