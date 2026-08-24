@@ -1,7 +1,9 @@
 import { computed, defineComponent, h, markRaw } from "vue";
+import { useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 // Types
-import type { cartProduct } from "@shared/types/Cart";
-import type { productCatalog } from "@shared/types/Product";
+import type { cartProduct } from "@shop/shared/types/Cart";
+import type { productCatalog } from "@shop/shared/types/Product";
 // Ui
 import { toast } from "vue-sonner";
 // Stores
@@ -9,6 +11,7 @@ import { useCartStore } from "@/store/CartStore";
 
 export function useCartProcess() {
   const cartStore = useCartStore();
+  const router = useRouter();
 
   const totalItems = computed(() => cartStore.getCartTotalItems);
   const wordingTotalNumberOfItem = computed(() => {
@@ -25,14 +28,18 @@ export function useCartProcess() {
             "p",
             `Vous avez ${totalItems.value} ${wordingTotalNumberOfItem.value} dans votre panier.`,
           ),
-          h("div", {
-            innerHTML:
-              '<Button type="button" class="bg-primary text-background px-3 py-1 ">Voir le panier</Button>',
-            class: "mt-2 justify-end grid",
-            onClick: () => {
-              window.location.href = "/cart";
-            },
-          }),
+          h("p", { class: "grid justify-end" }, [
+            h(
+              RouterLink,
+              {
+                to: "/cart",
+                class: "bg-primary text-background px-3 py-1 mt-2",
+              },
+              {
+                default: () => "Voir le panier",
+              },
+            ),
+          ]),
         ]);
     },
   });
