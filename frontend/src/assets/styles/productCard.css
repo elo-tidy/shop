@@ -138,7 +138,7 @@
       @apply font-bold;
     }
     .nb-quantity {
-      @apply ml-7 px-13;
+      @apply ml-7 px-13 leading-9;
       anchor-name: --nbQuantity;
     }
     .group-quantity {

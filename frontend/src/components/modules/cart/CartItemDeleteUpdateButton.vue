@@ -29,7 +29,7 @@ const product = computed(() => {
 <template>
   <CardFooter class="mt-6" v-if="product">
     <div
-      class="grid auto-cols-max grid-flow-col group-quantity mr-10"
+      class="grid auto-cols-max grid-flow-col group-quantity mr-10 relative"
       role="group"
       aria-label="Gestion de la quantité"
     >
@@ -78,6 +78,9 @@ const product = computed(() => {
       >
         <span class="sr-only">Augmenter la quantité de 1</span>+
       </Button>
+      <p v-if="limitUpdateQty(product.id, 'add')" class="text-xs absolute right-0 top-full">
+        Stock disponible épuisé
+      </p>
     </div>
 
     <!-- Delete item -->

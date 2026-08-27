@@ -41,8 +41,8 @@ export class Cart {
 
   getItemQuantity(productId: number): cartProduct["quantity"] {
     const product = this.getProduct(productId);
-    if (!product) throw new Error("Product not found");
-    return product.quantity;
+    // if (!product) throw new Error("Product not found");
+    return product?.quantity ?? 0;
   }
 
   addItemToCart(product: cartProduct, itemQuantity: number): void {
