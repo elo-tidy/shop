@@ -1,7 +1,7 @@
-export const allowedOrigins = [
-  "https://fictive-shop.vercel.app",
-  "http://localhost:5173",
-];
+export const allowedOrigin = Deno.env.get("CORS_ALLOWED_ORIGINS");
+if (!allowedOrigin) {
+  throw new Error("CORS_ALLOWED_ORIGINS is not configured");
+}
 
 export const defaultCorsHeaders = {
   "Access-Control-Allow-Headers":
@@ -14,8 +14,6 @@ export function getCorsHeaders(req: Request) {
 
   return {
     ...defaultCorsHeaders,
-    "Access-Control-Allow-Origin": allowedOrigins.includes(origin)
-      ? origin
-      : "",
+    "Access-Control-Allow-Origin": origin === allowedOrigin ? origin : "",
   };
 }
