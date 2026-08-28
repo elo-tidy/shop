@@ -1,4 +1,4 @@
-# Boutique e-Commerce demo
+# Boutique e-commerce demo
 
 Boutique e-commerce fictive développée avec **Vue 3**, **Supabase** et **Stripe**.
 
@@ -24,11 +24,9 @@ Ce projet a été conçu afin d'explorer plusieurs problématiques rencontrées 
 
 ## Aperçu
 
-![Catalogue](docs/catalog.gif)
-
-![Checkout](docs/checkout.gif)
-
-![Administration](docs/admin.gif)
+|                                                                                         Catalogue                                                                                          |                                                                                       Checkout                                                                                       |                                                                                                      Administration                                                                                                       |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![Catalogue](./frontend/public/demo/img/catalog.webp)](https://fictive-shop.vercel.app/demo/videos/catalog.mp4)<br>Consultation du catalogue et synchronisation des stocks en temps réel. | [![Checkout](./frontend/public/demo/img/checkout.webp)](https://fictive-shop.vercel.app/demo/videos/checkout.mp4)<br>Panier, choix de livraison et parcours de paiement avec Stripe. | [![Administration](./frontend/public/demo/img/admin-crud-product.webp)](https://fictive-shop.vercel.app/demo/videos/admin-crud-product.mp4)<br>Gestion du catalogue : création, modification et suppression des produits. |
 
 ---
 
@@ -102,12 +100,13 @@ http://localhost:5173
 
 ### Frontend
 
-Créer un fichier frontend/.env.local avec les variables suivantes :
+Créer un fichier frontend/.env avec les variables suivantes :
 
 ```env
 VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
 VITE_STRIPE_PUBLISHABLE_KEY=
+VITE_STRIPE_TEST_ASSISTANT=
 ```
 
 Après l'exécution de supabase start, les informations de connexion locales Supabase sont disponibles dans le terminal ou via :
@@ -125,6 +124,9 @@ Créer un fichier supabase/functions/.env avec les variables suivantes :
 SB_JWT_ISSUER=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# CORS configuration
+CORS_ALLOWED_ORIGINS=
 
 # Stripe
 STRIPE_SECRET_KEY=
@@ -250,6 +252,16 @@ Lorsqu'une commande est modifiée :
 Cette approche évite la création de multiples Payment Intents inutiles.
 
 La validation du paiement repose exclusivement sur les **Webhooks Stripe**.
+
+Le **Stripe Test Assistant** est activé par défaut dans le dépôt afin de faciliter les tests en développement.
+
+Il peut être désactivé via la variable d'environnement `VITE_STRIPE_TEST_ASSISTANT`.
+
+Pour la démonstration en ligne, cette variable est désactivée afin de conserver une interface de paiement plus proche d'un parcours utilisateur réel.
+
+```env
+VITE_STRIPE_TEST_ASSISTANT=false
+```
 
 ---
 
@@ -407,3 +419,7 @@ Le projet applique plusieurs mécanismes destinés à sécuriser les traitements
 
 - Mise en place de tests unitaires
 - Mise en place de tests End-to-End (Playwright ou Cypress)
+
+```
+
+```
