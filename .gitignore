@@ -46,3 +46,5 @@ supabase/_backups/
 supabase/snippets/
 .vercel
 .env*.local
+
+.vercel
