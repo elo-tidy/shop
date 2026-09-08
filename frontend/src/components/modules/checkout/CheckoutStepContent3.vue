@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 // Types
 import type { Order } from '@shop/shared/types/Order'
@@ -11,9 +11,11 @@ import { usecheckoutStepper } from '@/store/OrderStepperStore'
 import { useCartStore } from '@/store/CartStore'
 import { usePaymentStore } from '@/store/StripeStore'
 import { useOrderStore } from '@/store/OrderStore'
+// Utils
+import { stripePromise } from '@/utils/stripe'
 
 // Data Order details
-const { verifyStripePayment, confirmPaidOrder } = useOrderProcess()
+const { confirmPaidOrder } = useOrderProcess()
 
 // Data delivery
 const orderStore = useOrderStore()
@@ -42,8 +44,14 @@ onMounted(async () => {
     return
   }
 
-  const result = await verifyStripePayment(clientSecret)
-  if (!result?.paymentIntent) return
+  const stripe = await stripePromise
+  if (!stripe) {
+    console.error("Stripe n'a pas pu être chargé")
+    return
+  }
+
+  const result = await stripe.retrievePaymentIntent(clientSecret)
+  if (!result.paymentIntent) return
 
   switch (result.paymentIntent?.status) {
     case 'succeeded':
@@ -60,8 +68,8 @@ onMounted(async () => {
 
       // Clear cart and reload with paid order products
       cartStore.clearCartStore()
-      const paidProducts = computed(() => paidOrder.value?.cart.products ?? [])
-      paidProducts.value.forEach((product: Order['cart']['products'][number]) => {
+      const paidProducts = paidOrder.value?.cart.products ?? []
+      paidProducts.forEach((product: Order['cart']['products'][number]) => {
         cartStore.addToCart(product, product.quantity)
       })
 

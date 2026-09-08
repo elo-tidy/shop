@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, computed } from 'vue'
+import { onBeforeMount, ref, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 // Type
-import type { StripeElementsOptionsMode, StripePaymentElementOptions } from '@stripe/stripe-js'
+import type {
+  StripeElements,
+  StripePaymentElement,
+  StripeElementsOptionsMode,
+  StripePaymentElementOptions,
+} from '@stripe/stripe-js'
 // UI
 import Button from '@/components/ui/button/Button.vue'
 // Composables
@@ -15,8 +20,7 @@ import { useOrderStore } from '@/store/OrderStore'
 import { usePaymentStore } from '@/store/StripeStore'
 
 // Stripes
-import { loadStripe } from '@stripe/stripe-js'
-import { StripeElements, StripeElement } from 'vue-stripe-js'
+import { stripePromise } from '@/utils/stripe'
 
 // Global data : order - stripe
 const orderStore = useOrderStore()
@@ -30,28 +34,32 @@ const paymentError = ref<string | null>(null)
 // Submit pay form
 async function handleSubmit() {
   paymentError.value = null
-  // Confirm the PaymentIntent using the details collected by the Payment Element
-  const stripeInstance = elementsComponent.value?.instance
-  const elements = elementsComponent.value?.elements
 
-  if (!stripeInstance || !elements) return
-
-  // Front Stripe form error
-  const { error: submitError } = await elements.submit()
-  if (submitError) {
-    console.error('Erreur lors de la soumission des éléments Stripe:', submitError)
+  const stripe = await stripePromise
+  if (!stripe || !elements.value) {
+    paymentError.value = 'Le formulaire de paiement n’est pas prêt.'
+    return
+  }
+  if (!clientSecretRef.value) {
+    paymentError.value = 'Le paiement n’est pas prêt.'
     return
   }
 
-  // Stripe Metadata update
-  await resolveOrderPayment()
+  // Front Stripe form error
+  const { error: submitError } = await elements.value.submit()
+  if (submitError) {
+    paymentError.value = submitError.message ?? 'Erreur dans le formulaire de paiement.'
+    return
+  }
 
-  // Stripe payment success
-  if (stripeInstance) {
-    // const returned_url = 'http://localhost:5173/checkout'
+  try {
+    // Stripe Metadata update
+    await resolveOrderPayment()
+
     const returned_url = `${window.location.origin}/checkout`
-    const { error } = await stripeInstance.confirmPayment({
-      elements,
+
+    const { error } = await stripe.confirmPayment({
+      elements: elements.value,
       clientSecret: clientSecretRef.value,
       confirmParams: {
         return_url: returned_url,
@@ -67,17 +75,17 @@ async function handleSubmit() {
 
     if (error) {
       paymentError.value = error.message ?? 'Le paiement a échoué.'
-      console.error('Stripe error:', error.message)
-    } else {
-      // Your customer is redirected to your `return_url`. For some payment
-      // methods like iDEAL, your customer is redirected to an intermediate
-      // site first to authorize the payment, then redirected to the `return_url`.
     }
+  } catch (error) {
+    console.error('Payment error:', error)
+    paymentError.value = 'Une erreur est survenue lors du paiement.'
   }
 }
 
 // Stripe elements
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+const elements = ref<StripeElements | null>(null)
+const paymentElement = ref<StripePaymentElement | null>(null)
+const paymentElementContainer = ref<HTMLElement | null>(null)
 
 const elementsOptions = computed<StripeElementsOptionsMode>(() => ({
   // https://stripe.com/docs/js/elements_object/create#stripe_elements-options
@@ -116,14 +124,30 @@ const paymentElementOptions = ref<StripePaymentElementOptions>({
 })
 const clientSecretRef = ref<string | null>(null)
 
-// Define component refs
-const elementsComponent = ref()
+async function initStripePaymentElement() {
+  if (!clientSecretRef.value) return
 
-// Load Stripe if needed
-// async function initStripe() {
-//   await loadStripe(stripeKey)
-//   stripeStore.setStripeLoaded(true)
-// }
+  const stripe = await stripePromise
+
+  if (!stripe) {
+    throw new Error('Stripe n’a pas pu être chargé')
+  }
+  if (!paymentElementContainer.value) {
+    throw new Error('Conteneur Stripe introuvable')
+  }
+  if (paymentElement.value) return
+
+  const stripeElements = stripe.elements(elementsOptions.value)
+
+  elements.value = stripeElements
+
+  const element = stripeElements.create('payment', paymentElementOptions.value)
+
+  paymentElement.value = element
+
+  element.mount(paymentElementContainer.value)
+}
+
 const session = useSupabaseSession()
 
 const route = useRoute()
@@ -152,13 +176,14 @@ onBeforeMount(async () => {
     // Synchro between local and bdd cart
     await syncCartWithOrder()
 
-    // Stripe init and paymentIntent
-    // await initStripe()
     stripeStore.setStripeLoaded(true)
     const payment = await resolveOrderPayment()
     clientSecretRef.value = payment.clientSecret
     const paymentIntentId = payment.paymentIntentId
     pI.value = paymentIntentId
+
+    await nextTick()
+    await initStripePaymentElement()
 
     // create bdd order
     if (!bddOrder) {
@@ -181,15 +206,9 @@ onBeforeMount(async () => {
   >
     {{ paymentError }}
   </p>
-  <StripeElements
-    v-if="stripeStore.stripeLoaded && clientSecretRef"
-    :key="clientSecretRef"
-    :stripe-key="stripeKey"
-    :elements-options="elementsOptions"
-    ref="elementsComponent"
-  >
-    <StripeElement type="payment" :options="paymentElementOptions" />
-  </StripeElements>
 
-  <Button v-if="!payment_intent" type="button" @click="handleSubmit">Payer</Button>
+  <div v-if="stripeStore.stripeLoaded && clientSecretRef" ref="paymentElementContainer"></div>
+  <Button v-if="!payment_intent && clientSecretRef" type="button" @click="handleSubmit"
+    >Payer</Button
+  >
 </template>

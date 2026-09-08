@@ -8,7 +8,7 @@ import type {
   ResolvePaymentIntentInput,
   ResolvePaymentIntentResponse,
 } from "@shop/shared/types/stripe";
-import type { PaymentIntentResult } from "@stripe/stripe-js";
+// import type { PaymentIntentResult } from "@stripe/stripe-js";
 // Stores
 import { useCartStore } from "@/store/CartStore";
 import { useOrderStore } from "@/store/OrderStore";
@@ -19,7 +19,7 @@ import { resolvePaymentIntent } from "@/api/payment";
 // Services
 import { getOrderService } from "@shop/shared/services/SupabaseServices";
 // Utils
-import { stripePromise } from "@/utils/stripe";
+// import { stripePromise } from "@/utils/stripe";
 // Api
 import { deleteOrderApi } from "@/api/order";
 
@@ -120,13 +120,13 @@ export function useOrderProcess() {
 
     return await resolvePaymentIntent(payload);
   }
-  async function verifyStripePayment(
+  /*async function verifyStripePayment(
     clientSecret: string,
   ): Promise<PaymentIntentResult | null> {
     const stripe = await stripePromise;
     if (!stripe) return null;
     return await stripe.retrievePaymentIntent(clientSecret);
-  }
+  }*/
   async function confirmPaidOrder(): Promise<Order | null> {
     const data = await loadLastOrder("paid");
     if (!data) throw new Error("Order not found");
@@ -196,7 +196,7 @@ export function useOrderProcess() {
     deleteOrder,
     resetOrder,
     resolveOrderPayment,
-    verifyStripePayment,
+    // verifyStripePayment,
     confirmPaidOrder,
     syncCartWithOrder,
   };
