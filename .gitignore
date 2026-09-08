@@ -13,13 +13,14 @@ backend/node_modules/
 node_modules/
 
 # Environnement
-frontend/.env.example.local
-frontend/.env.production
 frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
 
 supabase/functions/.env
-supabase/functions/.env.local
-supabase/functions/.env.production
+supabase/functions/.env.*
+!supabase/functions/.env.example
 
 # Dossiers de build
 frontend/dist/
