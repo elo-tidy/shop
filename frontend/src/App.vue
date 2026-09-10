@@ -33,7 +33,7 @@ onBeforeUnmount(() => {
       <RouterView />
     </main>
     <footer role="contentinfo" class="border-t text-right">
-      <p>© 2025 Fictive Shop</p>
+      <p>© 2026 Fictive Shop</p>
     </footer>
   </SidebarProvider>
   <Toaster
