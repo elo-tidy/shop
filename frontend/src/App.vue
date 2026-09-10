@@ -10,6 +10,9 @@ import AppSidebar from '@/components/header/AppSidebar.vue'
 import Breadcrumbs from '@/components/header/Breadcrumbs.vue'
 // Store
 import { useProductStore } from '@/store/ProductStore'
+// Analytics
+import { Analytics } from '@vercel/analytics/vue'
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 
 const productStore = useProductStore()
 
@@ -26,6 +29,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <Analytics />
+  <SpeedInsights />
   <SidebarProvider>
     <AppSidebar />
     <main role="main">
