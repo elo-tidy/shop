@@ -1,12 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 // Ui
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  useSidebar,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar'
+import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '@/components/ui/sidebar'
 import { Button } from '../ui/button'
 // Components
 import CartButton from '@/components/modules/cart/CartSectionLink.vue'
@@ -17,22 +12,7 @@ import { useIsUserAdmin } from '@/composables/useIsUserAdmin'
 
 // Data
 const { currentSessionIsAdmin } = useIsUserAdmin()
-const { state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar } = useSidebar()
-
-const sidebarIsVisible = (): boolean => {
-  if (isMobile.value) return false
-  // if (openMobile.value) return false
-  // if (open.value) return true
-  return true
-}
-
-const tglSidebar = () => {
-  console.log(state.value)
-  console.log(open.value)
-  console.log(isMobile.value)
-  console.log(openMobile.value)
-  toggleSidebar()
-}
+const { open, isMobile, toggleSidebar, openMobile } = useSidebar()
 </script>
 
 <template>
@@ -46,9 +26,10 @@ const tglSidebar = () => {
       title="Ouvrir le menu de principal"
       @click="toggleSidebar()"
       aria-controls="sidebar"
+      :aria-expanded="openMobile"
       id="menuBtn"
     >
-      <span class="sr-only">Ouvrir le menu de principal</span>
+      <span class="sr-only">Ouvrir le menu de principa</span>
     </Button>
     <p class="pr-[clamp(7.5rem,12.8571rem+-26.7857vw,0rem)]">
       <img
@@ -60,12 +41,7 @@ const tglSidebar = () => {
       />
     </p>
   </div>
-  <Sidebar
-    variant="sidebar"
-    id="sidebar"
-    :aria-hidden="!open"
-    :aria-expanded="state === 'expanded' ? true : false"
-  >
+  <Sidebar variant="sidebar" id="sidebar" :aria-hidden="!open">
     <SidebarHeader class="px-6">
       <!-- <SearchForm /> -->
       <p>
