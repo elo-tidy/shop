@@ -73,7 +73,6 @@ const stepper = computed(() => {
     v-model="stepStore.step"
     :linear="false"
     aria-label="Étapes de la commande"
-    :orientation="stepper.direction"
   >
     <StepperItem
       v-for="(stepItem, index) in steps"
