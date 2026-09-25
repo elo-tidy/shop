@@ -7,6 +7,9 @@ import { Stepper, StepperItem, StepperSeparator, StepperTrigger } from '@/compon
 import { Button } from '@/components/ui/button'
 // Stores
 import { usecheckoutStepper } from '@/store/OrderStepperStore'
+// Composables
+import { useBreakpoint } from '@/composables/useBreakpoints'
+import { computed } from 'vue'
 
 // Props
 const props = defineProps<{
@@ -49,20 +52,33 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
 
   return false
 }
+
+const { isSm } = useBreakpoint()
+const stepper = computed(() => {
+  const direction = !isSm.value ? 'horizontal' : 'vertical'
+  const classes = !isSm.value ? 'justify-center items-start' : 'justify-start flex-col gap-10'
+  const itemClasses = !isSm.value ? 'flex-col items-center' : 'items-start gap-6'
+  const separatorClasses = !isSm.value
+    ? 'left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 h-0.5 '
+    : 'left-[18px] top-[38px] h-[105%] w-0.5 '
+  const titleClasses = !isSm.value ? 'top-full mt-4 ' : 'translate-x-full text-left -right-4'
+  return { direction, classes, itemClasses, separatorClasses, titleClasses }
+})
 </script>
 <template>
   <Stepper
     id="stepper"
-    class="flex w-full items-start gap-2 -order-1 mb-10"
+    :class="['flex w-full  gap-2 -order-1 mb-10', `${stepper.classes}`]"
     v-if="productInCart.products.length"
-    :defaultValue="stepStore.step"
+    v-model="stepStore.step"
     :linear="false"
     aria-label="Étapes de la commande"
+    :orientation="stepper.direction"
   >
     <StepperItem
       v-for="(stepItem, index) in steps"
       :key="stepItem.step"
-      class="relative flex w-full flex-col items-center justify-center"
+      :class="['relative flex w-full', `${stepper.itemClasses}`]"
       :step="stepItem.step"
       :completed="stepItem.stepValidated"
       :disabled="!isStepClickable(stepItem, index)"
@@ -73,7 +89,10 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
     >
       <StepperSeparator
         v-if="stepItem.step !== steps[steps.length - 1].step"
-        class="absolute left-[calc(50%+20px)] right-[calc(-50%+10px)] top-5 block h-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary"
+        :class="[
+          'absolute  block shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary',
+          `${stepper.separatorClasses}`,
+        ]"
       />
 
       <StepperTrigger as-child>
@@ -89,7 +108,7 @@ const isStepClickable = (stepItem: stepType, index: number): boolean => {
           ]"
           @click="GoToStep(stepItem.step)"
           :title="`Revenir à l'${stepItem.title} - ${stepItem.description}`"
-          ><span class="step-title"
+          ><span :class="['step-title absolute  text-white', `${stepper.titleClasses}`]"
             >{{ stepItem.title }} <span class="step-desc">{{ stepItem.description }}</span></span
           >
         </Button>

@@ -28,7 +28,7 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <ul class="grid grid-flow-col-dense auto-cols-min gap-3 mb-6">
+  <ul class="flex flex-wrap gap-3 mb-6">
     <li v-for="category in categories">
       <Button
         class="border border-dashed"

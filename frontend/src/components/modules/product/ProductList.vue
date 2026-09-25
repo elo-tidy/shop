@@ -28,7 +28,11 @@ const props = withDefaults(
 )
 
 // Class
-const gridClass = computed(() => (props.display === 'card' ? 'grid-cols-3 gap-6' : 'gap-y-2'))
+const gridClass = computed(() =>
+  props.display === 'card'
+    ? 'grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-[clamp(0.9375rem,-0.1786rem+5.5804vw,2.5rem)]'
+    : 'gap-y-[clamp(0.9375rem,-0.1786rem+5.5804vw,2.5rem)]',
+)
 const compLayout = computed(() =>
   props.display === 'grid' || !props.display === null ? 'grid-tpl' : 'card-tpl',
 )

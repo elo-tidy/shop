@@ -41,7 +41,7 @@ onMounted(async () => {
     <h1 class="mb-10 text-[30px]">Espace administrateur</h1>
 
     <Tabs default-value="products">
-      <TabsList class="mb-6">
+      <TabsList class="mb-6 flex flex-row flex-wrap h-auto">
         <TabsTrigger value="products">Gestion des produits</TabsTrigger>
         <TabsTrigger value="commandes">Gestion des commandes</TabsTrigger>
       </TabsList>

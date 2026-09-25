@@ -31,9 +31,20 @@ onBeforeUnmount(() => {
 <template>
   <Analytics />
   <SpeedInsights />
-  <SidebarProvider>
-    <AppSidebar />
-    <main role="main">
+  <SidebarProvider class="flex-col sm:flex-row">
+    <header role="banner">
+      <ul id="skip-links" class="z-11 text-background absolute">
+        <li>
+          <a href="#main">Aller au menu</a>
+        </li>
+        <li>
+          <a href="#main">Passer au contenu principal</a>
+        </li>
+      </ul>
+
+      <AppSidebar />
+    </header>
+    <main role="main" id="main">
       <Breadcrumbs />
       <RouterView />
     </main>

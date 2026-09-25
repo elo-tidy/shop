@@ -34,7 +34,7 @@ import { Input } from '@/components/ui/input'
           <FieldLabel for="country">Pays </FieldLabel>
           <Input id="country" class="inputField" placeholder="France" type="text" disabled />
         </Field>
-        <Field class="grid w-full gap-4 mb-4 justify-end">
+        <!--<Field class="grid w-full gap-4 mb-4 justify-end">
           <input
             type="submit"
             class="button"
@@ -42,6 +42,7 @@ import { Input } from '@/components/ui/input'
             disabled
           />
         </Field>
+        -->
       </FieldGroup>
     </FieldSet>
   </form>

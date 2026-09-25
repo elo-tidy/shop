@@ -33,7 +33,11 @@ const prevtStep = (): void => {
 }
 </script>
 <template>
-  <div id="checkout" class="grid gap-10 grid-cols-2" v-if="productInCart">
+  <div
+    id="checkout"
+    class="grid gap-[clamp(1.25rem,0.3571rem+4.4643vw,2.5rem)] md:grid-cols-[minmax(350px,1fr)_minmax(300px,1fr)] md:max-[1126px]:grid-cols-[minmax(350px,1fr)] grid-cols-1"
+    v-if="productInCart"
+  >
     <div>
       <div class="grid">
         <h1 class="mt-10 mb-5 text-[30px]">Commande</h1>
@@ -53,7 +57,10 @@ const prevtStep = (): void => {
       </template>
 
       <div
-        :class="['grid grid-flow-col', stepStore.step != 0 ? 'justify-between ' : 'justify-end']"
+        :class="[
+          'flex flex-row flex-wrap h-auto md:mb-0 mb-5',
+          stepStore.step != 0 ? 'justify-between ' : 'justify-end',
+        ]"
         v-if="productInCart.products.length"
       >
         <Button

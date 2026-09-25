@@ -27,9 +27,9 @@ const product = computed(() => {
 })
 </script>
 <template>
-  <CardFooter class="mt-6" v-if="product">
+  <CardFooter class="mt-6 flex-wrap gap-1" v-if="product">
     <div
-      class="grid auto-cols-max grid-flow-col group-quantity mr-10 relative"
+      class="grid auto-cols-max grid-flow-col group-quantity relative justify-end flex-1"
       role="group"
       aria-label="Gestion de la quantité"
     >
@@ -85,7 +85,7 @@ const product = computed(() => {
 
     <!-- Delete item -->
     <Button
-      class="delete-item ml-10"
+      class="delete-item ml-20 flex-0"
       variant="link"
       type="button"
       @click="deleteThisProductfromCart(product.id)"

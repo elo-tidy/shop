@@ -158,7 +158,7 @@ const stockClassAlert = computed((): string | undefined => {
     <img :src="product.image ?? ''" :alt="imageAlt" class="object-contain img" />
 
     <!-- v-if="layout !== 'detail' && layout !== 'admin'" -->
-    <CardContent :class="['h-full card-content', displayFooter === false ? 'pb-4' : undefined]">
+    <CardContent :class="['h-full card-content', displayFooter === false ? 'pb-5' : undefined]">
       <p>{{ productContent.productDescription }}</p>
     </CardContent>
 

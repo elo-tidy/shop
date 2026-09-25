@@ -18,7 +18,7 @@ const orderStore = useOrderStore()
 const isEditable = computed(() => !orderStore.isPaid)
 </script>
 <template>
-  <div class="grid grid-cols-2 gap-2">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2 justify-between">
     <div class="flex flex-col justify-between h-full items-start">
       <p class="mb-2">
         <strong>{{ orderStore.deliveryDetails?.deliveryMode }}</strong> :

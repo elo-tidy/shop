@@ -42,11 +42,11 @@ const currentContent = computed(() => content[stepStore.step])
   <div>
     <h2 class="mb-5 text-[23px]">{{ stepProp.title }}</h2>
     <div class="grid gap-y-10 max-w-xxl">
-      <Card class="px-6">
+      <Card class="px-5">
         <slot :content="currentContent" />
       </Card>
       <div v-if="stepStore.step === 2">
-        <Card class="px-6">
+        <Card class="px-5">
           <StripeTestAssitant />
         </Card>
       </div>

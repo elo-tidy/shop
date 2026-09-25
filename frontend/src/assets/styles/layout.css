@@ -10,7 +10,7 @@
   @apply overflow-hidden;
 }
 main {
-  @apply h-full p-10 overflow-auto bg-secondary w-full;
+  @apply h-full overflow-auto bg-secondary w-full p-[clamp(0.9375rem,-0.1786rem+5.5804vw,2.5rem)];
 }
 [data-slot='sidebar-wrapper'] {
   @apply h-full;
@@ -31,6 +31,11 @@ main {
   }
 }
 
+#menuBtn {
+  @apply border-1 bg-center bg-no-repeat bg-size-[3rem] ml-1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --%3E%3Cpath fill='%23facc15' d='M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z'/%3E%3C/svg%3E");
+}
+
 [data-sonner-toast] *:not(button) {
   /* @apply w-full; */
 }
@@ -39,13 +44,15 @@ main {
   @apply h-full w-full;
 }
 
+[data-sidebar='sidebar'],
+[data-slot='sheet-overlay'] {
+  @apply h-full sm:!h-[calc(100%-3rem)];
+}
+
 /************************************/
 /************** Footer **************/
 /************************************/
 
 footer {
-  @apply fixed w-full bottom-0 left-0 content-center;
-  padding-left: calc(var(--sidebar-width) + 1rem);
-  padding-right: 1rem;
-  height: 3rem;
+  @apply fixed w-full h-[3rem] bottom-0 left-0 content-end pb-1 md:content-center md:pb-0 pr-[clamp(0.9375rem,-0.1786rem+5.5804vw,2.5rem)]  md:pl-[calc(var(--sidebar-width)+1rem)]  text-sm md:text-base;
 }

@@ -42,6 +42,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
       :style="{
         '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
       }"
+      v-bind="$attrs"
     >
       <SheetHeader class="sr-only">
         <SheetTitle>Sidebar</SheetTitle>

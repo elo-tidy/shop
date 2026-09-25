@@ -105,9 +105,12 @@ const onSubmit = handleSubmit(async (data: productForm) => {
 })
 </script>
 <template>
-  <div v-if="currentSessionIsAdmin" class="grid gap-10 grid-cols-2">
+  <div
+    v-if="currentSessionIsAdmin"
+    class="grid gap-10 md:grid-cols-[minmax(450px,1fr)_minmax(300px,1fr)] grid-cols-1 md:max-[1126px]:grid-cols-[minmax(450px,1fr)]"
+  >
     <div>
-      <div class="flex max-w-xl justify-between gap-x-4">
+      <div class="flex justify-between gap-x-4 flex-col md:flex-row items-end">
         <h1 class="mb-5 text-[23px]">{{ labels.pageTitle }}</h1>
         <p>
           <Button asChild>
@@ -117,8 +120,8 @@ const onSubmit = handleSubmit(async (data: productForm) => {
           </Button>
         </p>
       </div>
-      <div class="grid gap-y-10 max-w-137.5">
-        <Card class="px-6">
+      <div class="grid gap-y-10">
+        <Card class="p-5">
           <form ref="addProductForm" id="add-product" @submit="onSubmit">
             <FieldSet>
               <FieldLegend variant="label" class="mb-5 text-[23px] sr-only">
@@ -299,7 +302,7 @@ const onSubmit = handleSubmit(async (data: productForm) => {
                   </FieldSet>
                 </VeeField>
 
-                <Field class="grid w-full gap-4 mb-4 justify-end">
+                <Field class="grid w-full gap-4 justify-end">
                   <input
                     type="submit"
                     class="button"

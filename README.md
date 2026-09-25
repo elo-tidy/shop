@@ -60,7 +60,7 @@ shop/
 
 ## Prérequis
 
-- Node.js 20+
+- Node.js 24+
 - pnpm
 - Docker Desktop (doit être démarré avant l'utilisation de Supabase en local)
 - Supabase CLI
@@ -409,17 +409,7 @@ Le projet applique plusieurs mécanismes destinés à sécuriser les traitements
 
 ---
 
-## Responsive
-
-- Optimisation de l'affichage mobile et tablette
-
----
-
 ## Qualité
 
 - Mise en place de tests unitaires
 - Mise en place de tests End-to-End (Playwright ou Cypress)
-
-```
-
-```

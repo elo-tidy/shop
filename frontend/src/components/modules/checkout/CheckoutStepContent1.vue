@@ -43,7 +43,7 @@ onMounted(async () => {
     v-model="activeTab"
     :unmountOnHide="false"
   >
-    <TabsList class="w-full grid grid-cols-2 h-auto">
+    <TabsList class="w-fit flex flex-row flex-wrap h-auto">
       <TabsTrigger
         asChild
         v-for="shippingOption in shippingOptions?.delivery_modes"
@@ -51,7 +51,7 @@ onMounted(async () => {
         class="whitespace-normal p-0"
         :value="shippingOption.id"
       >
-        <h3>
+        <h3 class="h-auto">
           <Button class="w-full bg-transparent text-inherit hover:bg-transparent" type="button">{{
             shippingOption.name
           }}</Button>

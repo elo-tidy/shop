@@ -24,7 +24,12 @@ const cartStore = useCartStore()
 const quantityInCart = computed(() => cartStore.getItemQuantity(props.product.id))
 </script>
 <template>
-  <CardFooter class="card-footer flex flex-col justify-end-safe items-end mb-6 text-right">
+  <CardFooter
+    :class="[
+      'card-footer flex flex-col justify-end-safe items-end mb-5 text-right',
+      layout === 'detail' ? 'mb-0' : 'mb-5',
+    ]"
+  >
     <Button
       type="button"
       @click="addThisProductToCart(product, 1)"

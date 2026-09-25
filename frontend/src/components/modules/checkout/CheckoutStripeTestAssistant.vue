@@ -59,18 +59,25 @@ async function copy(value: string, field: string) {
 <template>
   <p>Sélectionnez une carte pour tester le formulaire de paiement :</p>
   <Tabs>
-    <TabsList class="grid grid-cols-4 gap-2 h-full *:border-primary/20">
+    <TabsList
+      class="gap-2 h-full *:border-primary/20 grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] w-full"
+    >
       <TabsTrigger
         v-for="card in stripeData.cards"
         :key="card.id"
         :value="card.label"
-        class="w-full whitespace-normal p-2 text-xs hover:border-primary"
+        class="flex p-2 text-xs hover:border-primary"
       >
-        <span class="text-foreground">{{ card.label }}</span>
+        <span class="w-full whitespace-normal text-foreground">{{ card.label }}</span>
       </TabsTrigger>
     </TabsList>
-    <TabsContent v-for="card in stripeData.cards" :key="card.id" :value="card.label">
-      <dl class="grid grid-rows-3 grid-cols-[150px_1fr] *:mb-2 mt-4">
+    <TabsContent
+      v-for="card in stripeData.cards"
+      :key="card.id"
+      :value="card.label"
+      class="@container"
+    >
+      <dl class="grid @md:grid-cols-[150px_1fr] grid-cols-1 *:mb-2 mt-4 items-center">
         <!-- Card number -->
         <dt class="block text-sm font-medium">{{ stripeData.fields.number.label }} :</dt>
         <dd class="flex items-center justify-between rounded-lg border px-3 py-2 h-11">
